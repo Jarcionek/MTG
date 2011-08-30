@@ -1,14 +1,15 @@
 package mtg;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Jaroslaw Pawlak
  */
-public class Deck {
-    private File directory;
+public class Deck implements Serializable {
+    private transient File directory;
     private ArrayList<String> names;
     private ArrayList<Integer> amounts;
 
