@@ -16,7 +16,8 @@ import java.net.Socket;
 public class Utilities {
     public static String findPath(File directory, String name) {
         for (File e : directory.listFiles()) {
-            if (e.isFile() && e.getName().equals(name.concat(".jpg"))) {
+            if (e.isFile()
+                    && e.getName().toLowerCase().equals(name.toLowerCase().concat(".jpg"))) {
                 return e.getPath();
             }
             if (e.isDirectory()) {
