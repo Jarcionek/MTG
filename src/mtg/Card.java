@@ -24,12 +24,9 @@ import javax.swing.JLabel;
  * @author Jaroslaw Pawlak
  */
 public final class Card extends JLabel {
-//    public final static int W = 80;
-//    public final static int H = (int) (W * 1.5);
     public final static int W = 160;
     public final static int H = (int) (W * 1.5);
 
-    private String name;
     private File image;
     private boolean tapped;
     private int xpos;
@@ -39,7 +36,6 @@ public final class Card extends JLabel {
     public Card(File image) {
         super();
 
-        this.name = image.getName().substring(0, image.getName().lastIndexOf("."));
         this.image = image;
         this.tapped = true;
         this.untap();
@@ -49,18 +45,21 @@ public final class Card extends JLabel {
     }
 
     public boolean isBasicLand() {
-        return name.toLowerCase().equals("plains")
-                || name.toLowerCase().equals("island")
-                || name.toLowerCase().equals("swamp")
-                || name.toLowerCase().equals("mountain")
-                || name.toLowerCase().equals("forest");
+        String t = image.getName()
+                .substring(0, image.getName().lastIndexOf("."))
+                .toLowerCase();
+        return t.equals("plains")
+                || t.equals("island")
+                || t.equals("swamp")
+                || t.equals("mountain")
+                || t.equals("forest");
     }
 
     public String getCardName() {
-        return name;
+        return image.getName().substring(0, image.getName().lastIndexOf("."));
     }
 
-    private static BufferedImage resize(BufferedImage org) {
+    public static BufferedImage resize(BufferedImage org) {
         BufferedImage scaledImage = new BufferedImage(
                 W, H, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = scaledImage.createGraphics();
@@ -176,6 +175,6 @@ public final class Card extends JLabel {
 
     @Override
     public String toString() {
-        return name;
+        return image.getName().substring(0, image.getName().lastIndexOf("."));
     }
 }

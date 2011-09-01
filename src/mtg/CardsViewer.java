@@ -67,7 +67,7 @@ public class CardsViewer {
                 JMenuItem play = new JMenuItem("play");
                 play.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        Main.putCard(c, Main.library, table);
+                        OldMain.putCard(c, OldMain.library, table);
                         cards.remove(c);
 //                        contentPane.remove(c);
 //                        contentPane.revalidate();

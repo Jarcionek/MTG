@@ -60,7 +60,11 @@ public final class Library implements Serializable {
     }
 
     public Card draw() {
-        return cards.remove(cards.size() - 1);
+        if (cards.isEmpty()) {
+            return null;
+        } else {
+            return cards.remove(cards.size() - 1);
+        }
     }
 
     public void tempprint() {
