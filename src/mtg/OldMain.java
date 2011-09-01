@@ -18,8 +18,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
 /**
- * @author Jaroslaw Pawlak
- */
+* @author Jaroslaw Pawlak
+*/
 public class OldMain {
 
     static Card tempCard;
@@ -35,7 +35,7 @@ public class OldMain {
         JFrame frame = new JFrame("MTG");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Deck deck = new Deck("c:/Documents and Settings/Jarek/Desktop/MTG");
+        Deck deck = new Deck();
         deck.addCard("Ezuri's Archers", 4);
         deck.addCard("Joraga Treespeaker", 1);
         deck.addCard("Joraga Warcaller", 1);
@@ -88,6 +88,7 @@ public class OldMain {
         deck.addCard("Silhana Starfletcher", 2);
         deck.addCard("Spider Umbra", 4);
         deck.addCard("Forest", 24);
+
         library = new Library(deck);
 
         final JPanel contentPane = new JPanel(null);
@@ -115,7 +116,7 @@ public class OldMain {
                 }
 
                 CardsViewer.addCard(c);
-//                putCard(c, library, contentPane);
+// putCard(c, library, contentPane);
             }
         });
         JMenuItem createCard = new JMenuItem("create card");
@@ -135,22 +136,22 @@ public class OldMain {
 
         for (int i = 1; i <= 7; i++) {
             Card x = library.draw();
-//            putCard(x, library, contentPane);
-//            x.setCardPosition(Card.H / 2 * i, Card.H / 2);
+// putCard(x, library, contentPane);
+// x.setCardPosition(Card.H / 2 * i, Card.H / 2);
             CardsViewer.addCard(x);
         }
 
-//        frame.pack();
+// frame.pack();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setSize(d.width / 2, d.height - Card.H - 80);
         frame.setLocation(0, 0);
-//        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
         CardsViewer.show();
     }
 
     public static void putCard(final Card c, Library library, final JPanel contentPane) {
-//        c.setCardPosition(Card.H / 2, Card.H / 2);
+// c.setCardPosition(Card.H / 2, Card.H / 2);
         c.setCardPosition(szer, wys);
          szer += Card.H / 2;
         if (szer == Card.H * 4) {

@@ -38,7 +38,7 @@ public class TempTest extends MouseAdapter {
     private static JScrollPane scrollPane = null;
 
     public static void main(String[] args) {
-        Deck x = new Deck("c:/Documents and Settings/Jarek/Desktop/MTG/");
+        Deck x = new Deck();
         x.addCard("Nin, the Pain Artist", 4);
         x.addCard("Curiosity", 4);
         x.addCard("Ivory Tower", 4);

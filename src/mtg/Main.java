@@ -1,5 +1,6 @@
 package mtg;
 
+import deckCreator.DeckCreator;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -12,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * @author Jaroslaw Pawlak
@@ -44,7 +42,7 @@ public class Main {
             int choice = JOptionPane.showConfirmDialog(
                     null,
                     "MTG will be using \n" + DIRECTORY.getPath()
-                    + "\nto save some files. "
+                    + "\nto save files. "
                     + "Do you want to continue?",
                     TITLE,
                     JOptionPane.YES_NO_OPTION,
@@ -67,7 +65,7 @@ public class Main {
                 deckCreator.getPreferredSize().height);
         deckCreator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new DeckCreator(frame);
+                new DeckCreator(TITLE + ": Deck Creator", frame, CARDS);
             }
         });
         contentPane.add(deckCreator);

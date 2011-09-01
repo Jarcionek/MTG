@@ -28,7 +28,7 @@ public class Client {
     private static int fileTransferPort;
 
     public static void main(String[] args) throws Exception {
-        Deck deck = new Deck(temp);
+        Deck deck = new Deck();
 //        deck.addCard("Abyssal Specter", 4);
 //        deck.addCard("Befoul", 4);
         deck.addCard("Coercion", 4);
@@ -59,7 +59,7 @@ public class Client {
                 Socket socket = new Socket(IP, fileTransferPort);
                 Debug.p("Sending card \"" + t.name + "\"", Debug.I);
                 Utilities.sendFile(
-                        new File(Utilities.findPath(deck.getDirectory(), t.name)),
+                        new File(Utilities.findPath(Main.CARDS, t.name)),
                         socket);
                 socket.close();
                 Debug.p("Card \"" + t.name + "\" sent", Debug.I);

@@ -18,7 +18,7 @@ public final class Library implements Serializable {
         cards = new ArrayList<Card>(deck.getDeckSize());
 
         for (int i = 0; i < deck.getArraySize(); i++) {
-            String path = findPath(deck.getDirectory(), deck.getArrayNames(i));
+            String path = deck.getArrayFiles(i).getPath();
             for (int j = 0; j < deck.getArrayAmounts(i); j++) {
                 cards.add(new Card(path));
             }
