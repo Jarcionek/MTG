@@ -7,10 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import mtg.Card;
+import mtg.Debug;
+import mtg.Utilities;
 
 /**
  * JPanel displaying cards from the given directory containing hundreds
@@ -20,6 +25,8 @@ import mtg.Card;
  * @author Jaroslaw Pawlak
  */
 public class LargeCardsViewer extends JPanel {
+    private DeckCreator parent;
+
     private File[] files;
 
     private int start = 0;
@@ -31,8 +38,10 @@ public class LargeCardsViewer extends JPanel {
     private JButton moreLeft;
     private JPanel cardsPanel;
 
-    public LargeCardsViewer() {
+    public LargeCardsViewer(DeckCreator parent) {
         super(new BorderLayout());
+
+        this.parent = parent;
 
         moreRight = new JButton(">>");
         moreRight.addActionListener(new ActionListener() {
@@ -101,8 +110,27 @@ public class LargeCardsViewer extends JPanel {
         }
 
         for (int j = start; j < start + cards; j++) {
-            //TODO add mouse listener here with adding to the deck
-            cardsPanel.add(new ViewableCard(files[j]));
+            final ViewableCard t = new ViewableCard(files[j]);
+            t.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        try {
+                            ViewableCard vc = (ViewableCard) t.clone();
+                            if (parent.deck.addCard(vc.getCardName(), 1, vc.getImage())) {
+                                parent.scv.addCard(vc);
+                                JLabel t = LargeCardsViewer.this.parent.deckName;
+                                if (!t.getText().endsWith("*")) {
+                                    t.setText(t.getText() + "*");
+                                }
+                            }
+                        } catch (CloneNotSupportedException ex) {
+                            Debug.p("Should never happen: " + ex, Debug.E);
+                        }
+                    }
+                }
+            });
+            cardsPanel.add(t);
         }
 
         if (cards >= files.length) {
@@ -128,6 +156,7 @@ public class LargeCardsViewer extends JPanel {
         }
 
         cardsPanel.validate();
+        cardsPanel.repaint();
     }
 
     /**
@@ -144,15 +173,20 @@ public class LargeCardsViewer extends JPanel {
         }
     }
 
+    /**
+     * Sets a directory to show cards from, if directory is a valid file
+     * then only this file is shown.
+     * @param directory a directory containing cards
+     */
     public void setDirectory(File directory) {
         if (!directory.isDirectory()) {
             files = new File[] {directory};
         } else {
             int i = 0;
-            for (String e : directory.list()) {
-                if (e.contains(".")
-                        && e.substring(e.lastIndexOf("."))
-                        .toLowerCase().equals(".jpg")) {
+            for (File e : directory.listFiles()) {
+                if (e.getName().contains(".")
+                        && Utilities.getExtension(e)
+                        .toLowerCase().equals("jpg")) {
                     i++;
                 }
             }
@@ -160,8 +194,8 @@ public class LargeCardsViewer extends JPanel {
             i = 0;
             for (File e : directory.listFiles()) {
                 if (e.getName().contains(".")
-                        && e.getName().substring(e.getName().lastIndexOf("."))
-                        .toLowerCase().equals(".jpg")) {
+                        && Utilities.getExtension(e)
+                        .toLowerCase().equals("jpg")) {
                     files[i++] = e;
                 }
             }

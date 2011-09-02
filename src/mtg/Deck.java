@@ -2,18 +2,14 @@ package mtg;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author Jaroslaw Pawlak
  */
 public class Deck implements Serializable {
@@ -43,38 +39,42 @@ public class Deck implements Serializable {
         return addCard(name, amount, null);
     }
 
-    public boolean addCard(String name, int amount, File path) {
-        if (isBasicLand(name)) {
-            if (isCardInDeck(name)) {
-                return setCardAmount(name, amount);
-            } else {
-                names.add(name);
-                amounts.add(amount);
-                if (path == null) {
-                    path = new File(Utilities.findPath(Main.CARDS, name));
-                }
-                paths.add(path);
-                return true;
-            }
+    /**
+     * Adds card to the deck.
+     * @param name Card to be added
+     * @param amount amount to be added
+     * @param path optional file path
+     * @return true if card has been added
+     * @throws IllegalArgumentException if amount <= 0
+     */
+    public boolean addCard(String name, int amount, File path)
+            throws IllegalArgumentException{
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Adding " + amount + " cards");
         }
 
-        if (isCardInDeck(name)) {
-            if (amounts.get(names.indexOf(name)) < 4) {
-                return setCardAmount(name, amount);
-            } else {
-                return false;
-            }
-        } else {
+        if (checkCard(name) == 0) { //not in deck
             names.add(name);
             amounts.add(amount);
-            if (path == null) {
-                path = new File(Utilities.findPath(Main.CARDS, name));
-            }
             paths.add(path);
             return true;
         }
+
+        int index = names.indexOf(name);
+        int previousValue = amounts.get(index);
+        amounts.set(index, amounts.get(index) + amount);
+        if (checkCard(name) == 3) {
+            amounts.set(index, previousValue);
+            return false;
+        }
+        return true;
     }
 
+    /**
+     * Removes all cards of given name
+     * @param name card to be removed
+     * @return true if a card was in a deck, false otherwise
+     */
     public boolean removeCard(String name) {
         int t = names.indexOf(name);
         if (t != -1) {
@@ -86,20 +86,54 @@ public class Deck implements Serializable {
         return false;
     }
 
-    public boolean setCardAmount(String name, int amount) {
-        if (amount == 0) {
-            return removeCard(name);
-        } else if (!isCardInDeck(name)) {
-            addCard(name, amount, null);
-            return true;
-        } else {
-            if (amounts.get(names.indexOf(name)) >= 4) {
-                return false;
-            } else {
-                amounts.set(names.indexOf(name), amount);
-                return true;
-            }
+    /**
+     * Removes given amount of given cards from the deck
+     * @param name card to be removed
+     * @param amount amount to be removed
+     * @return true if card's amount has been decreased, false otherwise
+     */
+    public boolean removeCard(String name, int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Removing " + amount + " cards");
         }
+
+        if (checkCard(name) == 0) { //not in deck
+            return false;
+        }
+
+        int index = names.indexOf(name);
+        amounts.set(index, amounts.get(index) - amount);
+        switch (checkCard(name)) {
+            case 1:
+            case 2:
+                removeCard(name);
+        }
+        return true;
+    }
+    
+    /**
+     * Returns:<p>
+     * 0 - if card is not in a deck<p>
+     * 1 - if card has negative amount<p>
+     * 2 - if card is in a deck with amount equal 0<p>
+     * 3 - if card is not a basic land type and its amount is greater than 4<p>
+     * 4 - if card is a basic land type or its amount is smaller or equal 4
+     */
+    private int checkCard(String name) {
+        int t = names.indexOf(name);
+        if (t == -1) {
+            return 0;
+        }
+        if (amounts.get(t) < 0) {
+            return 1;
+        }
+        if (amounts.get(t) == 0) {
+            return 2;
+        }
+        if (!isBasicLand(name) && amounts.get(t) > 4) {
+            return 3;
+        }
+        return 4;
     }
 
     /**
@@ -133,7 +167,7 @@ public class Deck implements Serializable {
             paths.add(j, null);
         }
         File t;
-        if ((t = paths.get(i)) == null) {
+        if ((t = paths.get(i)) == null || !t.exists()) {
             t = new File(Utilities.findPath(Main.CARDS, names.get(i)));
             paths.set(i, t);
         }
@@ -148,6 +182,11 @@ public class Deck implements Serializable {
                 || name.toLowerCase().equals("forest");
     }
 
+    /**
+     * Saves this deck to the text file given
+     * @param file file to save a deck
+     * @return true if save succeeded, false otherwise
+     */
     public boolean save(File file) {
         try {
             if (!file.exists()) {
@@ -168,16 +207,22 @@ public class Deck implements Serializable {
         return true;
     }
 
+    /**
+     * Loads a deck from text file given
+     * @param file file to load a deck from
+     * @return deck or null if loading failed
+     */
     public static Deck load(File file) {
         try {
             Scanner in = new Scanner(file);
             Deck result = new Deck();
+            String line;
             while (in.hasNextLine()) {
-                String[] t = in.nextLine().split(";");
-                if (t.length == 3) {
-                    result.addCard(t[0],
-                            Integer.parseInt(t[1]),
-                            new File(t[2]));
+                String[] t = (line = in.nextLine()).split(";");
+                try {
+                    result.addCard(t[0], Integer.parseInt(t[1]), new File(t[2]));
+                } catch (Exception ex) {
+                    Debug.p("Ignored line while loading a deck: " + line, Debug.W);
                 }
             }
             in.close();

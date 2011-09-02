@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import javax.swing.tree.TreeNode;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -47,10 +48,14 @@ public class CardTreeNode implements TreeNode {
 
     private CardTreeNode() {}
 
-    public CardTreeNode(File[] children) {
+    public CardTreeNode(File directory) {
         this.file = null;
         this.parent = null;
-        this.children = children;
+        File[] directories = directory.listFiles(ff);
+        File[] files = directory.listFiles(fnf);
+        this.children = new File[directories.length + files.length];
+        System.arraycopy(directories, 0, children, 0, directories.length);
+        System.arraycopy(files, 0, children, directories.length, files.length);
     }
 
     public CardTreeNode(File file, TreeNode parent) {
@@ -100,7 +105,7 @@ public class CardTreeNode implements TreeNode {
         } else if (!file.getName().contains(".")) {
             return file.getName();
         } else {
-            return file.getName().substring(0, file.getName().lastIndexOf("."));
+            return Utilities.getName(file);
         }
     }
 

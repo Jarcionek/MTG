@@ -18,7 +18,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 /**
- *
  * @author Jaroslaw Pawlak
  */
 public final class Card extends JLabel {
@@ -43,18 +42,19 @@ public final class Card extends JLabel {
     }
 
     public boolean isBasicLand() {
-        String t = image.getName()
-                .substring(0, image.getName().lastIndexOf("."))
-                .toLowerCase();
-        return t.equals("plains")
-                || t.equals("island")
-                || t.equals("swamp")
-                || t.equals("mountain")
-                || t.equals("forest");
+        return isBasicLand(Utilities.getName(image));
+    }
+
+    public static boolean isBasicLand(String name) {
+        return name.toLowerCase().equals("plains")
+                || name.toLowerCase().equals("island")
+                || name.toLowerCase().equals("swamp")
+                || name.toLowerCase().equals("mountain")
+                || name.toLowerCase().equals("forest");
     }
 
     public String getCardName() {
-        return image.getName().substring(0, image.getName().lastIndexOf("."));
+        return Utilities.getName(image);
     }
 
     public static BufferedImage resize(BufferedImage org) {
@@ -173,6 +173,6 @@ public final class Card extends JLabel {
 
     @Override
     public String toString() {
-        return image.getName().substring(0, image.getName().lastIndexOf("."));
+        return Utilities.getName(image);
     }
 }

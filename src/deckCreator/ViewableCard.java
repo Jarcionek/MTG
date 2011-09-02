@@ -16,16 +16,20 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import mtg.Card;
 import mtg.Debug;
+import mtg.Utilities;
 
 /**
  * Card which does not have any play mechanisms. It can be only enlarged.
  *
  * @author Jaroslaw Pawlak
  */
-public class ViewableCard extends JLabel {
+public class ViewableCard extends JLabel implements Comparable<ViewableCard> {
+    private File image;
+
     private ViewableCard() {}
     public ViewableCard(final File image) {
         super();
+        this.image = image;
         BufferedImage img = null;
         try {
             img = ImageIO.read(image);
@@ -71,5 +75,40 @@ public class ViewableCard extends JLabel {
                 (d.height - temp.getSize().height) / 2
                 );
         temp.setVisible(true);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new ViewableCard(image);
+    }
+
+    public int compareTo(ViewableCard o) {
+        if (this.image.equals(o.image)) {
+            return 0;
+        } else {
+            return this.image.getName().toLowerCase().compareTo(o.image.getName().toLowerCase());
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null
+                && obj.getClass() == ViewableCard.class
+                && this.image.equals(((ViewableCard) obj).image);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.image != null ? this.image.hashCode() : 0);
+        return hash;
+    }
+
+    public File getImage() {
+        return image;
+    }
+
+    public String getCardName() {
+        return Utilities.getName(image);
     }
 }

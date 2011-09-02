@@ -1,17 +1,18 @@
 package deckCreator;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -20,6 +21,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
+import mtg.Deck;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -28,11 +31,18 @@ public class DeckCreator extends JFrame {
     private File cardsDirectory;
     private JFrame parent;
 
-    private LargeCardsViewer lcv;
+    SmallCardsViewer scv;
+    LargeCardsViewer lcv;
     private JTree cardsTree;
     private JLabel cardsFound;
     private JButton back;
+    JLabel deckName;
+    private JButton load;
+    private JButton save;
 
+    Deck deck;
+
+    private DeckFileChooser dfc = new DeckFileChooser();
 
     private DeckCreator() {}
 
@@ -45,12 +55,15 @@ public class DeckCreator extends JFrame {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                scv.close();
                 parent.setVisible(true);
             }
         });
 
-        createComponents();
-        createLayout();
+        deck = new Deck();
+
+        createGUIComponents();
+        createGUILayout();
 
         this.pack();
         this.setMinimumSize(this.getSize());
@@ -59,8 +72,8 @@ public class DeckCreator extends JFrame {
         this.setVisible(true);
     }
 
-    private void createComponents() {
-        CardTreeNode treeRoot = new CardTreeNode(cardsDirectory.listFiles());
+    private void createGUIComponents() {
+        CardTreeNode treeRoot = new CardTreeNode(cardsDirectory);
 
         cardsTree = new JTree(treeRoot);
         cardsTree.setRootVisible(false);
@@ -77,20 +90,64 @@ public class DeckCreator extends JFrame {
         cardsFound.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         cardsFound.setHorizontalAlignment(SwingConstants.CENTER);
 
-        lcv = new LargeCardsViewer();
+        scv = new SmallCardsViewer(this);
+
+        lcv = new LargeCardsViewer(this);
         lcv.setDirectory(cardsDirectory);
 
         back = new JButton("Back");
         back.setFocusable(false);
         back.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                scv.close();
                 DeckCreator.this.dispose();
                 parent.setVisible(true);
             }
         });
+
+        deckName = new JLabel("Deck: new");
+
+        load = new JButton("Load");
+        load.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (dfc.showOpenDialog(DeckCreator.this)
+                        == JFileChooser.APPROVE_OPTION) {
+                    File f = dfc.getSelectedFile();
+                    Deck t = Deck.load(f);
+                    if (t == null) {
+                        JOptionPane.showMessageDialog(DeckCreator.this,
+                                "Deck could not be loaded", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        deck = t;
+                        deckName.setText("Deck: "
+                                + Utilities.getName(f));
+                        scv.refresh();
+                    }
+                }
+            }
+        });
+
+        save = new JButton("Save");
+        save.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (dfc.showSaveDialog(DeckCreator.this)
+                        == JFileChooser.APPROVE_OPTION) {
+                    File f = dfc.getSelectedFile();
+                    if (deck.save(f)) {
+                        deckName.setText("Deck: "
+                                + Utilities.getName(f));
+                    } else {
+                        JOptionPane.showMessageDialog(DeckCreator.this,
+                                "Deck could not be saved", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
     }
 
-    private void createLayout() {
+    private void createGUILayout() {
         JScrollPane treeScrollPane = new JScrollPane(cardsTree);
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(cardsFound, BorderLayout.NORTH);
@@ -98,13 +155,18 @@ public class DeckCreator extends JFrame {
         leftPanel.add(back, BorderLayout.SOUTH);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(new JLabel("there will be chosen deck here"), BorderLayout.NORTH);
+        centerPanel.add(scv, BorderLayout.NORTH);
         centerPanel.add(lcv, BorderLayout.SOUTH);
+
+        JPanel loadSavePanel = new JPanel(new GridLayout(3, 1));
+        loadSavePanel.add(deckName);
+        loadSavePanel.add(load);
+        loadSavePanel.add(save);
 
         JPanel rightPanel = new JPanel(new BorderLayout(5, 5));
         rightPanel.add(new JLabel("cards, lands"), BorderLayout.NORTH);
         rightPanel.add(new JLabel("card - amount"), BorderLayout.CENTER);
-        rightPanel.add(new JLabel("save/load deck"), BorderLayout.SOUTH);
+        rightPanel.add(loadSavePanel, BorderLayout.SOUTH);
 
         JSplitPane centerAndRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 centerPanel, rightPanel);

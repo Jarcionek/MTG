@@ -10,14 +10,12 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**
- *
  * @author Jaroslaw Pawlak
  */
 public class Utilities {
     public static String findPath(File directory, String name) {
         for (File e : directory.listFiles()) {
-            if (e.isFile()
-                    && e.getName().toLowerCase().equals(name.toLowerCase().concat(".jpg"))) {
+            if (e.isFile() && Utilities.getName(e).equals(name)) {
                 return e.getPath();
             }
             if (e.isDirectory()) {
@@ -54,5 +52,32 @@ public class Utilities {
         }
         bis.close();
         bos.close();
+    }
+
+    /**
+     * Returns file name without extension
+     * @param file
+     * @return
+     */
+    public static String getName(File file) {
+        if (!file.getName().contains(".")) {
+            return file.getName();
+        } else {
+            return file.getName().substring(0, file.getName().lastIndexOf("."));
+        }
+    }
+
+    /**
+     * Returns file extension or null if file is a directory or does not
+     * contain "."
+     * @param file file
+     * @return file extension or null if none
+     */
+    public static String getExtension(File file) {
+        if (!file.isFile() || !file.getName().contains(".")) {
+            return null;
+        } else {
+            return file.getName().substring(file.getName().lastIndexOf(".") + 1);
+        }
     }
 }

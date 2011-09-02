@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 
 /**
- *
  * @author Jaroslaw Pawlak
  */
 public class Debug {

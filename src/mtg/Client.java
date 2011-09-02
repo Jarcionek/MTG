@@ -2,17 +2,10 @@ package mtg;
 
 import flags.CheckDeck;
 import flags.RequestCard;
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import javax.imageio.ImageIO;
 
 /**
  * @author Jaroslaw Pawlak

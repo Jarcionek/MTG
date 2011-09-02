@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 /**
- *
  * @author Jaroslaw Pawlak
  */
 public class CardsViewer {

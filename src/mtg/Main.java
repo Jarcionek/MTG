@@ -28,6 +28,7 @@ public class Main {
     public static final File DIRECTORY
             = new File(System.getProperty("user.dir"), "MTG");
     public static final File CARDS = new File(DIRECTORY, "Cards");
+    public static final File DECKS = new File(DIRECTORY, "Decks");
     public static final String TITLE = "MTG";
     
     public static void main(String[] args)
@@ -51,6 +52,7 @@ public class Main {
                 System.exit(0);
             }
             saveExampleCards();
+            saveExampleDecks();
         }
         
         final JFrame frame = new JFrame(TITLE);
@@ -119,10 +121,11 @@ public class Main {
             "Captivating Vampire.jpg",
             "Child of Night.jpg",
             "Corrupt.jpg",
+            "Demon's Horn.jpg",
             "Drana, Kalastria Bloodchief.jpg",
+            "Duskhunter Bat.jpg",
             "Feast of Blood.jpg",
             "Gatekeeper of Malakir.jpg",
-            "Leechridden Swamp.jpg",
             "Mirri the Cursed.jpg",
             "Quag Vampires.jpg",
             "Repay in Kind.jpg",
@@ -133,6 +136,7 @@ public class Main {
             "Spread the Sickness.jpg",
             "Stalking Bloodsucker.jpg",
             "Swamp.jpg",
+            "Tormented Soul.jpg",
             "Urge to Feed.jpg",
             "Vampire Aristocrat.jpg",
             "Vampire Nighthawk.jpg",
@@ -141,19 +145,40 @@ public class Main {
             "Vampire's Bite.jpg",
             "Vicious Hunger.jpg",
         };
+        String[] lands = {
+            "Forest.jpg",
+            "Island.jpg",
+            "Mountain.jpg",
+            "Plains.jpg",
+        };
 
-        File exampleCards = new File(CARDS, "Example");
-        if (!exampleCards.exists()) {
-            exampleCards.mkdirs();
-        }
+        File examples = new File(CARDS, "Example");
+        File bloodHunger = new File(examples, "Blood Hunger");
 
         for (String e : cards) {
-            BufferedOutputStream bos = null;
+            save("/resources/cards/" + e, new File(bloodHunger, e));
+        }
+        for (String e : lands) {
+            save("/resources/cards/" + e, new File(examples, e));
+        }
+    }
+
+    private static void saveExampleDecks() {
+        String[] decks = {"Blood Hunger.txt"};
+
+        for (String e : decks) {
+            save("/resources/decks/" + e, new File(DECKS, e));
+        }
+    }
+
+    private static void save(String resource, File file) {
+        file.getParentFile().mkdirs();
+        BufferedOutputStream bos = null;
             try {
                 InputStream is = Main.class
-                        .getResourceAsStream("/resources/cards/" + e);
+                        .getResourceAsStream(resource);
                 bos = new BufferedOutputStream(
-                        new FileOutputStream(new File(exampleCards, e)));
+                        new FileOutputStream(file));
                 byte[] b = new byte[256];
                 int read = -1;
                 while ((read = is.read(b)) >= 0) {
@@ -162,17 +187,15 @@ public class Main {
                 bos.close();
                 is.close();
             } catch (IOException ex) {
-                Debug.p("Example card \"" + e + "\" could not be saved: "
+                Debug.p("Resource " + resource + " could not be saved: "
                         + ex, Debug.E);
             } finally {
                 try {
                     bos.close();
                 } catch (IOException ex) {
-                    Debug.p("Example card \"" + e + "\" output stream could "
+                    Debug.p("Resource " + resource + " output stream could "
                             + "not be closed: " + ex, Debug.E);
                 }
             }
-
-        }
     }
 }

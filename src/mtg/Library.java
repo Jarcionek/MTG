@@ -29,8 +29,7 @@ public final class Library implements Serializable {
 
     private String findPath(File directory, String name) {
         for (File e : directory.listFiles()) {
-            if (e.isFile() && e.getName()
-                    .substring(0, e.getName().lastIndexOf(".")).equals(name)) {
+            if (e.isFile() && Utilities.getName(e).equals(name)) {
                 return e.getPath();
             }
             if (e.isDirectory()) {

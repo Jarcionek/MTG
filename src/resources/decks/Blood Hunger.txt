@@ -1,0 +1,30 @@
+Barony Vampire;2;null
+Blade of the Bloodchief;1;null
+Bloodghast;1;null
+Bloodrage Vampire;3;null
+Captivating Vampire;1;null
+Child of Night;2;null
+Corrupt;2;null
+Demon's Horn;3;null
+Drana, Kalastria Bloodchief;1;null
+Duskhunter Bat;3;null
+Feast of Blood;2;null
+Gatekeeper of Malakir;2;null
+Mirri the Cursed;1;null
+Quag Vampires;2;null
+Repay in Kind;1;null
+Ruthless Cullblade;2;null
+Sangromancer;1;null
+Sengir Vampire;1;null
+Skeletal Vampire;1;null
+Spread the Sickness;3;null
+Stalking Bloodsucker;1;null
+Swamp;26;null
+Tormented Soul;3;null
+Urge to Feed;2;null
+Vampire Aristocrat;2;null
+Vampire Nighthawk;2;null
+Vampire Nocturnus;1;null
+Vampire Outcasts;2;null
+Vampire's Bite;2;null
+Vicious Hunger;2;null
