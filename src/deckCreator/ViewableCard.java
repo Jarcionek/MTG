@@ -86,7 +86,8 @@ public class ViewableCard extends JLabel implements Comparable<ViewableCard> {
         if (this.image.equals(o.image)) {
             return 0;
         } else {
-            return this.image.getName().toLowerCase().compareTo(o.image.getName().toLowerCase());
+            return this.image.getName().toLowerCase()
+                    .compareTo(o.image.getName().toLowerCase());
         }
     }
 

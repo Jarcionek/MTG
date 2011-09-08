@@ -16,14 +16,14 @@ import javax.swing.JPopupMenu;
 /**
  * @author Jaroslaw Pawlak
  */
-public class CardsViewer {
+public class OldCardsViewer {
     private static ArrayList<Card> cards = new ArrayList<Card>(60);
     private static int mid = 3;
     private static JPanel contentPane = new JPanel(null);
     private static JFrame frame;
     public static JPanel table;
 
-    private CardsViewer() {}
+    private OldCardsViewer() {}
 
     public static void addCard(final Card c) {
         for (MouseListener e : c.getMouseListeners()) {

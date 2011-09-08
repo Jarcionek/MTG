@@ -14,6 +14,9 @@ import java.net.Socket;
  */
 public class Utilities {
     public static String findPath(File directory, String name) {
+//        Debug.p("Looking for \"" + name + "\" in "
+//                + directory.toString().replace(Main.CARDS.getParent().toString(), "")
+//                , Debug.I);
         for (File e : directory.listFiles()) {
             if (e.isFile() && Utilities.getName(e).equals(name)) {
                 return e.getPath();

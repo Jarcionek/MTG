@@ -100,7 +100,7 @@ public class OldMain {
         contentPane.setMaximumSize(blah);
         contentPane.setPreferredSize(blah);
 
-        CardsViewer.table = contentPane;
+        OldCardsViewer.table = contentPane;
 
         JMenuBar menuBar = new JMenuBar();
         JMenu card = new JMenu("card");
@@ -115,7 +115,7 @@ public class OldMain {
                     source.setEnabled(false);
                 }
 
-                CardsViewer.addCard(c);
+                OldCardsViewer.addCard(c);
 // putCard(c, library, contentPane);
             }
         });
@@ -138,7 +138,7 @@ public class OldMain {
             Card x = library.draw();
 // putCard(x, library, contentPane);
 // x.setCardPosition(Card.H / 2 * i, Card.H / 2);
-            CardsViewer.addCard(x);
+            OldCardsViewer.addCard(x);
         }
 
 // frame.pack();
@@ -147,7 +147,7 @@ public class OldMain {
         frame.setLocation(0, 0);
 // frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
-        CardsViewer.show();
+        OldCardsViewer.show();
     }
 
     public static void putCard(final Card c, Library library, final JPanel contentPane) {
@@ -209,7 +209,7 @@ public class OldMain {
                     JMenuItem play = new JMenuItem("return to hand");
                     play.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            CardsViewer.addCard(c);
+                            OldCardsViewer.addCard(c);
                             contentPane.remove(c);
                             contentPane.repaint();
                         }

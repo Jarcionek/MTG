@@ -168,7 +168,11 @@ public class Deck implements Serializable {
         }
         File t;
         if ((t = paths.get(i)) == null || !t.exists()) {
-            t = new File(Utilities.findPath(Main.CARDS, names.get(i)));
+            String path = Utilities.findPath(Main.CARDS, names.get(i));
+            if (path == null) {
+                Debug.p("Card \"" + names.get(i) + "\" not found", Debug.CE);
+            }
+            t = new File(path);
             paths.set(i, t);
         }
         return t;

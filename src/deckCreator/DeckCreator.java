@@ -29,7 +29,7 @@ import mtg.Utilities;
  */
 public class DeckCreator extends JFrame {
     private File cardsDirectory;
-    private JFrame parent;
+    private JFrame parentFrame;
 
     SmallCardsViewer scv;
     LargeCardsViewer lcv;
@@ -46,17 +46,18 @@ public class DeckCreator extends JFrame {
 
     private DeckCreator() {}
 
-    public DeckCreator(String title, final JFrame parent, File cardsDirectory) {
+    public DeckCreator(String title, JFrame parentFrame, File cardsDirectory) {
         super(title);
-        this.parent = parent;
         this.cardsDirectory = cardsDirectory;
+        this.parentFrame = parentFrame;
+        this.parentFrame.setVisible(false);
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 scv.close();
-                parent.setVisible(true);
+                DeckCreator.this.parentFrame.setVisible(true);
             }
         });
 
@@ -68,7 +69,6 @@ public class DeckCreator extends JFrame {
         this.pack();
         this.setMinimumSize(this.getSize());
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        parent.setVisible(false);
         this.setVisible(true);
     }
 
@@ -101,7 +101,7 @@ public class DeckCreator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 scv.close();
                 DeckCreator.this.dispose();
-                parent.setVisible(true);
+                parentFrame.setVisible(true);
             }
         });
 

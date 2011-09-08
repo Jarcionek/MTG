@@ -88,6 +88,13 @@ public class Server extends Thread {
             }
         }
         Debug.p("Game initialisation finished", Debug.I);
+        /* //TODO wait to receive ready signals from all the players, players
+         * may still be downloading missing cards.
+         * 
+         * To each player must be sent the number of players and their names
+         * and that player's shuffled library (or maybe not?)
+         */
+
     }
 
     private Server(int id) {

@@ -86,6 +86,10 @@ public class SmallCardsViewer extends JScrollPane {
     }
 
     public void addCard(ViewableCard card) {
+        /* Add a non-basic land card in a proper lixicographical position
+         * or before the first found basic land. Basic lands are always added
+         * at the end.
+         */
         boolean done = false;
         if (!Card.isBasicLand(card.getCardName())) {
             for (int i = 0; i < cards.size(); i++) {
@@ -98,11 +102,11 @@ public class SmallCardsViewer extends JScrollPane {
                 }
             }
         }
-
         if (!done) {
             cards.add(card);
             panel.add(card);
         }
+
         card.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

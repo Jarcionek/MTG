@@ -1,6 +1,5 @@
 package mtg;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,7 +11,9 @@ import java.util.Random;
 public final class Library implements Serializable {
     private ArrayList<Card> cards;
 
-    private Library() {};
+    public Library() {
+        cards = new ArrayList<Card>(15);
+    };
 
     public Library(Deck deck) {
         cards = new ArrayList<Card>(deck.getDeckSize());
@@ -25,21 +26,6 @@ public final class Library implements Serializable {
         }
 
         shuffle();
-    }
-
-    private String findPath(File directory, String name) {
-        for (File e : directory.listFiles()) {
-            if (e.isFile() && Utilities.getName(e).equals(name)) {
-                return e.getPath();
-            }
-            if (e.isDirectory()) {
-                String x = findPath(e, name);
-                if (x != null) {
-                    return x;
-                }
-            }
-        }
-        return null;
     }
 
     public int getSize() {
@@ -66,9 +52,11 @@ public final class Library implements Serializable {
         }
     }
 
-    public void tempprint() {
-        for (Card e : cards) {
-            System.out.println(e);
-        }
+    public void addCardOnTop(Card card) {
+        cards.add(card);
+    }
+
+    public void addCardOnBottom(Card card) {
+        cards.add(0, card);
     }
 }
