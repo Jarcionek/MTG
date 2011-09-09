@@ -22,7 +22,7 @@ public class Table extends JScrollPane {
      * movement event will not be sent to the server and in the client's table
      * that card will be moved to the original position
      */
-    public static final int mistakeMargin = 20;
+    public static final int mistakeMargin = Card.W / 8;
 
 
     /*
@@ -33,11 +33,16 @@ public class Table extends JScrollPane {
     /**
      * Intended gaps between cards
      */
-    private static final int gap = 40;
+    private static final int gap = Card.W / 4;
     public static final Dimension TWO_PLAYERS
             = new Dimension((15 * Card.W + 14 * gap) * 2 + 2 * Card.H,
             (5 * Card.H + 4 * gap) * 2 + 2 * Card.H);
-    //TODO other sizes
+    public static final Dimension FOUR_PLAYERS
+            = TWO_PLAYERS; //TODO
+    public static final Dimension SIX_PLAYERS
+            = TWO_PLAYERS; //TODO
+    public static final Dimension EIGHT_PLAYERS
+            = TWO_PLAYERS; //TODO
     
     private JPanel table;
 

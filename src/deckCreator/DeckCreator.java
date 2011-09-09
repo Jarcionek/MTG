@@ -131,9 +131,11 @@ public class DeckCreator extends JFrame {
         save = new JButton("Save");
         save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (dfc.showSaveDialog(DeckCreator.this)
-                        == JFileChooser.APPROVE_OPTION) {
+                if (dfc.showSaveDialog(DeckCreator.this) == JFileChooser.APPROVE_OPTION) {
                     File f = dfc.getSelectedFile();
+                    if (!"txt".equals(Utilities.getExtension(f))) {
+                        f = new File(f.toString() + ".txt");
+                    }
                     if (deck.save(f)) {
                         deckName.setText("Deck: "
                                 + Utilities.getName(f));

@@ -40,7 +40,10 @@ public class OnTableMouseListener extends MouseAdapter {
                     source.tap(); //TODO client
                 }
             }
-        } else if (e.getButton() == MouseEvent.BUTTON3) {
+        } else {
+            tempCard = null;
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
             source.viewLarger();
 //            JPopupMenu popupMenu = new JPopupMenu();
 //            JMenuItem tapper = new JMenuItem(source.isTapped()? "untap" : "tap");
@@ -83,6 +86,9 @@ public class OnTableMouseListener extends MouseAdapter {
     }
     @Override
     public void mouseReleased(MouseEvent e) {
+        if (tempCard == null) {
+            return;
+        }
         Card source = ((Card) e.getSource());
         Point currentPos = source.getCardPosition();
         if (Math.abs(currentPos.x - cardPosition.x) > Table.mistakeMargin
@@ -90,11 +96,16 @@ public class OnTableMouseListener extends MouseAdapter {
             //TODO client - card moved
         } else {
             source.setCardPosition(cardPosition.x, cardPosition.y);
+            //TODO this should be moved before if statement
+            //card will be really moved after receiving a notice from the server
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        if (tempCard == null) {
+            return;
+        }
         JPanel table = (JPanel) ((Card) e.getSource()).getParent();
         int newx = tempCard.getXpos() - tempX + e.getX();
         int newy = tempCard.getYpos() - tempY + e.getY();

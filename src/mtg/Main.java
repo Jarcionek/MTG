@@ -13,8 +13,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,11 +27,14 @@ import javax.swing.UIManager;
 /**
  * @author Jaroslaw Pawlak
  */
-public class Main {
+public class Main extends JFrame {
+
     public static final File DIRECTORY
             = new File(System.getProperty("user.dir"), "MTG");
     public static final File CARDS = new File(DIRECTORY, "Cards");
+    public static final File CARDS_DL = new File(CARDS, "Download");
     public static final File DECKS = new File(DIRECTORY, "Decks");
+    public static final File DECKS_DL = new File(DECKS, "Download");
     public static final String TITLE = "MTG";
     
     public static void main(String[] args)
@@ -54,12 +60,19 @@ public class Main {
             saveExampleCards();
             saveExampleDecks();
         }
-        
-        final JFrame frame = new JFrame(TITLE);
+        CARDS.mkdirs();
+        CARDS_DL.mkdirs();
+        DECKS.mkdirs();
+
+        new Main();
+    }
+
+    private Main() {
+        super(TITLE);
+
         JPanel contentPane = new JPanel(null);
 
         JButton deckCreator = new JButton("Deck creator");
-        deckCreator.setFocusPainted(false);
         deckCreator.setOpaque(false);
         deckCreator.setFocusable(false);
         deckCreator.setBounds(40, 60,
@@ -67,13 +80,12 @@ public class Main {
                 deckCreator.getPreferredSize().height);
         deckCreator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new DeckCreator(TITLE + ": Deck Creator", frame, CARDS);
+                new DeckCreator(TITLE + ": Deck Creator", Main.this, CARDS);
             }
         });
         contentPane.add(deckCreator);
 
         JButton exit = new JButton("Exit");
-        exit.setFocusPainted(false);
         exit.setOpaque(false);
         exit.setFocusable(false);
         exit.setBounds(60, 405,
@@ -86,30 +98,64 @@ public class Main {
         });
         contentPane.add(exit);
 
+        JButton createGame = new JButton("Create game");
+        createGame.setOpaque(false);
+        createGame.setFocusable(false);
+        createGame.setBounds(325, 35,
+                createGame.getPreferredSize().width,
+                createGame.getPreferredSize().height);
+        createGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new ServerFrame(Main.this);
+            }
+        });
+        contentPane.add(createGame);
+
+        JButton joinGame = new JButton("Join game");
+        joinGame.setOpaque(false);
+        joinGame.setFocusable(false);
+        joinGame.setBounds(625, 75,
+                joinGame.getPreferredSize().width,
+                joinGame.getPreferredSize().height);
+        joinGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser jfc = new JFileChooser(DECKS);
+                jfc.setMultiSelectionEnabled(false);
+                jfc.showOpenDialog(Main.this);
+                File f = jfc.getSelectedFile();
+                Deck deck = Deck.load(f);
+                String ip = JOptionPane.showInputDialog(Main.this, "IP:", "localhost");
+                int port = Integer.parseInt(
+                        JOptionPane.showInputDialog(Main.this, "port:", "56789"));
+                try {
+                    new Client("Jarek", ip, port, deck);
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        contentPane.add(joinGame);
+
         JLabel background = new JLabel(new ImageIcon(
                 Main.class.getResource("/resources/Background.jpg")));
         background.setBounds(0, 0, 750, 450);
         contentPane.add(background);
 
-        frame.addWindowStateListener(new WindowStateListener() {
+        this.addWindowStateListener(new WindowStateListener() {
             public void windowStateChanged(WindowEvent e) {
-                frame.setExtendedState(JFrame.NORMAL);
+                Main.this.setExtendedState(JFrame.NORMAL);
             }
         });
 
-        exit.revalidate();
-//        contentPane.validate();
-
-        frame.setContentPane(contentPane);
-        frame.setUndecorated(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(750, 450);
-        frame.setResizable(true);
+        this.setContentPane(contentPane);
+        this.setUndecorated(true);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(750, 450);
+        this.setResizable(true);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((d.width - frame.getSize().width) / 2,
-                          (d.height - frame.getSize().height) / 2);
-        frame.setVisible(true);
-
+        this.setLocation((d.width - this.getSize().width) / 2,
+                          (d.height - this.getSize().height) / 2);
+        this.setVisible(true);
     }
 
     private static void saveExampleCards() {
@@ -199,3 +245,9 @@ public class Main {
             }
     }
 }
+
+/** //TODO LIST
+ * server and clients save decks
+ * return random number from server (coin, die, specified borders)
+ * choose a card at random from your hand
+ */

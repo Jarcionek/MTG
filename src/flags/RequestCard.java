@@ -13,7 +13,7 @@ public class RequestCard extends Action {
 
     @Override
     public String toString() {
-        return this.getClass().getName() + "(" + name + ")";
+        return super.toString() + "(" + name + ")";
     }
 
 }

@@ -1,6 +1,6 @@
 package game;
 
-import java.awt.Toolkit;
+import java.awt.Dimension;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ public class CardViewer extends JPanel {
         super(null);
         this.listener = listener;
         this.cards = new ArrayList<Card>(60);
+        this.setPreferredSize(new Dimension(Card.W * 2, Card.H));
     }
 
     /**
@@ -78,17 +79,33 @@ public class CardViewer extends JPanel {
         }
 
         this.removeAll();
-        int d = cards.size() == 1?
-                0 : (this.getSize().width - Card.W) / (cards.size() - 1);
 
-        for (int i = top; i < cards.size(); i++) {
-            cards.get(i).setCardPosition(Card.W / 2 + i * d, Card.H / 2);
-            this.add(cards.get(i));
+        if (cards.size() * Card.W < this.getSize().width) {
+//            System.out.println(this.getSize().width);
+//            System.out.println(cards.size() * Card.W);
+            int start = this.getSize().width - (cards.size() - 1) * Card.W;
+            start /= 2;
+            for (int i = 0; i < cards.size(); i++) {
+                cards.get(i).setCardPosition(start + i * Card.W, Card.H / 2);
+                this.add(cards.get(i));
+            }
+        } else {
+            for (int i = top; i < cards.size(); i++) {
+                cards.get(i).setCardPosition(
+                        Card.W / 2 + i * (this.getSize().width - Card.W)
+                                         / (cards.size() - 1),
+                        Card.H / 2);
+                this.add(cards.get(i));
+            }
+            for (int i = top - 1; i >= 0; i--) {
+                cards.get(i).setCardPosition(
+                        Card.W / 2 + i * (this.getSize().width - Card.W)
+                                         / (cards.size() - 1),
+                        Card.H / 2);
+                this.add(cards.get(i));
+            }
         }
-        for (int i = top - 1; i >= 0; i--) {
-            cards.get(i).setCardPosition(Card.W / 2 + i * d, Card.H / 2);
-            this.add(cards.get(i));
-        }
+        //(this.getSize().width - Card.W) / (cards.size() - 1);
         this.repaint();
     }
 
@@ -109,7 +126,8 @@ public class CardViewer extends JPanel {
 
 
         x.setContentPane(cont);
-        x.setSize(400, 300);
+//        x.setSize(400, 300);
+        x.pack();
         x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         x.setVisible(true);
 

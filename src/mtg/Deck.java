@@ -1,9 +1,13 @@
 package mtg;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -49,6 +53,7 @@ public class Deck implements Serializable {
      */
     public boolean addCard(String name, int amount, File path)
             throws IllegalArgumentException{
+        checkPaths();
         if (amount <= 0) {
             throw new IllegalArgumentException("Adding " + amount + " cards");
         }
@@ -76,6 +81,7 @@ public class Deck implements Serializable {
      * @return true if a card was in a deck, false otherwise
      */
     public boolean removeCard(String name) {
+        checkPaths();
         int t = names.indexOf(name);
         if (t != -1) {
             names.remove(t);
@@ -160,12 +166,7 @@ public class Deck implements Serializable {
     }
 
     public File getArrayFiles(int i) {
-        if (paths == null) {
-            paths = new ArrayList<File>(getArraySize());
-        }
-        for (int j = paths.size(); j < getArraySize(); j++) {
-            paths.add(j, null);
-        }
+        checkPaths();
         File t;
         if ((t = paths.get(i)) == null || !t.exists()) {
             String path = Utilities.findPath(Main.CARDS, names.get(i));
@@ -179,11 +180,11 @@ public class Deck implements Serializable {
     }
 
     private boolean isBasicLand(String name) {
-        return name.toLowerCase().equals("plains")
-                || name.toLowerCase().equals("island")
-                || name.toLowerCase().equals("swamp")
-                || name.toLowerCase().equals("mountain")
-                || name.toLowerCase().equals("forest");
+        return name.equalsIgnoreCase("plains")
+                || name.equalsIgnoreCase("island")
+                || name.equalsIgnoreCase("swamp")
+                || name.equalsIgnoreCase("mountain")
+                || name.equalsIgnoreCase("forest");
     }
 
     /**
@@ -192,11 +193,15 @@ public class Deck implements Serializable {
      * @return true if save succeeded, false otherwise
      */
     public boolean save(File file) {
+        checkPaths();
         try {
+            file.getParentFile().mkdirs();
             if (!file.exists()) {
                 file.createNewFile();
             }
-            Writer bf = new BufferedWriter(new FileWriter(file));
+            Writer bf = new OutputStreamWriter(
+                    new FileOutputStream(file), "UTF-8");
+            bf.write("\r\n");
             for (int i = 0; i < names.size(); i++) {
                 bf.write(names.get(i) + ";"
                         + amounts.get(i) + ";"
@@ -212,24 +217,40 @@ public class Deck implements Serializable {
     }
 
     /**
+     * In case of accessing <code>paths</code> after serialization.
+     * This method creates <code>paths</code> ArrayList (if missing)
+     * and adds nulls if <code>paths'</code> size is smaller than
+     * <code>names'</code> size.
+     */
+    private void checkPaths() {
+        if (paths == null) {
+            paths = new ArrayList<File>(getArraySize());
+        }
+        for (int i = paths.size(); i < getArraySize(); i++) {
+            paths.add(i, null);
+        }
+    }
+
+    /**
      * Loads a deck from text file given
      * @param file file to load a deck from
      * @return deck or null if loading failed
      */
     public static Deck load(File file) {
         try {
-            Scanner in = new Scanner(file);
+            BufferedReader br = new BufferedReader(new FileReader(file));
             Deck result = new Deck();
             String line;
-            while (in.hasNextLine()) {
-                String[] t = (line = in.nextLine()).split(";");
+            while ((line = br.readLine()) != null) {
+                String[] t = line.split(";");
                 try {
+                    // t[2] is not null, but "null"
                     result.addCard(t[0], Integer.parseInt(t[1]), new File(t[2]));
                 } catch (Exception ex) {
                     Debug.p("Ignored line while loading a deck: " + line, Debug.W);
                 }
             }
-            in.close();
+            br.close();
             return result;
         } catch (Exception ex) {
             Debug.p("Deck could not be loaded from file "

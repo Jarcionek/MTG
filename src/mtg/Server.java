@@ -1,93 +1,73 @@
 package mtg;
 
+import flags.Action;
 import flags.CheckDeck;
 import flags.RequestCard;
 import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Jaroslaw Pawlak
  */
 public class Server extends Thread {
-    private static final int PORT = 12345;
 
-    private static final File IMAGES = new File("c:/Documents and Settings/Jarek/Desktop/MTG2/server");
-    private static final int PLAYERS = 3;
+    private static Thread serverMainThread;
 
-    private static Socket[] socket = new Socket[PLAYERS];
-    private static ServerSocket[] fileSocket = new ServerSocket[PLAYERS];
-    private static ObjectOutputStream[] oos = new ObjectOutputStream[PLAYERS];
-    private static ObjectInputStream[] ois = new ObjectInputStream[PLAYERS];
+    private static int port;
+    private static int players;
 
-    private static Deck[] deck = new Deck[PLAYERS];
-    private static String[] name = new String[PLAYERS];
+    private static ServerSocket ss;
 
-    private int id;
+    private static ServerListeningThread[] serverListeningThreads;
+    private static Socket[] socket;
+    private static ServerSocket[] fileSocket;
+    private static ObjectOutputStream[] oos;
+    private static ObjectInputStream[] ois;
 
-    public static void main(String[] args) throws Exception {
-        if (!IMAGES.exists()) {
-            IMAGES.mkdirs();
-        }
-        ServerSocket ss = new ServerSocket(PORT);
-        for (int i = 0; i < PLAYERS; i++) {
-            fileSocket[i] = new ServerSocket(PORT + i + 1);
-            Debug.p("Waiting for player " + i + "/" + PLAYERS, Debug.I);
-            socket[i] = ss.accept();
-            Debug.p("Player connected", Debug.I);
-            ois[i] = new ObjectInputStream(socket[i].getInputStream());
-            oos[i] = new ObjectOutputStream(socket[i].getOutputStream());
-            oos[i].flush();
+    private static Deck[] deck;
+    private static String[] name;
 
-            // exchange basic info
-            name[i] = (String) ois[i].readObject();
-            Debug.p("Player's name received: " + name[i], Debug.I);
-            deck[i] = (Deck) ois[i].readObject();
-            Debug.p("Player's deck received", Debug.I);
-            oos[i].writeInt(PORT + i + 1);
-            oos[i].flush();
-            Debug.p("Player's file transfer port sent: " + (PORT + i + 1), Debug.I);
+    private static boolean[] ready;
 
-            // check new deck and download missing cards
-            for (int j = 0; j < deck[i].getArraySize(); j++) {
-                if (Utilities.findPath(IMAGES, deck[i].getArrayNames(j)) == null) {
-                    // send card request
-                    Debug.p("Card \"" + deck[i].getArrayNames(j) + "\" not found", Debug.I);
-                    oos[i].writeObject(new RequestCard(deck[i].getArrayNames(j)));
-                    oos[i].flush();
-                    Debug.p("Card request sent", Debug.I);
+    private Server() {}
 
-                    // receive file
-                    Socket t = fileSocket[i].accept();
-                    Debug.p("Receiving file", Debug.I);
-                    Utilities.receiveFile(
-                            new File(IMAGES, deck[i].getArrayNames(j).concat(".jpg")),
-                            t);
-                    t.close();
-                    Debug.p("File received", Debug.I);
-                }
-            }
-            Debug.p("All cards downloaded", Debug.I);
+    /**
+     * Waits for connection of <code>players</code> number of players. Downloads
+     * their decks and exchange with other players missing cards.
+     * @param port port to be used for communication. For exchanging cards
+     * there will be used ports between <code>port + 1</code> and
+     * <code>port + players</code>, both inclusive.
+     * @param players number of players
+     * @throws IOException if an I/O error occurs when opening the socket.
+     * See {@link java.net.ServerSocket#ServerSocket(int)}
+     */
+    public static void start(int port, int players) throws IOException {
 
-            // start listening to the new client
-            (new Server(i)).start();
-            Debug.p("Listening thread started", Debug.I);
+        Server.port = port;
+        Server.players = players;
 
-            // all clients check all decks
-            for (int j = 0; j < i; j++) {
-                // send new deck to already connected clients
-                oos[j].writeObject(new CheckDeck(deck[i]));
-                oos[j].flush();
-                Debug.p(i + "'s deck sent to " + j, Debug.I);
-                // send already connected clients' decks to the new client
-                oos[i].writeObject(new CheckDeck(deck[j]));
-                oos[i].flush();
-                Debug.p(j + "'s deck sent to " + i, Debug.I);
-            }
-        }
-        Debug.p("Game initialisation finished", Debug.I);
+        serverListeningThreads = new ServerListeningThread[players];
+        socket = new Socket[players];
+        fileSocket = new ServerSocket[players];
+        oos = new ObjectOutputStream[players];
+        ois = new ObjectInputStream[players];
+        
+        deck = new Deck[players];
+        name = new String[players];
+
+        ready = new boolean[players];
+
+        ss = new ServerSocket(port);
+
+        serverMainThread = new Server();
+        serverMainThread.start();
+
         /* //TODO wait to receive ready signals from all the players, players
          * may still be downloading missing cards.
          * 
@@ -97,34 +77,84 @@ public class Server extends Thread {
 
     }
 
-    private Server(int id) {
-        super();
-        this.id = id;
-    }
-
     @Override
     public void run() {
-        Object object = null;
-        while(true) {
+        for (int i = 0; i < ready.length; i++) {
             try {
-                object = null;
-                object = ois[id].readObject();
-                Debug.p("Listening thread " + id + " received object", Debug.I);
+                fileSocket[i] = new ServerSocket(port + i + 1);
+                socket[i] = ss.accept();
+                ois[i] = new ObjectInputStream(socket[i].getInputStream());
+                oos[i] = new ObjectOutputStream(socket[i].getOutputStream());
+                oos[i].flush();
 
-                if (object.getClass().equals(RequestCard.class)) {
-                    RequestCard t = ((RequestCard) object);
-                    Debug.p("Listening thread " + id + " received request card \"" + t.name + "\"", Debug.I);
-                    Socket s = fileSocket[id].accept();
-                    Debug.p("Listening thread " + id + " sending card \"" + t.name + "\"", Debug.I);
-                    Utilities.sendFile(new File(Utilities.findPath(IMAGES, t.name)), s);
-                    s.close();
-                    Debug.p("Listening thread " + id + " sent card \"" + t.name + "\"", Debug.I);
+                // exchange basic info
+                name[i] = (String) ois[i].readObject();
+                deck[i] = (Deck) ois[i].readObject();
+                deck[i].save(new File(Main.DECKS_DL, Utilities
+                        .getCurrentTimeForFile()+ " " + name[i] + ".txt"));
+                oos[i].writeInt(port + i + 1);
+                oos[i].flush();
+
+                // check new deck and download missing cards
+                for (int j = 0; j < deck[i].getArraySize(); j++) {
+                    if (Utilities.findPath(Main.CARDS, deck[i].getArrayNames(j))
+                            == null) {
+                        System.out.println("Card not found: " + deck[i].getArrayNames(j));
+                        // send card request
+                        oos[i].writeObject(new RequestCard(
+                                deck[i].getArrayNames(j)));
+                        oos[i].flush();
+
+                        // receive file
+                        Socket t = fileSocket[i].accept();
+                        Utilities.receiveFile(new File(Main.CARDS_DL, 
+                                deck[i].getArrayNames(j) + ".jpg"), t);
+                        t.close();
+                    }
+                }
+
+                // start listening to the new client
+                serverListeningThreads[i]
+                        = new ServerListeningThread(i, ois[i], fileSocket[i]);
+                serverListeningThreads[i].start();
+
+                // all clients check all decks
+                for (int j = 0; j < i; j++) {
+                    // send new deck to already connected clients
+                    oos[j].writeObject(new CheckDeck(deck[i]));
+                    oos[j].flush();
+                    // send already connected clients' decks to the new client
+                    oos[i].writeObject(new CheckDeck(deck[j]));
+                    oos[i].flush();
                 }
             } catch (Exception ex) {
-                Debug.p("Listening thread " + id + " crashed while dealing with " + object + ": " + ex, Debug.E);
-                if (ex.getLocalizedMessage().equals("Connection reset")) {
-                    break;
-                }
+                String ip = socket[i].getLocalAddress() == null?
+                    "not received" : "" + socket[i].getLocalAddress();
+                String msg = "Error while dealing with player " + i
+                        + ": " + "IP = " + ip + ", name = " + name[i]
+                        + ", " + "exception = " + ex;
+                Debug.p(msg, Debug.W);
+                i--;
+                try {
+                    fileSocket[i].close();
+                } catch (Exception ex2) {}
+                //TODO temp - it crashes too often and becomes an infinite loop with ex =
+                // java.net.BindException: Address already in use: JVM_Bind
+                System.err.println("TEMPORARY LOGGER HERE");
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                System.exit(1);
+            }
+        }
+        Debug.p("Game initialisation finished", Debug.I);
+    }
+
+    public static void send(int player, Action object) {
+        if (oos[player] != null) {
+            try {
+                oos[player].writeObject(object);
+                oos[player].flush();
+            } catch (IOException ex) {
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

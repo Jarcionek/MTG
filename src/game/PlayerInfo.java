@@ -29,8 +29,10 @@ public class PlayerInfo extends JPanel {
     private JLabel librarySizeValue;
     private JLabel poisonCountersLabel;
     private JLabel poisonCountersValue;
-    private JButton viewGraveyard;
-    private JButton viewExiled;
+    private JButton viewGraveyardButton;
+    private JButton viewExiledButton;
+    private JButton poisonButton;
+    private JButton healthButton;
 
     public PlayerInfo(String name) {
         super();
@@ -54,21 +56,37 @@ public class PlayerInfo extends JPanel {
             e.setHorizontalAlignment(JLabel.CENTER);
         }
         
-        viewGraveyard = new JButton("Graveyard");
-        viewGraveyard.addActionListener(new ActionListener() {
+        viewGraveyardButton = new JButton("Graveyard");
+        viewGraveyardButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         });
-        viewGraveyard.setFocusable(false);
+        viewGraveyardButton.setFocusable(false);
         
-        viewExiled = new JButton("Exiled");
-        viewExiled.addActionListener(new ActionListener() {
+        viewExiledButton = new JButton("Exiled");
+        viewExiledButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         });
-        viewExiled.setFocusable(false);
+        viewExiledButton.setFocusable(false);
+
+        poisonButton = new JButton("Poison");
+        poisonButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
+        poisonButton.setFocusable(false);
+
+        healthButton = new JButton("Health");
+        healthButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
+        healthButton.setFocusable(false);
     }
 
     private void createGUI() {
@@ -127,10 +145,16 @@ public class PlayerInfo extends JPanel {
         this.add(hand, c);
 
         c.gridy += 1;
+        c.insets = new Insets(0, outside, between, between);
+        this.add(viewGraveyardButton, c);
+        c.insets = new Insets(0, 0, between, outside);
+        this.add(viewExiledButton, c);
+
+        c.gridy += 1;
         c.insets = new Insets(0, outside, outside, between);
-        this.add(viewGraveyard, c);
+        this.add(poisonButton, c);
         c.insets = new Insets(0, 0, outside, outside);
-        this.add(viewExiled, c);
+        this.add(healthButton, c);
     }
 
     public static void main(String[] asfasf) {

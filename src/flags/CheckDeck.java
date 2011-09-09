@@ -13,9 +13,4 @@ public class CheckDeck extends Action {
         this.deck = deck;
     }
 
-    @Override
-    public String toString() {
-        return this.getClass().getName();
-    }
-
 }
