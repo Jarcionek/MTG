@@ -35,12 +35,13 @@ public class ServerListeningThread extends Thread {
                 if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = ((RequestCard) object);
                     Socket s = fileSocket.accept();
-                    Utilities.sendFile(new File(Utilities.findPath(Main.CARDS, t.name)), s);
+                    Utilities.sendFile(new File(Utilities.findPath(t.name)), s);
                     s.close();
                 }
             } catch (Exception ex) {
                 if (ex.getLocalizedMessage() != null
                         && ex.getLocalizedMessage().equals("Connection reset")) {
+                    Server.disconnect(id);
                     break;
                 }
             }

@@ -81,8 +81,6 @@ public class CardViewer extends JPanel {
         this.removeAll();
 
         if (cards.size() * Card.W < this.getSize().width) {
-//            System.out.println(this.getSize().width);
-//            System.out.println(cards.size() * Card.W);
             int start = this.getSize().width - (cards.size() - 1) * Card.W;
             start /= 2;
             for (int i = 0; i < cards.size(); i++) {
@@ -105,7 +103,6 @@ public class CardViewer extends JPanel {
                 this.add(cards.get(i));
             }
         }
-        //(this.getSize().width - Card.W) / (cards.size() - 1);
         this.repaint();
     }
 

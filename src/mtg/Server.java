@@ -9,8 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Jaroslaw Pawlak
@@ -20,7 +18,6 @@ public class Server extends Thread {
     private static Thread serverMainThread;
 
     private static int port;
-    private static int players;
 
     private static ServerSocket ss;
 
@@ -50,7 +47,6 @@ public class Server extends Thread {
     public static void start(int port, int players) throws IOException {
 
         Server.port = port;
-        Server.players = players;
 
         serverListeningThreads = new ServerListeningThread[players];
         socket = new Socket[players];
@@ -80,6 +76,7 @@ public class Server extends Thread {
     @Override
     public void run() {
         for (int i = 0; i < ready.length; i++) {
+            Debug.p("waiting for player " + i + "/" + ready.length);
             try {
                 fileSocket[i] = new ServerSocket(port + i + 1);
                 socket[i] = ss.accept();
@@ -91,19 +88,16 @@ public class Server extends Thread {
                 name[i] = (String) ois[i].readObject();
                 deck[i] = (Deck) ois[i].readObject();
                 deck[i].save(new File(Main.DECKS_DL, Utilities
-                        .getCurrentTimeForFile()+ " " + name[i] + ".txt"));
+                        .getCurrentTimeForFile()+ " " + name[i] + ""
+                        + deck[i].getName() + ".txt"));
                 oos[i].writeInt(port + i + 1);
                 oos[i].flush();
 
                 // check new deck and download missing cards
                 for (int j = 0; j < deck[i].getArraySize(); j++) {
-                    if (Utilities.findPath(Main.CARDS, deck[i].getArrayNames(j))
-                            == null) {
-                        System.out.println("Card not found: " + deck[i].getArrayNames(j));
+                    if (Utilities.findPath(deck[i].getArrayNames(j)) == null) {
                         // send card request
-                        oos[i].writeObject(new RequestCard(
-                                deck[i].getArrayNames(j)));
-                        oos[i].flush();
+                        send(i, new RequestCard(deck[i].getArrayNames(j)));
 
                         // receive file
                         Socket t = fileSocket[i].accept();
@@ -112,6 +106,7 @@ public class Server extends Thread {
                         t.close();
                     }
                 }
+                Debug.p("Missing cards downloaded");
 
                 // start listening to the new client
                 serverListeningThreads[i]
@@ -121,41 +116,52 @@ public class Server extends Thread {
                 // all clients check all decks
                 for (int j = 0; j < i; j++) {
                     // send new deck to already connected clients
-                    oos[j].writeObject(new CheckDeck(deck[i]));
-                    oos[j].flush();
+                    send(j, new CheckDeck(name[i], deck[i]));
                     // send already connected clients' decks to the new client
-                    oos[i].writeObject(new CheckDeck(deck[j]));
-                    oos[i].flush();
+                    send(i, new CheckDeck(name[j], deck[j]));
                 }
             } catch (Exception ex) {
                 String ip = socket[i].getLocalAddress() == null?
                     "not received" : "" + socket[i].getLocalAddress();
-                String msg = "Error while dealing with player " + i
-                        + ": " + "IP = " + ip + ", name = " + name[i]
-                        + ", " + "exception = " + ex;
+                String msg = "Error while dealing with player " + i + ": "
+                        + "IP = " + ip + ", name = " + name[i]
+                        + ", exception = " + ex;
                 Debug.p(msg, Debug.W);
                 i--;
                 try {
                     fileSocket[i].close();
                 } catch (Exception ex2) {}
-                //TODO temp - it crashes too often and becomes an infinite loop with ex =
-                // java.net.BindException: Address already in use: JVM_Bind
-                System.err.println("TEMPORARY LOGGER HERE");
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                System.exit(1);
             }
         }
         Debug.p("Game initialisation finished", Debug.I);
     }
 
-    public static void send(int player, Action object) {
+    static void send(int player, Action object) {
         if (oos[player] != null) {
             try {
                 oos[player].writeObject(object);
                 oos[player].flush();
             } catch (IOException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                Debug.p("Error while sending " + object + " to player "
+                        + player + ": " + ex, Debug.E);
             }
         }
+    }
+
+    /**
+     * Closes all streams and sockets of given player.
+     * @param player player
+     */
+    static void disconnect(int player) {
+        try {
+            socket[player].close();
+        } catch (IOException ex) {}
+        try {
+            fileSocket[player].close();
+        } catch (IOException ex) {}
+        fileSocket[player] = null;
+        socket[player] = null;
+        ois[player] = null;
+        oos[player] = null;
     }
 }

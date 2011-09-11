@@ -36,6 +36,13 @@ public class Debug {
     private Debug() {};
 
     /**
+     * print information
+     */
+    public static void p(Object message) {
+        p(message, Debug.I);
+    }
+
+    /**
      * print
      */
     public static void p(Object message, int type) {

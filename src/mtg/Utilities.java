@@ -11,14 +11,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.Scanner;
 
 /**
  * @author Jaroslaw Pawlak
@@ -34,13 +30,24 @@ public class Utilities {
     private Utilities() {}
 
     /**
+     * Looks for a file with given name (with no extension) in directory
+     * {@link Main#CARDS} and all its subdirectories. Returns a total path
+     * of file found or null.
+     * @param name file name without extension
+     * @return file path or null if not found
+     */
+    public static String findPath(String name) {
+        return findPath(Main.CARDS, name);
+    }
+
+    /**
      * Looks for a file with given name (with no extension) in specified
      * directory (and subdirectories) and returns a total path of file found.
      * @param directory top directory to search
      * @param name file name without extension
      * @return total path or null if file not found
      */
-    public static String findPath(File directory, String name) {
+    private static String findPath(File directory, String name) {
         for (File e : directory.listFiles()) {
 //            System.out.println(e);
             if (e.isFile() && Utilities.getName(e).equals(name)) {
@@ -172,27 +179,5 @@ public class Utilities {
             IP = null;
             return "Could not connect with http://checkip.dyndns.org/";
         }
-    }
-
-    public static void main(String[] asr) throws Exception {
-//        String text = "Æ";
-        File file = new File("c:\\Documents and Settings\\Jarek\\Desktop\\MTG2\\elves\\MTG\\Decks", "elves.txt");
-//        FileOutputStream fos = new FileOutputStream(file);
-//        ObjectOutputStream oos = new ObjectOutputStream(fos);
-//        oos.writeObject(text);
-
-//        FileInputStream fis = new FileInputStream(file);
-//        ObjectInputStream ois = new ObjectInputStream(fis);
-//        System.out.println(ois.readObject());
-
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String t;
-        while ((t = br.readLine()) != null) {
-            System.out.println(t);
-        }
-//        Scanner in = new Scanner(file);
-//        while (in.hasNextLine()) {
-//            System.out.println(in.nextLine());
-//        }
     }
 }

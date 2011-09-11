@@ -29,16 +29,13 @@ public class Client {
     public Client(String playerName, String ip, int port, Deck deck)
             throws IOException {
         Socket s = new Socket(ip, port);
-        Debug.p("Connected to " + ip + ":" + port, Debug.I);
+        Debug.p("Connected to " + ip + ":" + port);
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         oos.flush();
         ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
         oos.writeObject(playerName);
-        Debug.p("Name sent", Debug.I);
         oos.writeObject(deck);
-        Debug.p("Deck sent", Debug.I);
         fileTransferPort = ois.readInt();
-        Debug.p("File transfer port received " + fileTransferPort, Debug.I);
 
         Object object = null;
         while (true) {
@@ -49,12 +46,8 @@ public class Client {
                 // REQUEST CARD - server requests client to send card's image
                 if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = (RequestCard) object;
-                    System.out.println("Servers requests " + t.name);
                     Socket socket = new Socket(ip, fileTransferPort);
-                    System.out.println("Path = " + Utilities.findPath(Main.CARDS, t.name));
-                    Utilities.sendFile(
-                            new File(Utilities.findPath(Main.CARDS, t.name)),
-                            socket);
+                    Utilities.sendFile(new File(Utilities.findPath(t.name)), socket);
                     socket.close();
 
                 // CHECK DECK - server requests client to check if
@@ -62,7 +55,7 @@ public class Client {
                 } else if (object.getClass().equals(CheckDeck.class)) {
                     Deck d = ((CheckDeck) object).deck;
                     for (int j = 0; j < d.getArraySize(); j++) {
-                        if (Utilities.findPath(Main.CARDS, d.getArrayNames(j)) == null) {
+                        if (Utilities.findPath(d.getArrayNames(j)) == null) {
                             // send card request
                             oos.writeObject(new RequestCard(d.getArrayNames(j)));
                             oos.flush();
@@ -76,7 +69,9 @@ public class Client {
                     }
                     // save deck
                     d.save(new File(Main.DECKS_DL, Utilities
-                            .getCurrentTimeForFile() + ".txt"));
+                            .getCurrentTimeForFile()
+                            + " " + ((CheckDeck) object).owner + " "
+                            + d.getName() + ".txt"));
                 }
             } catch (Exception ex) {
                 Debug.p("Error while dealing with " + object + ": " + ex,

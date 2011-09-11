@@ -1,11 +1,9 @@
 package mtg;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
@@ -17,11 +15,13 @@ import java.util.Scanner;
  * @author Jaroslaw Pawlak
  */
 public class Deck implements Serializable {
+    private String deckName;
     private ArrayList<String> names;
     private ArrayList<Integer> amounts;
     private transient ArrayList<File> paths;
 
     public Deck() {
+        deckName = null;
         names = new ArrayList<String>(15);
         amounts = new ArrayList<Integer>(15);
         paths = new ArrayList<File>(15);
@@ -169,7 +169,7 @@ public class Deck implements Serializable {
         checkPaths();
         File t;
         if ((t = paths.get(i)) == null || !t.exists()) {
-            String path = Utilities.findPath(Main.CARDS, names.get(i));
+            String path = Utilities.findPath(names.get(i));
             if (path == null) {
                 Debug.p("Card \"" + names.get(i) + "\" not found", Debug.CE);
             }
@@ -188,6 +188,14 @@ public class Deck implements Serializable {
     }
 
     /**
+     * Returns deck name - specified at save/load time
+     * @return deck name
+     */
+    public String getName() {
+        return deckName;
+    }
+
+    /**
      * Saves this deck to the text file given
      * @param file file to save a deck
      * @return true if save succeeded, false otherwise
@@ -200,8 +208,7 @@ public class Deck implements Serializable {
                 file.createNewFile();
             }
             Writer bf = new OutputStreamWriter(
-                    new FileOutputStream(file), "UTF-8");
-            bf.write("\r\n");
+                    new FileOutputStream(file), "Unicode");
             for (int i = 0; i < names.size(); i++) {
                 bf.write(names.get(i) + ";"
                         + amounts.get(i) + ";"
@@ -213,7 +220,38 @@ public class Deck implements Serializable {
                     + file + ": " + ex, Debug.E);
             return false;
         }
+        deckName = Utilities.getName(file);
         return true;
+    }
+
+    /**
+     * Loads a deck from text file given
+     * @param file file to load a deck from
+     * @return deck or null if loading failed
+     */
+    public static Deck load(File file) {
+        try {
+            Deck result = new Deck();
+            Scanner in = new Scanner(file, "Unicode");
+            String line;
+            while (in.hasNextLine()) {
+                line = in.nextLine();
+                String[] t = line.split(";");
+                try {
+                    // t[2] is not null, but "null"
+                    result.addCard(t[0], Integer.parseInt(t[1]), new File(t[2]));
+                } catch (Exception ex) {
+                    Debug.p("Ignored line while loading a deck: " + line, Debug.W);
+                }
+            }
+            in.close();
+            result.deckName = Utilities.getName(file);
+            return result;
+        } catch (Exception ex) {
+            Debug.p("Deck could not be loaded from file "
+                    + file + ": " + ex, Debug.E);
+        }
+        return null;
     }
 
     /**
@@ -229,33 +267,5 @@ public class Deck implements Serializable {
         for (int i = paths.size(); i < getArraySize(); i++) {
             paths.add(i, null);
         }
-    }
-
-    /**
-     * Loads a deck from text file given
-     * @param file file to load a deck from
-     * @return deck or null if loading failed
-     */
-    public static Deck load(File file) {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            Deck result = new Deck();
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] t = line.split(";");
-                try {
-                    // t[2] is not null, but "null"
-                    result.addCard(t[0], Integer.parseInt(t[1]), new File(t[2]));
-                } catch (Exception ex) {
-                    Debug.p("Ignored line while loading a deck: " + line, Debug.W);
-                }
-            }
-            br.close();
-            return result;
-        } catch (Exception ex) {
-            Debug.p("Deck could not be loaded from file "
-                    + file + ": " + ex, Debug.E);
-        }
-        return null;
     }
 }
