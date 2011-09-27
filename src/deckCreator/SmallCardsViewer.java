@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 import mtg.Card;
 
@@ -23,7 +24,7 @@ import mtg.Card;
  * @author Jaroslaw Pawlak
  */
 public class SmallCardsViewer extends JScrollPane {
-    private Thread t;
+    private SwingWorker t;
 
     private JPanel panel;
     private List<ViewableCard> cards;
@@ -36,11 +37,12 @@ public class SmallCardsViewer extends JScrollPane {
 
         this.parent = parent;
 
-        t = new Thread() {
+        t = new SwingWorker() {
+
             @Override
-            public void run() {
+            protected Object doInBackground() throws Exception {
                 JScrollBar b = SmallCardsViewer.this.getHorizontalScrollBar();
-                while (!isInterrupted()) {
+                while (!isCancelled()) {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException ex) {}
@@ -62,17 +64,10 @@ public class SmallCardsViewer extends JScrollPane {
                         } else if (x > 2 * w / 3) {
                             i = 3;
                         }
-//                        try {
-                            b.setValue(b.getValue() + Card.W * i / 15);
-//                        } catch (NullPointerException ex) {}
-//TODO
-/* throws exceptions when scrolling and using JSplitPane at the same time
- * the best would be to do nothing if any mouse button is pressed
- * it sometimes crashes even if nothing special happened
- * I don't think it's a good idea to mix a Swing and own threads...
- */
+                        b.setValue(b.getValue() + Card.W * i / 15);
                     }
                 }
+                return null;
             }
         };
 
@@ -82,7 +77,7 @@ public class SmallCardsViewer extends JScrollPane {
 
         this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         this.setViewportView(panel);
-        t.start();
+        t.execute();
     }
 
     public void addCard(ViewableCard card) {
@@ -141,7 +136,7 @@ public class SmallCardsViewer extends JScrollPane {
      */
     public void close() {
         if (t != null) {
-            t.interrupt();
+            t.cancel(true);
         }
     }
 

@@ -1,14 +1,16 @@
-package mtg;
+package server;
 
-import flags.Action;
-import flags.CheckDeck;
-import flags.RequestCard;
+import server.flags.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import mtg.Debug;
+import mtg.Deck;
+import mtg.Main;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -30,7 +32,7 @@ public class Server extends Thread {
     private static Deck[] deck;
     private static String[] name;
 
-    private static boolean[] ready;
+    static boolean[] ready;
 
     private Server() {}
 
@@ -63,20 +65,13 @@ public class Server extends Thread {
 
         serverMainThread = new Server();
         serverMainThread.start();
-
-        /* //TODO wait to receive ready signals from all the players, players
-         * may still be downloading missing cards.
-         * 
-         * To each player must be sent the number of players and their names
-         * and that player's shuffled library (or maybe not?)
-         */
-
     }
 
     @Override
     public void run() {
         for (int i = 0; i < ready.length; i++) {
             Debug.p("waiting for player " + i + "/" + ready.length);
+            ready[i] = false;
             try {
                 fileSocket[i] = new ServerSocket(port + i + 1);
                 socket[i] = ss.accept();
@@ -85,8 +80,9 @@ public class Server extends Thread {
                 oos[i].flush();
 
                 // exchange basic info
-                name[i] = (String) ois[i].readObject();
-                deck[i] = (Deck) ois[i].readObject();
+                CheckDeck newdeck = (CheckDeck) ois[i].readObject();
+                name[i] = newdeck.owner;
+                deck[i] = newdeck.deck;
                 deck[i].save(new File(Main.DECKS_DL, Utilities
                         .getCurrentTimeForFile()+ " " + name[i] + ""
                         + deck[i].getName() + ".txt"));
@@ -114,11 +110,12 @@ public class Server extends Thread {
                 serverListeningThreads[i].start();
 
                 // all clients check all decks
-                for (int j = 0; j < i; j++) {
+                for (int prev = 0; prev < i; prev++) {
+                    ready[prev] = false;
                     // send new deck to already connected clients
-                    send(j, new CheckDeck(name[i], deck[i]));
+                    send(prev, newdeck);
                     // send already connected clients' decks to the new client
-                    send(i, new CheckDeck(name[j], deck[j]));
+                    send(i, new CheckDeck(name[prev], deck[prev]));
                 }
             } catch (Exception ex) {
                 String ip = socket[i].getLocalAddress() == null?
@@ -134,6 +131,22 @@ public class Server extends Thread {
             }
         }
         Debug.p("Game initialisation finished", Debug.I);
+
+        boolean allReady = false;
+        while (!allReady) {
+            for (int i = 0; i < ready.length; i++) {
+                if (!ready[i]) {
+                    break;
+                }
+            }
+            allReady = true;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {}
+        }
+
+        //TODO randomize decks and send cards
+        // send number of players and their names
     }
 
     static void send(int player, Action object) {

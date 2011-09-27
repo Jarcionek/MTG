@@ -1,4 +1,4 @@
-package flags;
+package server.flags;
 
 import java.io.Serializable;
 

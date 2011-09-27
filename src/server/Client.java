@@ -1,12 +1,15 @@
-package mtg;
+package server;
 
-import flags.CheckDeck;
-import flags.RequestCard;
+import server.flags.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import mtg.Debug;
+import mtg.Deck;
+import mtg.Main;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -33,8 +36,7 @@ public class Client {
         ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
         oos.flush();
         ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-        oos.writeObject(playerName);
-        oos.writeObject(deck);
+        oos.writeObject(new CheckDeck(playerName, deck));
         fileTransferPort = ois.readInt();
 
         Object object = null;
@@ -67,6 +69,8 @@ public class Client {
                             t.close();
                         }
                     }
+                    oos.writeObject(new Ready());
+                    oos.flush();
                     // save deck
                     d.save(new File(Main.DECKS_DL, Utilities
                             .getCurrentTimeForFile()

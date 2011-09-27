@@ -13,11 +13,10 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
-import mtg.Card;
-import mtg.Client;
 import mtg.Deck;
 import mtg.Library;
 import mtg.Main;
+import server.Client;
 
 /**
  * @author Jaroslaw Pawlak
@@ -36,10 +35,6 @@ public class Game extends JFrame {
 
     private Game() {}
 
-    /* //TODO client must receive number of players from the server with their
-     * names and optionally table's size. Also shuffled library is required.
-     *
-     */
     public Game(JFrame parentFrame, String[] playersNames) {
         super(Main.TITLE);
         this.parentFrame = parentFrame;
@@ -145,11 +140,12 @@ public class Game extends JFrame {
         deck.addCard("Bramblewood Paragon", 1);
         Library library = new Library(deck);
 
-        Card c;
-        while ((c = library.draw()) != null) {
-            x.hand.addCard(c);
+        for (int i = 0; i < 7; i++) {
+            x.hand.addCard(library.draw());
         }
 
         x.hand.showCards(null);
+        x.table.addCard(library.draw());
+        x.table.addCard(library.draw());
     }
 }

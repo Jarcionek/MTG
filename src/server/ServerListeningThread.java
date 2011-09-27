@@ -1,10 +1,11 @@
-package mtg;
+package server;
 
-import flags.*;
+import server.flags.*;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -37,6 +38,8 @@ public class ServerListeningThread extends Thread {
                     Socket s = fileSocket.accept();
                     Utilities.sendFile(new File(Utilities.findPath(t.name)), s);
                     s.close();
+                } else if (object.getClass().equals(Ready.class)) {
+                    Server.ready[id] = true;
                 }
             } catch (Exception ex) {
                 if (ex.getLocalizedMessage() != null

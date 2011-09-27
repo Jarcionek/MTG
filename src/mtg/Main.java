@@ -23,6 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import server.Client;
+import server.ServerFrame;
 
 /**
  * @author Jaroslaw Pawlak
@@ -80,7 +82,7 @@ public class Main extends JFrame {
                 deckCreator.getPreferredSize().height);
         deckCreator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new DeckCreator(TITLE + ": Deck Creator", Main.this, CARDS);
+                new DeckCreator(TITLE + ": Deck Creator", Main.this);
             }
         });
         contentPane.add(deckCreator);

@@ -22,13 +22,13 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 import mtg.Deck;
+import mtg.Main;
 import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
  */
 public class DeckCreator extends JFrame {
-    private File cardsDirectory;
     private JFrame parentFrame;
 
     SmallCardsViewer scv;
@@ -46,9 +46,8 @@ public class DeckCreator extends JFrame {
 
     private DeckCreator() {}
 
-    public DeckCreator(String title, JFrame parentFrame, File cardsDirectory) {
+    public DeckCreator(String title, JFrame parentFrame) {
         super(title);
-        this.cardsDirectory = cardsDirectory;
         this.parentFrame = parentFrame;
         this.parentFrame.setVisible(false);
 
@@ -73,7 +72,7 @@ public class DeckCreator extends JFrame {
     }
 
     private void createGUIComponents() {
-        CardTreeNode treeRoot = new CardTreeNode(cardsDirectory);
+        CardTreeNode treeRoot = new CardTreeNode(Main.CARDS);
 
         cardsTree = new JTree(treeRoot);
         cardsTree.setRootVisible(false);
@@ -93,7 +92,7 @@ public class DeckCreator extends JFrame {
         scv = new SmallCardsViewer(this);
 
         lcv = new LargeCardsViewer(this);
-        lcv.setDirectory(cardsDirectory);
+        lcv.setDirectory(Main.CARDS);
 
         back = new JButton("Back");
         back.setFocusable(false);

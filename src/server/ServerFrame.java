@@ -1,4 +1,4 @@
-package mtg;
+package server;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -18,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import mtg.Main;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -58,7 +60,6 @@ public class ServerFrame extends JFrame {
 
         createComponents();
         createGUI();
-//        check();
         center();
 
         this.setResizable(false);
