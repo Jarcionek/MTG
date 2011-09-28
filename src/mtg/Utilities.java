@@ -48,18 +48,8 @@ public class Utilities {
      */
     private static String findPath(File directory, String name) {
         for (File e : directory.listFiles()) {
-//            System.out.println(e);
-            if (e.isFile() && Utilities.getName(e).equals(name)) {
-//                System.out.println(true);
-//                System.out.println("======");
-//                System.out.println("File e: " + e);
-//                System.out.println("File name: " + Utilities.getName(e));
-//                System.out.println("requested name-" + name);
-//                System.out.println("equal-" + Utilities.getName(e).equals(name));
-//                System.out.println("======");
-//                if (Utilities.getName(e).equals(name)) {
-                    return e.getPath();
-//                }
+            if (e.isFile() && Utilities.getName(e).equalsIgnoreCase(name)) {
+                return e.getPath();
             }
             if (e.isDirectory()) {
                 String x = findPath(e, name);

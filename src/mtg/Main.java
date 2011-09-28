@@ -121,6 +121,7 @@ public class Main extends JFrame {
                 joinGame.getPreferredSize().height);
         joinGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                //TODO temp
                 JFileChooser jfc = new JFileChooser(DECKS);
                 jfc.setMultiSelectionEnabled(false);
                 jfc.showOpenDialog(Main.this);
@@ -130,7 +131,7 @@ public class Main extends JFrame {
                 int port = Integer.parseInt(
                         JOptionPane.showInputDialog(Main.this, "port:", "56789"));
                 try {
-                    new Client("Jarek", ip, port, deck);
+                    new Client("Jarek", ip, port, deck, Main.this);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -249,7 +250,8 @@ public class Main extends JFrame {
 }
 
 /** //TODO LIST
- * server and clients save decks
  * return random number from server (coin, die, specified borders)
  * choose a card at random from your hand
+ * add +1/+1 and -1/-1 counters to cards
+ * add notes to cards?
  */

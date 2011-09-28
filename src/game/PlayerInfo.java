@@ -8,27 +8,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
-import mtg.Debug;
 
 /**
  * @author Jaroslaw Pawlak
  */
 public class PlayerInfo extends JPanel {
 
-    private JLabel nameLabel;
+    /**
+     * name of a player
+     */
+    JLabel nameLabel;
     private JLabel handSizeLabel;
-    private JLabel handSizeValue;
+    JLabel handSizeValue;
     private JLabel healthPointsLabel;
-    private JLabel healthPointsValue;
+    JLabel healthPointsValue;
     private JLabel librarySizeLabel;
-    private JLabel librarySizeValue;
+    JLabel librarySizeValue;
     private JLabel poisonCountersLabel;
-    private JLabel poisonCountersValue;
+    JLabel poisonCountersValue;
     private JButton viewGraveyardButton;
     private JButton viewExiledButton;
     private JButton poisonButton;
@@ -47,10 +47,10 @@ public class PlayerInfo extends JPanel {
             healthPointsLabel = new JLabel("Health points"),
             librarySizeLabel = new JLabel("Library size"),
             poisonCountersLabel = new JLabel("Poison counters"),
-            handSizeValue = new JLabel("7"),
-            healthPointsValue = new JLabel("20"),
-            librarySizeValue = new JLabel("?"),
-            poisonCountersValue = new JLabel("0"),
+            handSizeValue = new JLabel("..."),
+            healthPointsValue = new JLabel("..."),
+            librarySizeValue = new JLabel("..."),
+            poisonCountersValue = new JLabel("..."),
         };
         for (JLabel e : jlabels) {
             e.setHorizontalAlignment(JLabel.CENTER);
@@ -156,20 +156,4 @@ public class PlayerInfo extends JPanel {
         c.insets = new Insets(0, 0, outside, outside);
         this.add(healthButton, c);
     }
-
-    public static void main(String[] asfasf) {
-        JFrame x = new JFrame();
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            Debug.p("Look and feel could not be set: " + ex, Debug.E);
-        }
-
-        x.setContentPane(new PlayerInfo("Jarcionek"));
-        x.pack();
-        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        x.setVisible(true);
-    }
-
 }

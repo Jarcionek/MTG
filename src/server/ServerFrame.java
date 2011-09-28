@@ -26,8 +26,10 @@ import mtg.Utilities;
  */
 public class ServerFrame extends JFrame {
 
+    private static int MAX_PLAYERS = 8;
+
     private static int PORT_MIN = 49152;
-    private static int PORT_MAX = 65535;
+    private static int PORT_MAX = 65535 - MAX_PLAYERS;
 
     private JFrame parentFrame;
     
@@ -102,7 +104,18 @@ public class ServerFrame extends JFrame {
                                 Integer.parseInt(portField.getText()),
                                 Integer.parseInt(playersField.getText()));
                         ServerFrame.this.dispose();
+
                         //TODO start client
+                        System.out.println("//TODO JOINING CLIENT TO LOCALHOST SERVER");
+                        javax.swing.JFileChooser jfc = new javax.swing.JFileChooser(mtg.Main.DECKS);
+                        jfc.setMultiSelectionEnabled(false);
+                        jfc.showOpenDialog(ServerFrame.this);
+                        java.io.File f = jfc.getSelectedFile();
+                                mtg.Deck deckblah = mtg.Deck.load(f);
+                        new Client("Jarcionek", "localhost",
+                                Integer.parseInt(portField.getText()), deckblah,
+                                parentFrame);
+                        
                     } catch (IOException ex) {
                         ServerFrame.this.setVisible(true);
                         ServerFrame.this.messagesField.setText("Could not create a server:\n" + ex);
@@ -213,8 +226,8 @@ public class ServerFrame extends JFrame {
             if (players < 1) {
                 messagesField.append("There must be at least one player\n");
                 allOK = false;
-            } else if (players > 8) {
-                messagesField.append("There cannot be more than 8 players\n");
+            } else if (players > MAX_PLAYERS) {
+                messagesField.append("There cannot be more than " + MAX_PLAYERS + " players\n");
                 allOK = false;
             }
         }

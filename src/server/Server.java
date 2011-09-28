@@ -29,10 +29,12 @@ public class Server extends Thread {
     private static ObjectOutputStream[] oos;
     private static ObjectInputStream[] ois;
 
-    private static Deck[] deck;
-    private static String[] name;
+    private static Deck[] decks;
+    private static String[] names;
 
     static boolean[] ready;
+
+    static Game game;
 
     private Server() {}
 
@@ -47,7 +49,6 @@ public class Server extends Thread {
      * See {@link java.net.ServerSocket#ServerSocket(int)}
      */
     public static void start(int port, int players) throws IOException {
-
         Server.port = port;
 
         serverListeningThreads = new ServerListeningThread[players];
@@ -56,10 +57,10 @@ public class Server extends Thread {
         oos = new ObjectOutputStream[players];
         ois = new ObjectInputStream[players];
         
-        deck = new Deck[players];
-        name = new String[players];
+        decks = new Deck[players];
+        names = new String[players];
 
-        ready = new boolean[players];
+        ready = new boolean[players]; //TODO shouldn't it be synchronized?
 
         ss = new ServerSocket(port);
 
@@ -72,6 +73,8 @@ public class Server extends Thread {
         for (int i = 0; i < ready.length; i++) {
             Debug.p("waiting for player " + i + "/" + ready.length);
             ready[i] = false;
+            CheckDeck newdeck = null;
+            
             try {
                 fileSocket[i] = new ServerSocket(port + i + 1);
                 socket[i] = ss.accept();
@@ -80,25 +83,27 @@ public class Server extends Thread {
                 oos[i].flush();
 
                 // exchange basic info
-                CheckDeck newdeck = (CheckDeck) ois[i].readObject();
-                name[i] = newdeck.owner;
-                deck[i] = newdeck.deck;
-                deck[i].save(new File(Main.DECKS_DL, Utilities
-                        .getCurrentTimeForFile()+ " " + name[i] + ""
-                        + deck[i].getName() + ".txt"));
+                newdeck = (CheckDeck) ois[i].readObject();
+                names[i] = checkName(newdeck.owner);
+                decks[i] = newdeck.deck;
+                decks[i].save(new File(Main.DECKS_DL, Utilities
+                        .getCurrentTimeForFile()+ " " + names[i] + ""
+                        + decks[i].getName() + ".txt"));
                 oos[i].writeInt(port + i + 1);
+                oos[i].flush();
+                oos[i].writeInt(ready.length);
                 oos[i].flush();
 
                 // check new deck and download missing cards
-                for (int j = 0; j < deck[i].getArraySize(); j++) {
-                    if (Utilities.findPath(deck[i].getArrayNames(j)) == null) {
+                for (int j = 0; j < decks[i].getArraySize(); j++) {
+                    if (Utilities.findPath(decks[i].getArrayNames(j)) == null) {
                         // send card request
-                        send(i, new RequestCard(deck[i].getArrayNames(j)));
+                        send(i, new RequestCard(decks[i].getArrayNames(j)));
 
                         // receive file
                         Socket t = fileSocket[i].accept();
                         Utilities.receiveFile(new File(Main.CARDS_DL, 
-                                deck[i].getArrayNames(j) + ".jpg"), t);
+                                decks[i].getArrayNames(j) + ".jpg"), t);
                         t.close();
                     }
                 }
@@ -108,27 +113,31 @@ public class Server extends Thread {
                 serverListeningThreads[i]
                         = new ServerListeningThread(i, ois[i], fileSocket[i]);
                 serverListeningThreads[i].start();
-
-                // all clients check all decks
-                for (int prev = 0; prev < i; prev++) {
-                    ready[prev] = false;
-                    // send new deck to already connected clients
-                    send(prev, newdeck);
-                    // send already connected clients' decks to the new client
-                    send(i, new CheckDeck(name[prev], deck[prev]));
-                }
             } catch (Exception ex) {
                 String ip = socket[i].getLocalAddress() == null?
                     "not received" : "" + socket[i].getLocalAddress();
                 String msg = "Error while dealing with player " + i + ": "
-                        + "IP = " + ip + ", name = " + name[i]
+                        + "IP = " + ip + ", name = " + names[i]
                         + ", exception = " + ex;
                 Debug.p(msg, Debug.W);
                 i--;
                 try {
                     fileSocket[i].close();
                 } catch (Exception ex2) {}
+                continue;
             }
+
+
+            // all clients check all decks
+            for (int prev = 0; prev < i; prev++) {
+                ready[prev] = false;
+                // send new deck to already connected clients
+                send(prev, newdeck);
+                // send already connected clients' decks to the new client
+                send(i, new CheckDeck(names[prev], decks[prev]));
+            }
+
+            send(i, newdeck);
         }
         Debug.p("Game initialisation finished", Debug.I);
 
@@ -145,8 +154,19 @@ public class Server extends Thread {
             } catch (InterruptedException ex) {}
         }
 
-        //TODO randomize decks and send cards
-        // send number of players and their names
+        game = new Game(decks);
+        CardsList x = new CardsList(game.getAllCardsList());
+        for (int i = 0; i < ready.length; i++) {
+            send(i, x);
+        }
+
+        for (int p = 0; p < ready.length; p++) {
+            for (int c = 0; c < 7; c++) {
+                game.libraryDraw(p);
+            }
+        }
+
+        Debug.p("Server main thread terminates");
     }
 
     static void send(int player, Action object) {
@@ -161,11 +181,18 @@ public class Server extends Thread {
         }
     }
 
+    static void sendToAll(Action object) {
+        for (int i = 0; i < ready.length; i++) {
+            send(i, object);
+        }
+    }
+
     /**
      * Closes all streams and sockets of given player.
      * @param player player
      */
     static void disconnect(int player) {
+        Debug.p("Player " + player + " - " + names[player] + " disconneced");
         try {
             socket[player].close();
         } catch (IOException ex) {}
@@ -176,5 +203,18 @@ public class Server extends Thread {
         socket[player] = null;
         ois[player] = null;
         oos[player] = null;
+    }
+
+    static String checkName(String name) {
+        name = name.replaceAll("\\W", "");
+        if (name.length() > 15) {
+            name = name.substring(0, 15);
+        }
+        for (int i = 0; i < names.length; i++) {
+            if (name.equals(names[i])) {
+                return checkName(name + "-");
+            }
+        }
+        return name;
     }
 }

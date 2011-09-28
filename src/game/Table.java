@@ -2,16 +2,13 @@ package game;
 
 import java.awt.Dimension;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import mtg.Card;
-import mtg.Deck;
-import mtg.Library;
 
 /**
  * @author Jaroslaw Pawlak
@@ -57,6 +54,8 @@ public class Table extends JScrollPane {
         this.table.addMouseListener(tdl);
         this.table.addMouseMotionListener(tdl);
         this.table.setAutoscrolls(true);
+
+        this.setWheelScrollingEnabled(false);
     }
 
     /**
@@ -86,13 +85,45 @@ public class Table extends JScrollPane {
         for (MouseListener e : card.getMouseListeners()) {
             card.removeMouseListener(e);
         }
-        OnTableMouseListener t = new OnTableMouseListener();
+        for (MouseMotionListener e : card.getMouseMotionListeners()) {
+            card.removeMouseMotionListener(e);
+        }
+
+        OnTableMouseAdapter t = new OnTableMouseAdapter();
         card.addMouseListener(t);
         card.addMouseMotionListener(t);
         card.setCardPosition(table.getPreferredSize().width / 2,
                 table.getPreferredSize().height / 2);
         table.add(card, 0);
         card.repaint();
+    }
+
+    public void dragCard(String ID, int newx, int newy) {
+        for (Object e : table.getComponents()) {
+            if (!e.getClass().equals(Card.class)) {
+                continue;
+            }
+            if (((Card) e).getID().equals(ID)) {
+                ((Card) e).setCardPosition(newx, newy);
+                break;
+            }
+        }
+    }
+
+    public void tapCard(String ID, boolean tapped) {
+        for (Object e : table.getComponents()) {
+            if (!e.getClass().equals(Card.class)) {
+                continue;
+            }
+            if (((Card) e).getID().equals(ID)) {
+                if (tapped) {
+                    ((Card) e).tap();
+                } else {
+                    ((Card) e).untap();
+                }
+                break;
+            }
+        }
     }
 
     /**
@@ -112,38 +143,5 @@ public class Table extends JScrollPane {
                 Card.W + 8,
                 Card.H + 8);
         table.add(centre);
-    }
-
-
-
-    public static void main(String[] ars) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {}
-
-        JFrame x = new JFrame();
-
-//        Table y = new Table(new Dimension(800, 600));
-        Table y = new Table(TWO_PLAYERS);
-
-
-        x.setContentPane(y);
-        x.setSize(400, 300);
-        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        x.setVisible(true);
-        y.centerView();
-
-        Deck deck = new Deck();
-        deck.addCard("Ezuri's Archers", 4);
-        deck.addCard("Joraga Treespeaker", 1);
-        deck.addCard("Joraga Warcaller", 1);
-        deck.addCard("Scattershot Archer", 2);
-        deck.addCard("Twinblade Slasher", 2);
-        deck.addCard("Bramblewood Paragon", 1);
-        Library library = new Library(deck);
-
-        y.addCard(library.draw());
-        y.addCard(library.draw());
-        y.addCard(library.draw());
     }
 }

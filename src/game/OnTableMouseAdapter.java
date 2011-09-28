@@ -1,15 +1,21 @@
 package game;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import mtg.Card;
+import server.flags.DragCard;
+import server.flags.TapCard;
 
 /**
  * @author Jaroslaw Pawlak
  */
-public class OnTableMouseListener extends MouseAdapter {
+public class OnTableMouseAdapter extends MouseAdapter {
 
     private Card tempCard;
     private int tempX;
@@ -35,53 +41,62 @@ public class OnTableMouseListener extends MouseAdapter {
             cardPosition = source.getCardPosition();
             if (e.getClickCount() >= 2) {
                 if (source.isTapped()) {
-                    source.untap(); //TODO client
+                    source.untap();
+                    Game.client.send(new TapCard(-1, source.getID(), false));
                 } else {
-                    source.tap(); //TODO client
+                    source.tap();
+                    Game.client.send(new TapCard(-1, source.getID(), true));
                 }
             }
         } else {
             tempCard = null;
         }
         if (e.getButton() == MouseEvent.BUTTON3) {
-            source.viewLarger();
-//            JPopupMenu popupMenu = new JPopupMenu();
-//            JMenuItem tapper = new JMenuItem(source.isTapped()? "untap" : "tap");
-//            tapper.addActionListener(new ActionListener() {
-//                public void actionPerformed(ActionEvent e) {
-//                    if (source.isTapped()) {
-//                        source.untap();
-//                    } else {
-//                        source.tap();
-//                    }
-//                }
-//            });
-//            JMenuItem viewerLarger = new JMenuItem("view");
-//            viewerLarger.addActionListener(new ActionListener() {
-//                public void actionPerformed(ActionEvent e) {
-//                    c.viewLarger();
-//                }
-//            });
-//            JMenuItem exile = new JMenuItem("exile");
-//            exile.addActionListener(new ActionListener() {
-//                public void actionPerformed(ActionEvent e) {
-//                    contentPane.remove(c);
-//                    contentPane.repaint();
-//                }
-//            });
-//            JMenuItem play = new JMenuItem("return to hand");
-//            play.addActionListener(new ActionListener() {
-//                public void actionPerformed(ActionEvent e) {
-//                    OldCardsViewer.addCard(c);
-//                    contentPane.remove(c);
-//                    contentPane.repaint();
-//                }
-//            });
-//            popupMenu.add(tapper);
-//            popupMenu.add(play);
-//            popupMenu.add(viewerLarger);
-//            popupMenu.add(exile);
-//            popupMenu.show(source, e.getX(), e.getY());
+            if (e.getClickCount() == 1) {
+                JPopupMenu popupMenu = new JPopupMenu();
+
+                JMenuItem exile = new JMenuItem("exile");
+                exile.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        
+                    }
+                });
+
+                JMenuItem moveToHand = new JMenuItem("return to hand");
+                moveToHand.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToGraveyard = new JMenuItem("destroy");
+                moveToGraveyard.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToLibrary = new JMenuItem("put on top of library");
+                moveToLibrary.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem enlarge = new JMenuItem("view large");
+                enlarge.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        source.viewLarger();
+                    }
+                });
+
+                popupMenu.add(moveToGraveyard);
+                popupMenu.add(moveToHand);
+                popupMenu.add(moveToLibrary);
+                popupMenu.add(exile);
+                popupMenu.add(enlarge);
+
+                popupMenu.show(source, e.getX(), e.getY());
+            } else {
+                source.viewLarger();
+            }
         }
     }
     @Override
@@ -93,11 +108,9 @@ public class OnTableMouseListener extends MouseAdapter {
         Point currentPos = source.getCardPosition();
         if (Math.abs(currentPos.x - cardPosition.x) > Table.mistakeMargin
                 || Math.abs(currentPos.y - cardPosition.y) > Table.mistakeMargin) {
-            //TODO client - card moved
+            Game.client.send(new DragCard(-1, source.getID(), currentPos.x, currentPos.y));
         } else {
             source.setCardPosition(cardPosition.x, cardPosition.y);
-            //TODO this should be moved before if statement
-            //card will be really moved after receiving a notice from the server
         }
     }
 

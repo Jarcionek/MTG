@@ -99,15 +99,4 @@ public class CurrentPlayerLibrary extends JPanel {
         c.insets = new Insets(0, outside, outside, outside);
         this.add(shuffleButton, c);
     }
-
-    public static void main(String[] asfasf) throws Exception {
-        JFrame x = new JFrame();
-
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-        x.setContentPane(new CurrentPlayerLibrary());
-        x.pack();
-        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        x.setVisible(true);
-    }
 }

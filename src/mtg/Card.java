@@ -46,25 +46,29 @@ public final class Card extends JLabel {
     private boolean tapped;
     private int xpos;
     private int ypos;
+    private String ID;
 
     private Card() {}
 
-    /**
-     * @see Card(String)
-     */
-    public Card(File image) {
+    public Card(File image, String ID) {
         super();
 
         this.image = image;
         this.tapped = true;
+        this.ID = ID;
         this.untap();
     }
 
-    /**
-     * @see Card(File)
-     */
+    public Card(File image) {
+        this(image, null);
+    }
+
     public Card(String path) {
         this(new File(path));
+    }
+
+    public Card(String path, String ID) {
+        this(new File(path), ID);
     }
 
     /**
@@ -179,6 +183,10 @@ public final class Card extends JLabel {
         }
     }
 
+    public String getID() {
+        return ID;
+    }
+
     /**
      * Displays new, undecorated JFrame with original (not resized) image in
      * the centre of a screen. Frame is disposed when mouse button is released
@@ -195,10 +203,6 @@ public final class Card extends JLabel {
             public void mouseReleased(MouseEvent e) {
                 temp.dispose();
             }
-//            @Override
-//            public void mouseExited(MouseEvent e) {
-//                temp.dispose();
-//            }
         });
         temp.addFocusListener(new FocusAdapter() {
             @Override
@@ -215,7 +219,21 @@ public final class Card extends JLabel {
         temp.setVisible(true);
     }
 
+
     ///// OVERRIDES /////
+
+    /**
+     * Cards are considered equal if their ID are the same. If any of them is
+     * null then cards are not equal.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null
+                && obj.getClass().equals(Card.class)
+                && this.ID != null
+                && ((Card) obj).ID != null
+                && this.ID.equals(((Card) obj).ID);
+    }
 
     @Override
     public String toString() {

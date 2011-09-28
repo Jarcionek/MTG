@@ -3,28 +3,25 @@ package game;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.Toolkit;
+import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
-import mtg.Deck;
-import mtg.Library;
+import mtg.Card;
 import mtg.Main;
+import mtg.Utilities;
 import server.Client;
 
 /**
  * @author Jaroslaw Pawlak
  */
 public class Game extends JFrame {
-    private JFrame parentFrame;
-
-    Client client;
+    static Client client;
 
     private Table table;
     private CardViewer hand;
@@ -32,25 +29,18 @@ public class Game extends JFrame {
     private CurrentPlayerLibrary playerLibrary;
     private Logger logger;
 
+    TreeMap<String, String> list;
 
     private Game() {}
 
-    public Game(JFrame parentFrame, String[] playersNames) {
+    public Game(int players, Client client) {
         super(Main.TITLE);
-        this.parentFrame = parentFrame;
-        this.parentFrame.setVisible(false);
+        Game.client = client;
 
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                Game.this.parentFrame.setVisible(true);
-            }
-        });
-
-        createGUIComponents(playersNames);
+        createGUIComponents(players);
         createGUILayout();
 
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setUndecorated(true);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
@@ -59,24 +49,26 @@ public class Game extends JFrame {
                 table.centerView();
             }
         });
+        
+        client.start();
     }
 
-    private void createGUIComponents(String[] playersNames) {
-        if (playersNames.length == 2) {
+    private void createGUIComponents(int players) {
+        if (players == 2) {
             table = new Table(Table.TWO_PLAYERS);
-        } else if (playersNames.length <= 4) {
+        } else if (players <= 4) {
             table = new Table(Table.FOUR_PLAYERS);
-        } else if (playersNames.length <= 6) {
+        } else if (players <= 6) {
             table = new Table(Table.SIX_PLAYERS);
         } else {
             table = new Table(Table.EIGHT_PLAYERS);
         }
 
-        hand = new CardViewer(new InSearcherMouseListener(Zone.HAND));
+        hand = new CardViewer(new InSearcherMouseAdapter(Zone.HAND));
 
-        playersInfo = new PlayerInfo[playersNames.length];
+        playersInfo = new PlayerInfo[players];
         for (int i = 0; i < playersInfo.length; i++) {
-            playersInfo[i] = new PlayerInfo(playersNames[i]);
+            playersInfo[i] = new PlayerInfo("...waiting...");
         }
 
         playerLibrary = new CurrentPlayerLibrary();
@@ -119,33 +111,86 @@ public class Game extends JFrame {
         center.add(table, BorderLayout.CENTER);
         center.add(bottom, BorderLayout.SOUTH);
 
-        JPanel contentPane = new JPanel(new BorderLayout());
-        contentPane.add(center, BorderLayout.CENTER);
-        contentPane.add(right, BorderLayout.EAST);
+//        JPanel contentPane = new JPanel(new BorderLayout());
+//        contentPane.add(center, BorderLayout.CENTER);
+//        contentPane.add(right, BorderLayout.EAST);
+        right.setMinimumSize(right.getPreferredSize());
+        center.setMinimumSize(new Dimension(Card.W*2, Card.H));
+        JSplitPane contentPane = new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT, center, right);
+        contentPane.setDividerLocation(
+                Toolkit.getDefaultToolkit().getScreenSize().width
+                - right.getPreferredSize().width);
+
         this.setContentPane(contentPane);
     }
 
-
-    public static void main(String[] as) throws Exception {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-        Game x = new Game(new JFrame(), new String[] {"Jarcionek", "Kenoicraj"});
-
-        Deck deck = new Deck();
-        deck.addCard("Ezuri's Archers", 4);
-        deck.addCard("Joraga Treespeaker", 1);
-        deck.addCard("Joraga Warcaller", 1);
-        deck.addCard("Scattershot Archer", 2);
-        deck.addCard("Twinblade Slasher", 2);
-        deck.addCard("Bramblewood Paragon", 1);
-        Library library = new Library(deck);
-
-        for (int i = 0; i < 7; i++) {
-            x.hand.addCard(library.draw());
+    public void addPlayer(String name) {
+        for (int i = 0; i < playersInfo.length; i++) {
+            if (playersInfo[i].nameLabel.getText().equals("...waiting...")) {
+                playersInfo[i].nameLabel.setText(name);
+                return;
+            }
         }
+    }
 
-        x.hand.showCards(null);
-        x.table.addCard(library.draw());
-        x.table.addCard(library.draw());
+    public void setPlayerLibrarySize(String playerName, int size) {
+        for (int i = 0; i < playersInfo.length; i++) {
+            if (playersInfo[i].nameLabel.getText().equals(playerName)) {
+                playersInfo[i].handSizeValue.setText("0");
+                playersInfo[i].healthPointsValue.setText("20");
+                playersInfo[i].librarySizeValue.setText("" + size);
+                playersInfo[i].poisonCountersValue.setText("0");
+            }
+        }
+    }
+
+    public void setCardsList(TreeMap<String, String> list) {
+        this.list = list;
+    }
+
+    public void cardAddToHand(String ID) {
+        Card c = new Card(Utilities.findPath(list.get(ID)), ID);
+        hand.addCard(c);
+        hand.showCards(c);
+    }
+
+    public void cardRemoveFromHand(String ID) {
+        hand.removeCard(new Card(Utilities.findPath(list.get(ID)), ID));
+        hand.showCards(null);
+    }
+
+    public void cardAddToTable(String ID) {
+        table.addCard(new Card(Utilities.findPath(list.get(ID)), ID));
+    }
+
+    public void cardRemoveFromTable(String ID) {
+        
+    }
+
+    public void cardDragOnTable(String ID, int newx, int newy) {
+        table.dragCard(ID, newx, newy);
+    }
+
+    public void cardTap(String ID, boolean tapped) {
+        table.tapCard(ID, tapped);
+    }
+
+
+
+    public void log(String text) {
+        logger.log(text);
+//        String temp = text.substring(text.lastIndexOf(" ") + 1);
+//        System.out.println(temp); //TODO remove
+//        logger.log(list.get(temp));
+    }
+
+
+    public String getCardName(String cardID) {
+        return list.get(cardID);
+    }
+
+    public String getPlayerName(int i) {
+        return playersInfo[i].nameLabel.getText();
     }
 }
