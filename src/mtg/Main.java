@@ -162,7 +162,13 @@ public class Main extends JFrame {
     }
 
     private static void saveExampleCards() {
-        String[] cards = {
+        String [] wieldingSteelCards = {};
+        String [] realmOfIllusionCards = {};
+        String [] strengthOfStoneCards = {};
+        String [] guardiansOfTheWoodCards = {};
+        String [] ancientDepthsCards = {};
+        String [] dragonsRoarCards = {};
+        String[] blooHungerCards = {
             "Barony Vampire.jpg",
             "Blade of the Bloodchief.jpg",
             "Bloodghast.jpg",
@@ -194,26 +200,43 @@ public class Main extends JFrame {
             "Vampire's Bite.jpg",
             "Vicious Hunger.jpg",
         };
+        String [] machinationsCards = {};
+        String [] unquenchableCards = {};
+        String [] apexPredatorsCards = {};
+
+        File examples = new File(CARDS, "Example");
+
+        File wieldingSteel = new File(examples, "Wielding Steel");
+        File realmOfIllusion = new File(examples, "Realm of Illusion");
+        File strengthOfStone = new File(examples, "Strength of Stone");
+        File guardiansOfTheWood = new File(examples, "Guardians of the Wood");
+        File ancientDepths = new File(examples, "Ancient Depths");
+        File dragonsRoar = new File(examples, "Dragon's Roar");
+        File bloodHunger = new File(examples, "Blood Hunger"); //TODO
+        File machinations = new File(examples, "Machinations");
+        File unquenchableFire = new File(examples, "Unquenchable Fire");
+        File apexPredators = new File(examples, "Apex Predators");
+
+        for (String e : blooHungerCards) {
+            save("/resources/cards/" + e, new File(bloodHunger, e));
+        }
+
+
+        //TODO --- remove
         String[] lands = {
             "Forest.jpg",
             "Island.jpg",
             "Mountain.jpg",
             "Plains.jpg",
         };
-
-        File examples = new File(CARDS, "Example");
-        File bloodHunger = new File(examples, "Blood Hunger");
-
-        for (String e : cards) {
-            save("/resources/cards/" + e, new File(bloodHunger, e));
-        }
         for (String e : lands) {
             save("/resources/cards/" + e, new File(examples, e));
         }
+        //TODO --- remove
     }
 
     private static void saveExampleDecks() {
-        String[] decks = {"Blood Hunger.txt"};
+        String[] decks = {"Blood Hunger.txt"}; //TODO
 
         for (String e : decks) {
             save("/resources/decks/" + e, new File(DECKS, e));
