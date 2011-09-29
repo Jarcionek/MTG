@@ -2,7 +2,6 @@ package server;
 
 import java.util.TreeMap;
 import mtg.Deck;
-import server.flags.DrawCard;
 import server.flags.MoveCard;
 
 /**
@@ -73,7 +72,18 @@ class Game {
         if (library[player].getSize() > 0) {
             Card c = library[player].removeLast();
             hand[player].addCard(c);
-            Server.sendToAll(new DrawCard(player, c.ID));
+
+            MoveCard mc = new MoveCard(
+                    MoveCard.LIBRARY, MoveCard.HAND, player, null);
+            for (int i = 0; i < library.length; i++) {
+                if (i == player) {
+                    mc.cardID = c.ID;
+                    Server.send(player, mc);
+                    mc.cardID = null;
+                } else {
+                    Server.send(player, mc);
+                }
+            }
         }
     }
 

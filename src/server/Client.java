@@ -73,8 +73,9 @@ public class Client extends Thread {
                     DragCard dc = (DragCard) object;
                     game.log(game.getPlayerName(dc.requestor)
                             + " drags " + game.getCardName(dc.ID)
-                            + " to (" + dc.newxpos
-                            + "," + dc.newypos + ")");
+//                            + " to (" + dc.newxpos
+//                            + "," + dc.newypos + ")"
+                            );
                     game.cardDragOnTable(dc.ID, dc.newxpos, dc.newypos);
                     
                 // TAP CARD
@@ -88,6 +89,14 @@ public class Client extends Thread {
                 // MOVE CARD
                 } else if (object.getClass().equals(MoveCard.class)) {
                     MoveCard mc = (MoveCard) object;
+                    if (mc.source == MoveCard.LIBRARY
+                            && mc.destination == MoveCard.HAND) {
+                        game.log(game.getPlayerName(mc.requestor) + " draws a card");
+                        if (game.getPlayerName(mc.requestor).equals(playerName)) {
+                            game.cardAddToHand(mc.cardID);
+                        }
+                        continue;
+                    }
                     if (mc.source == MoveCard.TABLE) {
                         game.cardRemoveFromTable(mc.cardID);
                     } else if (mc.source == MoveCard.HAND) {
@@ -98,15 +107,7 @@ public class Client extends Thread {
                     } else if (mc.destination == MoveCard.HAND) {
                         game.cardAddToHand(mc.cardID);
                     }
-
-                // DRAW CARD
-                } else if (object.getClass().equals(DrawCard.class)) {
-                    DrawCard dc = (DrawCard) object;
-                    game.log(game.getPlayerName(dc.requestor) + " draws a card " + dc.cardID);
-                    if (game.getPlayerName(dc.requestor).equals(playerName)) {
-                        game.cardAddToHand(dc.cardID);
-                    }
-
+                    
                 // REQUEST CARD - server requests client to send card's image
                 } else if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = (RequestCard) object;

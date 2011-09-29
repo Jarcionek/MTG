@@ -109,35 +109,4 @@ public class CardViewer extends JPanel {
         }
         this.repaint();
     }
-
-//    public static void main(String[] asf) {
-//        JFrame x = new JFrame();
-//
-//        Deck deck = new Deck();
-//        deck.addCard("Ezuri's Archers", 4);
-//        deck.addCard("Joraga Treespeaker", 1);
-//        deck.addCard("Joraga Warcaller", 1);
-//        deck.addCard("Scattershot Archer", 2);
-//        deck.addCard("Twinblade Slasher", 2);
-//        deck.addCard("Bramblewood Paragon", 1);
-//        Library library = new Library(deck);
-//
-//        CardViewer cont = new CardViewer(new InSearcherMouseListener(Zone.HAND));
-//
-//
-//
-//        x.setContentPane(cont);
-////        x.setSize(400, 300);
-//        x.pack();
-//        x.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        x.setVisible(true);
-//
-//
-//        Card c;
-//        while ((c = library.draw()) != null) {
-//            cont.addCard(c);
-//        }
-//
-//        cont.showCards(null);
-//    }
 }
