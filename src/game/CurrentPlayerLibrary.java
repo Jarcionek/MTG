@@ -7,11 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
+import server.flags.MoveCard;
 
 /**
  * @author Jaroslaw Pawlak
@@ -38,7 +37,8 @@ public class CurrentPlayerLibrary extends JPanel {
         drawButton = new JButton("Draw");
         drawButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Game.client.send(new MoveCard(
+                        MoveCard.TOP_LIBRARY, MoveCard.HAND, -1, null, false));
             }
         });
         drawButton.setFocusable(false);

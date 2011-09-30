@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import mtg.Utilities;
 
 /**
  * @author Jaroslaw Pawlak
@@ -13,9 +14,19 @@ public class Logger extends JPanel {
 
     public Logger() {
         super(new GridLayout(1, 1));
-        textArea = new JTextArea();
+
+        String text = "Internal IP: ";
+        text += Utilities.getInternalIP() + "\n";
+        text += "External IP: ";
+        text += Utilities.getExternalIP();
+
+        textArea = new JTextArea(text);
+
         textArea.setEditable(false);
-        this.add(new JScrollPane(textArea));
+        JScrollPane jsp = new JScrollPane(textArea,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.add(jsp);
     }
 
     public void log(String text) {

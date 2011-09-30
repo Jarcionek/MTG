@@ -86,9 +86,9 @@ public class Server extends Thread {
                 newdeck = (CheckDeck) ois[i].readObject();
                 names[i] = checkName(newdeck.owner);
                 decks[i] = newdeck.deck;
-                decks[i].save(new File(Main.DECKS_DL, Utilities
-                        .getCurrentTimeForFile()+ " " + names[i] + ""
-                        + decks[i].getName() + ".txt"));
+//                decks[i].save(new File(Main.DECKS_DL, Utilities
+//                        .getCurrentTimeForFile()+ " " + names[i] + "'s "
+//                        + decks[i].getName() + ".txt"));
                 oos[i].writeInt(port + i + 1);
                 oos[i].flush();
                 oos[i].writeInt(ready.length);
@@ -161,6 +161,7 @@ public class Server extends Thread {
         }
 
         for (int p = 0; p < ready.length; p++) {
+            game.libraryShuffle(p);
             for (int c = 0; c < 7; c++) {
                 game.libraryDraw(p);
             }

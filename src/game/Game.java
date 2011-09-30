@@ -191,6 +191,7 @@ public class Game extends JFrame {
     }
 
     public String getPlayerName(int i) {
+//        System.out.println("//TODO player " + i + " is " + playersInfo[i].nameLabel.getText());
         return playersInfo[i].nameLabel.getText();
     }
 }
