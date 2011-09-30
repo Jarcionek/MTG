@@ -153,7 +153,7 @@ public class Main extends JFrame {
                 Main.this.dispose();
                 Deck d = Deck.load(new File(DECKS, "Blood Hunger.txt"));
                 try {
-                    new server.Client("Me", "localhost", 56789, d);
+                    new server.Client("BlahHlaB", "localhost", 56789, d);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }

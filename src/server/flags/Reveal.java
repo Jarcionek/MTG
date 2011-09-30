@@ -4,6 +4,9 @@ import mtg.Zone;
 
 /**
  * @author Jaroslaw Pawlak
+ *
+ * This object detones that a player has revelaed a card to all other players
+ * from specified zone.
  */
 public class Reveal extends Action {
     public Zone source;

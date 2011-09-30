@@ -24,6 +24,7 @@ public class CurrentPlayerLibrary extends JPanel {
     private JButton drawButton;
     private JButton searchButton;
     private JButton revealTopButton;
+    private JButton lookTopButton;
     private JButton playTopButton;
     private JButton shuffleButton;
 
@@ -62,10 +63,19 @@ public class CurrentPlayerLibrary extends JPanel {
         });
         revealTopButton.setFocusable(false);
 
+        lookTopButton = new JButton("Look at top");
+        lookTopButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
+        lookTopButton.setFocusable(false);
+
         playTopButton = new JButton("Play top");
         playTopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Game.client.send(new MoveCard(
+                        Zone.TOP_LIBRARY, Zone.TABLE, -1, null, true));
             }
         });
         playTopButton.setFocusable(false);
@@ -98,6 +108,7 @@ public class CurrentPlayerLibrary extends JPanel {
         this.add(drawButton, c);
         this.add(searchButton, c);
         this.add(revealTopButton, c);
+        this.add(lookTopButton, c);
         this.add(playTopButton, c);
         c.insets = new Insets(0, outside, outside, outside);
         this.add(shuffleButton, c);

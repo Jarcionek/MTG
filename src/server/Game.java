@@ -8,7 +8,12 @@ import server.flags.MoveCard;
  * @author Jaroslaw Pawlak
  *
  * None of Game's method should send anything to clients, a proper actions
- * have to be sent explicitly.
+ * have to be sent explicitly depending on these methods return values.
+ *
+ * All of the methods must ensure that no illegal move is posibble, e.g.
+ * if player's library is empty, player cannot draw a card so nothing has
+ * to be sent to clients. Possibility of drawing a card from empty library
+ * should be disabled at client side, but a server has to be error-safe.
  */
 class Game {
     private Collection[] library;
@@ -69,6 +74,7 @@ class Game {
         return cardsList;
     }
 
+////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Modifies server's game and returns drawn card or does nothing and returns
@@ -90,14 +96,35 @@ class Game {
 
     }
 
+    /**
+     * Returns the top card of player's library
+     * @param player player
+     * @return top card of player's library
+     */
     synchronized Card libraryGetTop(int player) {
         return library[player].getLast();
     }
 
-    synchronized void libraryPlayTop(int player) {
-
+    /**
+     * Moves the top card of player's library onto the table and returns that
+     * card or null if a library is empty.
+     * @param player player
+     * @return top card or null if library is empty
+     */
+    synchronized Card libraryPlayTop(int player) {
+        if (library[player].getSize() == 0) {
+            return null;
+        } else {
+            Card c = library[player].removeLast();
+            table.addCard(c);
+            return c;
+        }
     }
 
+    /**
+     * Shuffles library of requested player.
+     * @param player player
+     */
     synchronized void libraryShuffle(int player) {
         library[player].shuffle();
     }

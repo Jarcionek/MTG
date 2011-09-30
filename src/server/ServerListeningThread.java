@@ -61,10 +61,13 @@ public class ServerListeningThread extends Thread {
 
                 // REVEAL
                 } else if (object.getClass().equals(Reveal.class)) {
-                    Reveal r = (Reveal) object;
-                    r.cardID = Server.game.libraryGetTop(id).ID;
-                    r.requstor = id;
-                    Server.sendToAll(r);
+                    Card c = Server.game.libraryGetTop(id);
+                    if (c != null) {
+                        Reveal r = (Reveal) object;
+                        r.cardID = c.ID;
+                        r.requstor = id;
+                        Server.sendToAll(r);
+                    }
 
                 // REQUEST CARD
                 } else if (object.getClass().equals(RequestCard.class)) {
@@ -87,6 +90,7 @@ public class ServerListeningThread extends Thread {
     }
 
     private void handleMoveCard(MoveCard mc) {
+        Card card = null;
         switch (mc.source) {
             case HAND:
                 switch (mc.destination) {
@@ -190,12 +194,14 @@ public class ServerListeningThread extends Thread {
             case TOP_LIBRARY:
                 switch (mc.destination) {
                     case HAND:
-                        Card card = Server.game.libraryDraw(id);
+                        card = Server.game.libraryDraw(id);
                         Server.sendToAllInvisible(new MoveCard(Zone.TOP_LIBRARY,
                                 Zone.HAND, id, card.ID));
                         break;
                     case TABLE:
-
+                        card = Server.game.libraryPlayTop(id);
+                        Server.sendToAll(new MoveCard(
+                                Zone.TOP_LIBRARY, Zone.TABLE, id, card.ID));
                         break;
                     case GRAVEYARD:
 

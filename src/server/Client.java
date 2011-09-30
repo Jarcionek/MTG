@@ -97,7 +97,7 @@ public class Client extends Thread {
                     Reveal r = (Reveal) object;
                     if (r.source == Zone.TOP_LIBRARY) {
                         game.log(r.cardID, false, game.getPlayerName(r.requstor)
-                                + " reveals top card of his library: "
+                                + " reveals top card of library: "
                                 + game.getCardName(r.cardID));
                     }
 
@@ -287,8 +287,11 @@ public class Client extends Thread {
                         }
                         break;
                     case TABLE:
-//                        //TODO log
-//                        game.cardAddToTable(mc.cardID);
+                        game.log(mc.cardID, true,
+                                game.getPlayerName(mc.requestor)
+                                + " plays top card of library: "
+                                + game.getCardName(mc.cardID));
+                        game.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
 

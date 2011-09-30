@@ -2,6 +2,9 @@ package server.flags;
 
 /**
  * @author Jaroslaw Pawlak
+ *
+ * This object denotes a card dragging event and contains new coordinates
+ * of this card.
  */
 public class DragCard extends Action {
     public int requestor;
