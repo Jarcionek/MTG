@@ -51,6 +51,13 @@ public class ServerListeningThread extends Thread {
                 } else if (object.getClass().equals(MoveCard.class)) {
                     handleMoveCard((MoveCard) object);
 
+                // SHUFFLE
+                } else if (object.getClass().equals(Shuffle.class)) {
+                    Shuffle s = (Shuffle) object;
+                    s.owner = id;
+                    Server.game.libraryShuffle(id);
+                    Server.sendToAll(s);
+
                 // REQUEST CARD
                 } else if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = ((RequestCard) object);
@@ -76,13 +83,17 @@ public class ServerListeningThread extends Thread {
             case MoveCard.HAND:
                 switch (mc.destination) {
                     case MoveCard.TABLE:
-                        Server.game.handPlay(id, mc.cardID);
+                        if (Server.game.handPlay(id, mc.cardID)) {
+                            Server.sendToAll(
+                                    new MoveCard(MoveCard.HAND,
+                                    MoveCard.TABLE, id, mc.cardID));
+                        }
                         break;
                     case MoveCard.GRAVEYARD:
-                        Server.game.handDestroy(id, mc.cardID);
+//                        Server.game.handDestroy(id, mc.cardID);
                         break;
                     case MoveCard.EXILED:
-                        Server.game.handExile(id, mc.cardID);
+//                        Server.game.handExile(id, mc.cardID);
                         break;
                     case MoveCard.LIBRARY:
 
@@ -95,13 +106,13 @@ public class ServerListeningThread extends Thread {
             case MoveCard.TABLE:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        Server.game.tableTake(mc.cardID);
+//                        Server.game.tableTake(mc.cardID);
                         break;
                     case MoveCard.GRAVEYARD:
-                        Server.game.tableDestroy(mc.cardID);
+//                        Server.game.tableDestroy(mc.cardID);
                         break;
                     case MoveCard.EXILED:
-                        Server.game.tableExile(mc.cardID);
+//                        Server.game.tableExile(mc.cardID);
                         break;
                     case MoveCard.LIBRARY:
 
@@ -171,7 +182,9 @@ public class ServerListeningThread extends Thread {
             case MoveCard.TOP_LIBRARY:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        Server.game.libraryDraw(id);
+                        Card card = Server.game.libraryDraw(id);
+                        Server.sendToAllInvisible(new MoveCard(MoveCard.TOP_LIBRARY,
+                                MoveCard.HAND, id, card.ID));
                         break;
                     case MoveCard.TABLE:
 

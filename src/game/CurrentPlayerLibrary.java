@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import server.flags.MoveCard;
+import server.flags.Shuffle;
 
 /**
  * @author Jaroslaw Pawlak
@@ -70,7 +71,7 @@ public class CurrentPlayerLibrary extends JPanel {
         shuffleButton = new JButton("Shuffle");
         shuffleButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Game.client.send(new Shuffle(-1));
             }
         });
         shuffleButton.setFocusable(false);

@@ -151,7 +151,8 @@ public class Client extends Thread {
             case MoveCard.HAND:
                 switch (mc.destination) {
                     case MoveCard.TABLE:
-                        //TODO log
+                        game.log(game.getPlayerName(mc.requestor) + " plays "
+                                + game.getCardName(mc.cardID));
                         game.cardAddToTable(mc.cardID);
                         break;
                     case MoveCard.GRAVEYARD:
@@ -174,10 +175,10 @@ public class Client extends Thread {
             case MoveCard.TABLE:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        //TODO log
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-                            game.cardAddToHand(mc.cardID);
-                        }
+//                        //TODO log
+//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+//                            game.cardAddToHand(mc.cardID);
+//                        }
                         break;
                     case MoveCard.GRAVEYARD:
 
@@ -197,14 +198,14 @@ public class Client extends Thread {
             case MoveCard.GRAVEYARD:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        //TODO log
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-                            game.cardAddToHand(mc.cardID);
-                        }
+//                        //TODO log
+//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+//                            game.cardAddToHand(mc.cardID);
+//                        }
                         break;
                     case MoveCard.TABLE:
-                        //TODO log
-                        game.cardAddToTable(mc.cardID);
+//                        //TODO log
+//                        game.cardAddToTable(mc.cardID);
                         break;
                     case MoveCard.EXILED:
 
@@ -220,14 +221,14 @@ public class Client extends Thread {
             case MoveCard.EXILED:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        //TODO log
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-                            game.cardAddToHand(mc.cardID);
-                        }
+//                        //TODO log
+//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+//                            game.cardAddToHand(mc.cardID);
+//                        }
                         break;
                     case MoveCard.TABLE:
-                        //TODO log
-                        game.cardAddToTable(mc.cardID);
+//                        //TODO log
+//                        game.cardAddToTable(mc.cardID);
                         break;
                     case MoveCard.GRAVEYARD:
 
@@ -243,14 +244,14 @@ public class Client extends Thread {
             case MoveCard.LIBRARY:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        //TODO log
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-                            game.cardAddToHand(mc.cardID);
-                        }
+//                        //TODO log
+//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+//                            game.cardAddToHand(mc.cardID);
+//                        }
                         break;
                     case MoveCard.TABLE:
-                        //TODO log
-                        game.cardAddToTable(mc.cardID);
+//                        //TODO log
+//                        game.cardAddToTable(mc.cardID);
                         break;
                     case MoveCard.GRAVEYARD:
 
@@ -266,14 +267,16 @@ public class Client extends Thread {
             case MoveCard.TOP_LIBRARY:
                 switch (mc.destination) {
                     case MoveCard.HAND:
-                        game.log(game.getPlayerName(mc.requestor) + " draws a card");
                         if (mc.cardID != null) {
+                            game.log("You draw " + game.getCardName(mc.cardID));
                             game.cardAddToHand(mc.cardID);
+                        } else {
+                            game.log(game.getPlayerName(mc.requestor) + " draws a card");
                         }
                         break;
                     case MoveCard.TABLE:
-                        //TODO log
-                        game.cardAddToTable(mc.cardID);
+//                        //TODO log
+//                        game.cardAddToTable(mc.cardID);
                         break;
                     case MoveCard.GRAVEYARD:
 

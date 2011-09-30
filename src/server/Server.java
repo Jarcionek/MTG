@@ -162,14 +162,22 @@ public class Server extends Thread {
 
         for (int p = 0; p < ready.length; p++) {
             game.libraryShuffle(p);
+            sendToAll(new Shuffle(p));
             for (int c = 0; c < 7; c++) {
-                game.libraryDraw(p);
+                Card card = game.libraryDraw(p);
+                sendToAllInvisible(new MoveCard(MoveCard.TOP_LIBRARY,
+                        MoveCard.HAND, p, card.ID));
             }
         }
 
         Debug.p("Server main thread terminates");
     }
 
+    /**
+     * Sends an action to specified player.
+     * @param player player to be sent to
+     * @param object action to be sent
+     */
     static void send(int player, Action object) {
         if (oos[player] != null) {
             try {
@@ -182,9 +190,34 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Sends an action to all players.
+     * @param object action to be sent
+     */
     static void sendToAll(Action object) {
         for (int i = 0; i < ready.length; i++) {
             send(i, object);
+        }
+    }
+
+    /**
+     * Sends an MoveCard action to all players but only to a requestor player
+     * is sent a card's ID. For example, if there are four players and player 2
+     * draws a card, players 0, 1 and 3 receives MoveCard object but with
+     * no card ID, while player 2 receives a full object with a proper ID.
+     * @param mc object to be sent
+     */
+    static void sendToAllInvisible(MoveCard mc) {
+        String id = mc.cardID;
+        mc.cardID = null;
+        for (int i = 0; i < ready.length; i++) {
+            if (i == mc.requestor) {
+                mc.cardID = id;
+                Server.send(i, mc);
+                mc.cardID = null;
+            } else {
+                Server.send(i, mc);
+            }
         }
     }
 

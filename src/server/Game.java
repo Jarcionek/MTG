@@ -3,21 +3,23 @@ package server;
 import java.util.TreeMap;
 import mtg.Deck;
 import server.flags.MoveCard;
-import server.flags.Shuffle;
 
 /**
  * @author Jaroslaw Pawlak
+ *
+ * None of Game's method should send anything to clients, a proper actions
+ * have to be sent explicitly.
  */
 class Game {
-    Collection[] library;
-    Collection[] hand;
-    Collection[] graveyard;
-    Collection[] exiled;
-    Collection table;
-    int[] health;
-    int[] poison;
+    private Collection[] library;
+    private Collection[] hand;
+    private Collection[] graveyard;
+    private Collection[] exiled;
+    private Collection table;
+    private int[] health;
+    private int[] poison;
 
-    TreeMap<String, String> cardsList;
+    private TreeMap<String, String> cardsList;
 
     private Game() {}
 
@@ -68,23 +70,19 @@ class Game {
     }
 
 
-
-    synchronized void libraryDraw(int player) {
+    /**
+     * Modifies server's game and returns drawn card or does nothing and returns
+     * null if library is empty.
+     * @param player player who draws a card
+     * @return top card of library or null if library is empty
+     */
+    synchronized Card libraryDraw(int player) {
         if (library[player].getSize() > 0) {
             Card c = library[player].removeLast();
             hand[player].addCard(c);
-
-            MoveCard mc = new MoveCard(
-                    MoveCard.TOP_LIBRARY, MoveCard.HAND, player, null);
-            for (int i = 0; i < library.length; i++) {
-                if (i == player) {
-                    mc.cardID = c.ID;
-                    Server.send(i, mc);
-                    mc.cardID = null;
-                } else {
-                    Server.send(i, mc);
-                }
-            }
+            return c;
+        } else {
+            return null;
         }
     }
 
@@ -102,14 +100,22 @@ class Game {
 
     synchronized void libraryShuffle(int player) {
         library[player].shuffle();
-        Server.sendToAll(new Shuffle(player));
     }
 
-    synchronized void handPlay(int player, String cardID) {
+    /**
+     * Modifies server's game by moving requested card from hand to the table
+     * if the hand really contained requested card.
+     * @param player player who played a card
+     * @param cardID card ID
+     * @return true if hand contained requested card and was played, false
+     * otherwise
+     */
+    synchronized boolean handPlay(int player, String cardID) {
         if (hand[player].contains(cardID)) {
             table.addCard(hand[player].removeCard(cardID));
-            Server.sendToAll(
-                    new MoveCard(MoveCard.HAND, MoveCard.TABLE, player, cardID));
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -117,50 +123,50 @@ class Game {
      * to graveyard
      */
     synchronized void handDestroy(int player, String cardID) {
-        if (hand[player].contains(cardID)) {
-            graveyard[player].addCard(hand[player].removeCard(cardID));
-            Server.sendToAll(
-                    new MoveCard(MoveCard.HAND, MoveCard.GRAVEYARD, player, cardID));
-        }
+//        if (hand[player].contains(cardID)) {
+//            graveyard[player].addCard(hand[player].removeCard(cardID));
+//            Server.sendToAll(
+//                    new MoveCard(MoveCard.HAND, MoveCard.GRAVEYARD, player, cardID));
+//        }
     }
 
     synchronized void handExile(int player, String cardID) {
-        if (hand[player].contains(cardID)) {
-            exiled[player].addCard(hand[player].removeCard(cardID));
-            Server.sendToAll(
-                    new MoveCard(MoveCard.HAND, MoveCard.EXILED, player, cardID));
-        }
+//        if (hand[player].contains(cardID)) {
+//            exiled[player].addCard(hand[player].removeCard(cardID));
+//            Server.sendToAll(
+//                    new MoveCard(MoveCard.HAND, MoveCard.EXILED, player, cardID));
+//        }
     }
 
     /**
      * to hand
      */
     synchronized void tableTake(String cardID) {
-        if (table.contains(cardID)) {
-            int player = cardID.charAt(0) - 'A';
-            hand[player].addCard(table.removeCard(cardID));
-            Server.sendToAll(
-                    new MoveCard(MoveCard.TABLE, MoveCard.HAND, player, cardID));
-        }
+//        if (table.contains(cardID)) {
+//            int player = cardID.charAt(0) - 'A';
+//            hand[player].addCard(table.removeCard(cardID));
+//            Server.sendToAll(
+//                    new MoveCard(MoveCard.TABLE, MoveCard.HAND, player, cardID));
+//        }
     }
 
     /**
      * to graveyard
      */
     synchronized void tableDestroy(String cardID) {
-        if (table.contains(cardID)) {
-            int player = cardID.charAt(0) - 'A';
-            graveyard[player].addCard(table.removeCard(cardID));
-            //TODO
-        }
+//        if (table.contains(cardID)) {
+//            int player = cardID.charAt(0) - 'A';
+//            graveyard[player].addCard(table.removeCard(cardID));
+//            //TODO
+//        }
     }
 
     synchronized void tableExile(String cardID) {
-        if (table.contains(cardID)) {
-            int player = cardID.charAt(0) - 'A';
-            exiled[player].addCard(table.removeCard(cardID));
-            //TODO
-        }
+//        if (table.contains(cardID)) {
+//            int player = cardID.charAt(0) - 'A';
+//            exiled[player].addCard(table.removeCard(cardID));
+//            //TODO
+//        }
     }
 
     synchronized void playerViewGraveyard(int requestor, int target) {

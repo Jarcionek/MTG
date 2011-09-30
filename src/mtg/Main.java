@@ -281,7 +281,6 @@ public class Main extends JFrame {
  */
 
 /** //FIXME
- * !!! downloaded deck has incorrect name !!!
  * linux could not load a deck: IllegalArgumentException: Unicode
  * UI problems on some computers (use java one)
  */
