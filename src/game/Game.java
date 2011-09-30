@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -176,6 +177,16 @@ public class Game extends JFrame {
 
     public void cardTap(String ID, boolean tapped) {
         table.tapCard(ID, tapped);
+    }
+
+    public void changeLibrarySize(int player, int by) {
+        JLabel t = playersInfo[player].librarySizeValue;
+        t.setText("" + (Integer.parseInt(t.getText()) + by));
+    }
+
+    public void changeHandSize(int player, int by) {
+        JLabel t = playersInfo[player].handSizeValue;
+        t.setText("" + (Integer.parseInt(t.getText()) + by));
     }
 
 ////////////////////////////////////////////////////////////////////////////////

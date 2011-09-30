@@ -171,12 +171,15 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
+                game.changeHandSize(mc.requestor, -1);
                 if (playerName.equals(game.getPlayerName(mc.requestor))) {
                     game.cardRemoveFromHand(mc.cardID);
                 }
@@ -184,6 +187,8 @@ public class Client extends Thread {
             case TABLE:
                 switch (mc.destination) {
                     case HAND:
+                        game.changeHandSize(mc.requestor, 1);
+
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
@@ -196,9 +201,11 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
@@ -207,6 +214,7 @@ public class Client extends Thread {
             case GRAVEYARD:
                 switch (mc.destination) {
                     case HAND:
+                        game.changeHandSize(mc.requestor, 1);
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
@@ -220,9 +228,11 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
@@ -230,6 +240,7 @@ public class Client extends Thread {
             case EXILED:
                 switch (mc.destination) {
                     case HAND:
+                        game.changeHandSize(mc.requestor, 1);
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
@@ -243,9 +254,11 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
+                        game.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
@@ -253,19 +266,24 @@ public class Client extends Thread {
             case LIBRARY:
                 switch (mc.destination) {
                     case HAND:
+                        game.changeLibrarySize(mc.requestor, -1);
+                        game.changeHandSize(mc.requestor, 1);
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
                     case TABLE:
+                        game.changeLibrarySize(mc.requestor, -1);
 //                        //TODO log
 //                        game.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
+                        game.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case EXILED:
+                        game.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case TOP_LIBRARY:
@@ -276,6 +294,8 @@ public class Client extends Thread {
             case TOP_LIBRARY:
                 switch (mc.destination) {
                     case HAND:
+                        game.changeLibrarySize(mc.requestor, -1);
+                        game.changeHandSize(mc.requestor, 1);
                         if (mc.cardID != null) {
                             game.log(mc.cardID, false, "You draw "
                                     + game.getCardName(mc.cardID));
@@ -287,6 +307,7 @@ public class Client extends Thread {
                         }
                         break;
                     case TABLE:
+                        game.changeLibrarySize(mc.requestor, -1);
                         game.log(mc.cardID, true,
                                 game.getPlayerName(mc.requestor)
                                 + " plays top card of library: "
@@ -294,9 +315,11 @@ public class Client extends Thread {
                         game.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
+                        game.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case EXILED:
+                        game.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case LIBRARY:
