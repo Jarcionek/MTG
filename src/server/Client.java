@@ -57,7 +57,7 @@ public class Client extends Thread {
         int players = ois.readInt();
 
         game = new game.Game(players, Client.this);
-        game.log("Connected to " + ip + ":" + port);
+        game.log("Connected to", ip + ":" + port);
     }
 
     @Override
@@ -71,14 +71,14 @@ public class Client extends Thread {
                 // DRAG
                 if (object.getClass().equals(DragCard.class)) {
                     DragCard dc = (DragCard) object;
-                    game.log(game.getPlayerName(dc.requestor)
+                    game.log(dc.ID, true, game.getPlayerName(dc.requestor)
                             + " drags " + game.getCardName(dc.ID));
                     game.cardDragOnTable(dc.ID, dc.newxpos, dc.newypos);
                     
                 // TAP CARD
                 } else if (object.getClass().equals(TapCard.class)) {
                     TapCard tc = (TapCard) object;
-                    game.log(game.getPlayerName(tc.requestor) + " "
+                    game.log(tc.ID, true, game.getPlayerName(tc.requestor) + " "
                             + (tc.tapped? "taps" : "untaps")
                             + " " + game.getCardName(tc.ID));
                     game.cardTap(tc.ID, tc.tapped);
@@ -90,14 +90,13 @@ public class Client extends Thread {
                 // SHUFFLE LIBRARY
                 } else if (object.getClass().equals(Shuffle.class)) {
                     Shuffle s = (Shuffle) object;
-                    game.log(game.getPlayerName(s.owner)
-                            + " shuffles library");
+                    game.log("", game.getPlayerName(s.owner) + " shuffles library");
 
                 // REVEAL
                 } else if (object.getClass().equals(Reveal.class)) {
                     Reveal r = (Reveal) object;
                     if (r.source == Zone.TOP_LIBRARY) {
-                        game.log(game.getPlayerName(r.requstor)
+                        game.log(r.cardID, false, game.getPlayerName(r.requstor)
                                 + " reveals top card of his library: "
                                 + game.getCardName(r.cardID));
                     }
@@ -161,8 +160,8 @@ public class Client extends Thread {
             case HAND:
                 switch (mc.destination) {
                     case TABLE:
-                        game.log(game.getPlayerName(mc.requestor) + " plays "
-                                + game.getCardName(mc.cardID));
+                        game.log(mc.cardID, true, game.getPlayerName(mc.requestor)
+                                + " plays " + game.getCardName(mc.cardID));
                         game.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
@@ -278,10 +277,13 @@ public class Client extends Thread {
                 switch (mc.destination) {
                     case HAND:
                         if (mc.cardID != null) {
-                            game.log("You draw " + game.getCardName(mc.cardID));
+                            game.log(mc.cardID, false, "You draw "
+                                    + game.getCardName(mc.cardID));
                             game.cardAddToHand(mc.cardID);
                         } else {
-                            game.log(game.getPlayerName(mc.requestor) + " draws a card");
+                            game.log(mc.cardID, false,
+                                    game.getPlayerName(mc.requestor)
+                                    + " draws a card");
                         }
                         break;
                     case TABLE:

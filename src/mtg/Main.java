@@ -140,6 +140,27 @@ public class Main extends JFrame {
         });
         contentPane.add(joinGame);
 
+        //TODO temp
+        JButton quickOnePlayerStart = new JButton("Quick one player game");
+        quickOnePlayerStart.setBounds(300, 200, 200, 100);
+        quickOnePlayerStart.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    server.Server.start(56789, 1);
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                Main.this.dispose();
+                Deck d = Deck.load(new File(DECKS, "Blood Hunger.txt"));
+                try {
+                    new server.Client("Me", "localhost", 56789, d);
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        contentPane.add(quickOnePlayerStart);
+
         JLabel background = new JLabel(new ImageIcon(
                 Main.class.getResource("/resources/Background.jpg")));
         background.setBounds(0, 0, 750, 450);
@@ -281,6 +302,9 @@ public class Main extends JFrame {
  */
 
 /** //FIXME
+ * deck creator - small cards viewer still crashes occasionally while scrolling
+ * deck creator - cards can be easily added or removed from the deck by
+ *          accident, especially while viewing larger cards
  * linux could not load a deck: IllegalArgumentException: Unicode
  * UI problems on some computers (use java one)
  */

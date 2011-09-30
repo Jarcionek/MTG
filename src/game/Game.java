@@ -74,7 +74,7 @@ public class Game extends JFrame {
 
         playerLibrary = new CurrentPlayerLibrary();
 
-        logger = new Logger();
+        logger = new Logger(this);
     }
 
     private void createGUILayout() {
@@ -93,12 +93,8 @@ public class Game extends JFrame {
                 playersInfoScrollPane.getPreferredSize().width + 20,
                 playersInfoScrollPane.getPreferredSize().height));
 
-        JScrollPane loggerScrollPane = new JScrollPane(logger,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
         JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                playersInfoScrollPane, loggerScrollPane);
+                playersInfoScrollPane, logger);
 
         JPanel handPanel = new JPanel(new GridLayout(1, 1));
         handPanel.add(hand);
@@ -112,9 +108,6 @@ public class Game extends JFrame {
         center.add(table, BorderLayout.CENTER);
         center.add(bottom, BorderLayout.SOUTH);
 
-//        JPanel contentPane = new JPanel(new BorderLayout());
-//        contentPane.add(center, BorderLayout.CENTER);
-//        contentPane.add(right, BorderLayout.EAST);
         right.setMinimumSize(right.getPreferredSize());
         center.setMinimumSize(new Dimension(Card.W*2, Card.H));
         JSplitPane contentPane = new JSplitPane(
@@ -125,6 +118,12 @@ public class Game extends JFrame {
 
         this.setContentPane(contentPane);
     }
+
+    Table getTable() {
+        return table;
+    }
+
+////////////////////////////////////////////////////////////////////////////////
 
     public void addPlayer(String name) {
         for (int i = 0; i < playersInfo.length; i++) {
@@ -149,6 +148,8 @@ public class Game extends JFrame {
     public void setCardsList(TreeMap<String, String> list) {
         this.list = list;
     }
+
+////////////////////////////////////////////////////////////////////////////////
 
     public void cardAddToHand(String ID) {
         Card c = new Card(Utilities.findPath(list.get(ID)), ID);
@@ -177,15 +178,15 @@ public class Game extends JFrame {
         table.tapCard(ID, tapped);
     }
 
+////////////////////////////////////////////////////////////////////////////////
 
-
-    public void log(String text) {
-        logger.log(text);
-//        String temp = text.substring(text.lastIndexOf(" ") + 1);
-//        System.out.println(temp); //TODO remove
-//        logger.log(list.get(temp));
+    public void log(String first, String second) {
+        logger.log(first, second);
     }
 
+    public void log(String cardID, boolean onTable, String text) {
+        logger.log(cardID, onTable, text);
+    }
 
     public String getCardName(String cardID) {
         return list.get(cardID);

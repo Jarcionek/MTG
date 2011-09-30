@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -7,6 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import mtg.Card;
 
@@ -124,6 +126,34 @@ public class Table extends JScrollPane {
                 break;
             }
         }
+    }
+
+    /**
+     * Scrolls table to the given card or returns false and does nothing
+     * if card is not on the table.
+     * @param ID Card ID
+     * @return true if scrolled to the card or false if card not on the table
+     */
+    public boolean scrollToCard(String ID) {
+        for (Component c : table.getComponents()) {
+            if (c.getClass().equals(Card.class)) {
+                final Card card = (Card) c;
+                if (card.getID().equals(ID)) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            Table.this.getHorizontalScrollBar().setValue(
+                                    card.getBounds().x + Card.W / 2
+                                    - Table.this.getWidth() / 2);
+                            Table.this.getVerticalScrollBar().setValue(
+                                    card.getBounds().y + Card.H / 2
+                                    - Table.this.getHeight() / 2);
+                        }
+                    });
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
