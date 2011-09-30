@@ -11,6 +11,7 @@ import mtg.Debug;
 import mtg.Deck;
 import mtg.Main;
 import mtg.Utilities;
+import mtg.Zone;
 
 /**
  * @author Jaroslaw Pawlak
@@ -165,8 +166,8 @@ public class Server extends Thread {
             sendToAll(new Shuffle(p));
             for (int c = 0; c < 7; c++) {
                 Card card = game.libraryDraw(p);
-                sendToAllInvisible(new MoveCard(MoveCard.TOP_LIBRARY,
-                        MoveCard.HAND, p, card.ID));
+                sendToAllInvisible(new MoveCard(Zone.TOP_LIBRARY,
+                        Zone.HAND, p, card.ID));
             }
         }
 

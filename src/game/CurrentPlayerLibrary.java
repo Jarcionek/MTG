@@ -41,7 +41,7 @@ public class CurrentPlayerLibrary extends JPanel {
         drawButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Game.client.send(new MoveCard(
-                        MoveCard.TOP_LIBRARY, MoveCard.HAND, -1, null, false));
+                        Zone.TOP_LIBRARY, Zone.HAND, -1, null, false));
             }
         });
         drawButton.setFocusable(false);

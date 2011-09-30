@@ -47,7 +47,7 @@ public class InSearcherMouseAdapter extends MouseAdapter {
         if (type.equals(Zone.HAND)
                 && e.getButton() == MouseEvent.BUTTON1) {
             Game.client.send(
-                    new MoveCard(MoveCard.HAND, MoveCard.TABLE, -1, source.getID()));
+                    new MoveCard(Zone.HAND, Zone.TABLE, -1, source.getID()));
         }
         
         if (e.getButton() == MouseEvent.BUTTON3) {
