@@ -26,10 +26,10 @@ import mtg.Utilities;
  */
 public class ServerFrame extends JFrame {
 
-    private static int MAX_PLAYERS = 8;
+    private static final int MAX_PLAYERS = 8;
 
-    private static int PORT_MIN = 49152;
-    private static int PORT_MAX = 65535 - MAX_PLAYERS;
+    private static final int PORT_MIN = 49152;
+    private static final int PORT_MAX = 65535 - MAX_PLAYERS;
 
     private JFrame parentFrame;
     
@@ -71,7 +71,7 @@ public class ServerFrame extends JFrame {
     private void createComponents() {
         ipLabel = new JLabel("IP:");
         ipLabel.setHorizontalAlignment(JLabel.CENTER);
-        ipValue = new JLabel(getExternalIP());
+        ipValue = new JLabel(Utilities.getExternalIP());
         ipValue.setHorizontalAlignment(JLabel.CENTER);
 
         portLabel = new JLabel("Port:");
@@ -113,8 +113,7 @@ public class ServerFrame extends JFrame {
                         java.io.File f = jfc.getSelectedFile();
                                 mtg.Deck deckblah = mtg.Deck.load(f);
                         new Client("Jarcionek", "localhost",
-                                Integer.parseInt(portField.getText()), deckblah,
-                                parentFrame);
+                                Integer.parseInt(portField.getText()), deckblah);
                         
                     } catch (IOException ex) {
                         ServerFrame.this.setVisible(true);
@@ -190,7 +189,7 @@ public class ServerFrame extends JFrame {
         allOK = true;
         messagesField.setText("");
         
-        String ip = getExternalIP();
+        String ip = Utilities.getExternalIP();
         if (ip.matches("\\d+.\\d+.\\d+.\\d+")) {
             ipValue.setText(ip);
         } else {
@@ -232,8 +231,9 @@ public class ServerFrame extends JFrame {
             }
         }
 
-        if (allOK && !ipLabel.getText().equals(getInternalIP())) {
-            messagesField.append("Your internal IP (" + getInternalIP() + ") "
+        if (allOK && !ipValue.getText().equals(Utilities.getInternalIP())) {
+            messagesField.append("Your internal IP ("
+                    + Utilities.getInternalIP() + ") "
                     + "and external IP differ.\n");
             messagesField.append("You may need port forwarding for ports <"
                     + port + ";" + (port + players) + ">.\n");
@@ -258,19 +258,5 @@ public class ServerFrame extends JFrame {
         Point p = this.getLocation();
         this.setLocation(p.x - (after.width - before.width) / 2,
                 p.y - (after.height - before.height) / 2);
-    }
-
-
-
-    private static String getInternalIP() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException ex) {
-            return null;
-        }
-    }
-
-    private static String getExternalIP() {
-        return Utilities.getExternalIP();
     }
 }

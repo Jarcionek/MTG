@@ -50,7 +50,7 @@ public class DeckCreator extends JFrame {
         super(title);
         this.parentFrame = parentFrame;
         this.parentFrame.setVisible(false);
-
+        
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override

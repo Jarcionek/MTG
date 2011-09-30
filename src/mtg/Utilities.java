@@ -10,8 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
@@ -132,7 +134,7 @@ public class Utilities {
     }
 
     /**
-     * Returns current time for file names in a format 2011-06-15 23-03.
+     * Returns current time for file names in a format 2011-06-15 23.03.48.
      * @return
      */
     public static String getCurrentTimeForFile() {
@@ -140,8 +142,8 @@ public class Utilities {
         return c.get(Calendar.YEAR) + "-"
                 + df2.format(c.get(Calendar.MONTH) + 1) + "-"
                 + df2.format(c.get(Calendar.DAY_OF_MONTH)) + " "
-                + df2.format(c.get(Calendar.HOUR_OF_DAY)) + "-"
-                + df2.format(c.get(Calendar.MINUTE)) + "-"
+                + df2.format(c.get(Calendar.HOUR_OF_DAY)) + "."
+                + df2.format(c.get(Calendar.MINUTE)) + "."
                 + df2.format(c.get(Calendar.SECOND));
     }
 
@@ -167,6 +169,14 @@ public class Utilities {
         } catch (Exception ex) {
             IP = null;
             return "Could not connect with http://checkip.dyndns.org/";
+        }
+    }
+
+    public static String getInternalIP() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException ex) {
+            return null;
         }
     }
 }

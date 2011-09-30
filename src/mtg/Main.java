@@ -131,7 +131,8 @@ public class Main extends JFrame {
                 int port = Integer.parseInt(
                         JOptionPane.showInputDialog(Main.this, "port:", "56789"));
                 try {
-                    new Client("Jarek", ip, port, deck, Main.this);
+                    new Client("Jarek", ip, port, deck);
+                    Main.this.setVisible(false);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -277,4 +278,10 @@ public class Main extends JFrame {
  * choose a card at random from your hand
  * add +1/+1 and -1/-1 counters to cards
  * add notes to cards?
+ */
+
+/** //FIXME
+ * !!! downloaded deck has incorrect name !!!
+ * linux could not load a deck: IllegalArgumentException: Unicode
+ * UI problems on some computers (use java one)
  */

@@ -3,6 +3,7 @@ package server;
 import java.util.TreeMap;
 import mtg.Deck;
 import server.flags.MoveCard;
+import server.flags.Shuffle;
 
 /**
  * @author Jaroslaw Pawlak
@@ -74,14 +75,14 @@ class Game {
             hand[player].addCard(c);
 
             MoveCard mc = new MoveCard(
-                    MoveCard.LIBRARY, MoveCard.HAND, player, null);
+                    MoveCard.TOP_LIBRARY, MoveCard.HAND, player, null);
             for (int i = 0; i < library.length; i++) {
                 if (i == player) {
                     mc.cardID = c.ID;
-                    Server.send(player, mc);
+                    Server.send(i, mc);
                     mc.cardID = null;
                 } else {
-                    Server.send(player, mc);
+                    Server.send(i, mc);
                 }
             }
         }
@@ -100,7 +101,8 @@ class Game {
     }
 
     synchronized void libraryShuffle(int player) {
-
+        library[player].shuffle();
+        Server.sendToAll(new Shuffle(player));
     }
 
     synchronized void handPlay(int player, String cardID) {

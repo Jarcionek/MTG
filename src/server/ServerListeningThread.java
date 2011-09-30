@@ -7,7 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import mtg.Debug;
 import mtg.Utilities;
-import org.omg.PortableServer.Servant;
 
 /**
  * @author Jaroslaw Pawlak
@@ -50,89 +49,7 @@ public class ServerListeningThread extends Thread {
 
                 // MOVE CARD
                 } else if (object.getClass().equals(MoveCard.class)) {
-                    MoveCard mc = (MoveCard) object;
-                    switch (mc.source) {
-                        case MoveCard.HAND:
-                            switch (mc.destination) {
-                                case MoveCard.TABLE:
-                                    Server.game.handPlay(id, mc.cardID);
-                                    break;
-                                case MoveCard.GRAVEYARD:
-                                    Server.game.handDestroy(id, mc.cardID);
-                                    break;
-                                case MoveCard.EXILED:
-                                    Server.game.handExile(id, mc.cardID);
-                                    break;
-                                case MoveCard.LIBRARY:
-
-                                    break;
-                            }
-                            break;
-                        case MoveCard.TABLE:
-                            switch (mc.destination) {
-                                case MoveCard.HAND:
-                                    Server.game.tableTake(mc.cardID);
-                                    break;
-                                case MoveCard.GRAVEYARD:
-                                    Server.game.tableDestroy(mc.cardID);
-                                    break;
-                                case MoveCard.EXILED:
-                                    Server.game.tableExile(mc.cardID);
-                                    break;
-                                case MoveCard.LIBRARY:
-
-                                    break;
-                            }
-                            break;
-                        case MoveCard.GRAVEYARD:
-                            switch (mc.destination) {
-                                case MoveCard.HAND:
-                                    
-                                    break;
-                                case MoveCard.TABLE:
-
-                                    break;
-                                case MoveCard.EXILED:
-
-                                    break;
-                                case MoveCard.LIBRARY:
-
-                                    break;
-                            }
-                            break;
-                        case MoveCard.EXILED:
-                            switch (mc.destination) {
-                                case MoveCard.HAND:
-
-                                    break;
-                                case MoveCard.TABLE:
-
-                                    break;
-                                case MoveCard.GRAVEYARD:
-
-                                    break;
-                                case MoveCard.LIBRARY:
-
-                                    break;
-                            }
-                            break;
-                        case MoveCard.LIBRARY:
-                            switch (mc.destination) {
-                                case MoveCard.HAND:
-
-                                    break;
-                                case MoveCard.TABLE:
-
-                                    break;
-                                case MoveCard.GRAVEYARD:
-
-                                    break;
-                                case MoveCard.EXILED:
-
-                                    break;
-                            }
-                            break;
-                    }
+                    handleMoveCard((MoveCard) object);
 
                 // REQUEST CARD
                 } else if (object.getClass().equals(RequestCard.class)) {
@@ -151,6 +68,125 @@ public class ServerListeningThread extends Thread {
                     break;
                 }
             }
+        }
+    }
+
+    private void handleMoveCard(MoveCard mc) {
+        switch (mc.source) {
+            case MoveCard.HAND:
+                switch (mc.destination) {
+                    case MoveCard.TABLE:
+                        Server.game.handPlay(id, mc.cardID);
+                        break;
+                    case MoveCard.GRAVEYARD:
+                        Server.game.handDestroy(id, mc.cardID);
+                        break;
+                    case MoveCard.EXILED:
+                        Server.game.handExile(id, mc.cardID);
+                        break;
+                    case MoveCard.LIBRARY:
+
+                        break;
+                    case MoveCard.TOP_LIBRARY:
+
+                        break;
+                }
+                break;
+            case MoveCard.TABLE:
+                switch (mc.destination) {
+                    case MoveCard.HAND:
+                        Server.game.tableTake(mc.cardID);
+                        break;
+                    case MoveCard.GRAVEYARD:
+                        Server.game.tableDestroy(mc.cardID);
+                        break;
+                    case MoveCard.EXILED:
+                        Server.game.tableExile(mc.cardID);
+                        break;
+                    case MoveCard.LIBRARY:
+
+                        break;
+                    case MoveCard.TOP_LIBRARY:
+
+                        break;
+                }
+                break;
+            case MoveCard.GRAVEYARD:
+                switch (mc.destination) {
+                    case MoveCard.HAND:
+
+                        break;
+                    case MoveCard.TABLE:
+
+                        break;
+                    case MoveCard.EXILED:
+
+                        break;
+                    case MoveCard.LIBRARY:
+
+                        break;
+                    case MoveCard.TOP_LIBRARY:
+
+                        break;
+                }
+                break;
+            case MoveCard.EXILED:
+                switch (mc.destination) {
+                    case MoveCard.HAND:
+
+                        break;
+                    case MoveCard.TABLE:
+
+                        break;
+                    case MoveCard.GRAVEYARD:
+
+                        break;
+                    case MoveCard.LIBRARY:
+
+                        break;
+                    case MoveCard.TOP_LIBRARY:
+
+                        break;
+                }
+                break;
+            case MoveCard.LIBRARY:
+                switch (mc.destination) {
+                    case MoveCard.HAND:
+
+                        break;
+                    case MoveCard.TABLE:
+
+                        break;
+                    case MoveCard.GRAVEYARD:
+
+                        break;
+                    case MoveCard.EXILED:
+
+                        break;
+                    case MoveCard.TOP_LIBRARY:
+
+                        break;
+                }
+                break;
+            case MoveCard.TOP_LIBRARY:
+                switch (mc.destination) {
+                    case MoveCard.HAND:
+                        Server.game.libraryDraw(id);
+                        break;
+                    case MoveCard.TABLE:
+
+                        break;
+                    case MoveCard.GRAVEYARD:
+
+                        break;
+                    case MoveCard.EXILED:
+
+                        break;
+                    case MoveCard.LIBRARY:
+
+                        break;
+                }
+                break;
         }
     }
 
