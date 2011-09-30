@@ -15,6 +15,7 @@ import javax.swing.border.EtchedBorder;
 import mtg.Card;
 import mtg.Main;
 import mtg.Utilities;
+import mtg.Zone;
 import server.Client;
 
 /**
@@ -191,7 +192,6 @@ public class Game extends JFrame {
     }
 
     public String getPlayerName(int i) {
-//        System.out.println("//TODO player " + i + " is " + playersInfo[i].nameLabel.getText());
         return playersInfo[i].nameLabel.getText();
     }
 }

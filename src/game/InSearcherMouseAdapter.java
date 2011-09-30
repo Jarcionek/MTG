@@ -1,14 +1,9 @@
 package game;
 
-import game.CardViewer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import mtg.Card;
+import mtg.Zone;
 import server.flags.MoveCard;
 
 /**
@@ -50,8 +45,7 @@ public class InSearcherMouseAdapter extends MouseAdapter {
         final Card source = (Card) e.getSource();
 
         if (type.equals(Zone.HAND)
-                && e.getButton() == MouseEvent.BUTTON1
-                && e.getClickCount() > 1) {
+                && e.getButton() == MouseEvent.BUTTON1) {
             Game.client.send(
                     new MoveCard(MoveCard.HAND, MoveCard.TABLE, -1, source.getID()));
         }

@@ -34,8 +34,16 @@ class Collection {
         return cards.size();
     }
 
+    /**
+     * Returns the last card in the collection or null if a collection is empty.
+     * @return the last card in the collection or null if a collection is empty
+     */
     Card getLast() {
-        return cards.get(cards.size() - 1);
+        if (cards.size() == 0) {
+            return null;
+        } else {
+            return cards.get(cards.size() - 1);
+        }
     }
 
     Card removeLast() {

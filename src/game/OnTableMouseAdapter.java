@@ -39,7 +39,7 @@ public class OnTableMouseAdapter extends MouseAdapter {
             tempX = e.getX();
             tempY = e.getY();
             cardPosition = source.getCardPosition();
-            if (e.getClickCount() >= 2) {
+            if (e.getClickCount() == 2) {
                 if (source.isTapped()) {
                     source.untap();
                     Game.client.send(new TapCard(-1, source.getID(), false));

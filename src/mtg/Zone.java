@@ -1,4 +1,4 @@
-package game;
+package mtg;
 
 /**
  * Specifies the zone of the game.
@@ -6,5 +6,5 @@ package game;
  * @author Jaroslaw Pawlak
  */
 public enum Zone {
-    HAND, LIBRARY, GRAVEYARD, EXILED, BATTLEFIELD
+    HAND, LIBRARY, GRAVEYARD, EXILED, TABLE, TOP_LIBRARY
 }

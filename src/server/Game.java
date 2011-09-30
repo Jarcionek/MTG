@@ -90,8 +90,8 @@ class Game {
 
     }
 
-    synchronized void libraryRevealTop(int player) {
-
+    synchronized Card libraryGetTop(int player) {
+        return library[player].getLast();
     }
 
     synchronized void libraryPlayTop(int player) {

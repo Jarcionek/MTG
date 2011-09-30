@@ -12,6 +12,7 @@ import mtg.Debug;
 import mtg.Deck;
 import mtg.Main;
 import mtg.Utilities;
+import mtg.Zone;
 
 /**
  * @author Jaroslaw Pawlak
@@ -92,6 +93,15 @@ public class Client extends Thread {
                     game.log(game.getPlayerName(s.owner)
                             + " shuffles library");
 
+                // REVEAL
+                } else if (object.getClass().equals(Reveal.class)) {
+                    Reveal r = (Reveal) object;
+                    if (r.source == Zone.TOP_LIBRARY) {
+                        game.log(game.getPlayerName(r.requstor)
+                                + " reveals top card of his library: "
+                                + game.getCardName(r.cardID));
+                    }
+
                 // REQUEST CARD - server requests client to send card's image
                 } else if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = (RequestCard) object;
@@ -148,23 +158,23 @@ public class Client extends Thread {
 
     private void handleMoveCard(MoveCard mc) {
         switch (mc.source) {
-            case MoveCard.HAND:
+            case HAND:
                 switch (mc.destination) {
-                    case MoveCard.TABLE:
+                    case TABLE:
                         game.log(game.getPlayerName(mc.requestor) + " plays "
                                 + game.getCardName(mc.cardID));
                         game.cardAddToTable(mc.cardID);
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
@@ -172,101 +182,101 @@ public class Client extends Thread {
                     game.cardRemoveFromHand(mc.cardID);
                 }
                 break;
-            case MoveCard.TABLE:
+            case TABLE:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 game.cardRemoveFromTable(mc.cardID);
                 break;
-            case MoveCard.GRAVEYARD:
+            case GRAVEYARD:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 //                        //TODO log
 //                        game.cardAddToTable(mc.cardID);
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.EXILED:
+            case EXILED:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 //                        //TODO log
 //                        game.cardAddToTable(mc.cardID);
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.LIBRARY:
+            case LIBRARY:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 //                        //TODO log
 //                        game.cardAddToTable(mc.cardID);
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.TOP_LIBRARY:
+            case TOP_LIBRARY:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
                         if (mc.cardID != null) {
                             game.log("You draw " + game.getCardName(mc.cardID));
                             game.cardAddToHand(mc.cardID);
@@ -274,17 +284,17 @@ public class Client extends Thread {
                             game.log(game.getPlayerName(mc.requestor) + " draws a card");
                         }
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 //                        //TODO log
 //                        game.cardAddToTable(mc.cardID);
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
                 }

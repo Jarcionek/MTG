@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import mtg.Debug;
 import mtg.Utilities;
+import mtg.Zone;
 
 /**
  * @author Jaroslaw Pawlak
@@ -58,6 +59,13 @@ public class ServerListeningThread extends Thread {
                     Server.game.libraryShuffle(id);
                     Server.sendToAll(s);
 
+                // REVEAL
+                } else if (object.getClass().equals(Reveal.class)) {
+                    Reveal r = (Reveal) object;
+                    r.cardID = Server.game.libraryGetTop(id).ID;
+                    r.requstor = id;
+                    Server.sendToAll(r);
+
                 // REQUEST CARD
                 } else if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = ((RequestCard) object);
@@ -80,122 +88,122 @@ public class ServerListeningThread extends Thread {
 
     private void handleMoveCard(MoveCard mc) {
         switch (mc.source) {
-            case MoveCard.HAND:
+            case HAND:
                 switch (mc.destination) {
-                    case MoveCard.TABLE:
+                    case TABLE:
                         if (Server.game.handPlay(id, mc.cardID)) {
                             Server.sendToAll(
-                                    new MoveCard(MoveCard.HAND,
-                                    MoveCard.TABLE, id, mc.cardID));
+                                    new MoveCard(Zone.HAND,
+                                    Zone.TABLE, id, mc.cardID));
                         }
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 //                        Server.game.handDestroy(id, mc.cardID);
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 //                        Server.game.handExile(id, mc.cardID);
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.TABLE:
+            case TABLE:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 //                        Server.game.tableTake(mc.cardID);
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 //                        Server.game.tableDestroy(mc.cardID);
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 //                        Server.game.tableExile(mc.cardID);
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
-
-                        break;
-                }
-                break;
-            case MoveCard.GRAVEYARD:
-                switch (mc.destination) {
-                    case MoveCard.HAND:
-
-                        break;
-                    case MoveCard.TABLE:
-
-                        break;
-                    case MoveCard.EXILED:
-
-                        break;
-                    case MoveCard.LIBRARY:
-
-                        break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.EXILED:
+            case GRAVEYARD:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case EXILED:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.LIBRARY:
+            case EXILED:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
 
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.EXILED:
+                    case LIBRARY:
 
                         break;
-                    case MoveCard.TOP_LIBRARY:
+                    case TOP_LIBRARY:
 
                         break;
                 }
                 break;
-            case MoveCard.TOP_LIBRARY:
+            case LIBRARY:
                 switch (mc.destination) {
-                    case MoveCard.HAND:
+                    case HAND:
+
+                        break;
+                    case TABLE:
+
+                        break;
+                    case GRAVEYARD:
+
+                        break;
+                    case EXILED:
+
+                        break;
+                    case TOP_LIBRARY:
+
+                        break;
+                }
+                break;
+            case TOP_LIBRARY:
+                switch (mc.destination) {
+                    case HAND:
                         Card card = Server.game.libraryDraw(id);
-                        Server.sendToAllInvisible(new MoveCard(MoveCard.TOP_LIBRARY,
-                                MoveCard.HAND, id, card.ID));
+                        Server.sendToAllInvisible(new MoveCard(Zone.TOP_LIBRARY,
+                                Zone.HAND, id, card.ID));
                         break;
-                    case MoveCard.TABLE:
+                    case TABLE:
 
                         break;
-                    case MoveCard.GRAVEYARD:
+                    case GRAVEYARD:
 
                         break;
-                    case MoveCard.EXILED:
+                    case EXILED:
 
                         break;
-                    case MoveCard.LIBRARY:
+                    case LIBRARY:
 
                         break;
                 }

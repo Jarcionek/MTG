@@ -10,7 +10,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
+import mtg.Zone;
 import server.flags.MoveCard;
+import server.flags.Reveal;
 import server.flags.Shuffle;
 
 /**
@@ -55,7 +57,7 @@ public class CurrentPlayerLibrary extends JPanel {
         revealTopButton = new JButton("Reveal top");
         revealTopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Game.client.send(new Reveal(Zone.TOP_LIBRARY, -1, null));
             }
         });
         revealTopButton.setFocusable(false);
