@@ -60,7 +60,8 @@ public class OnTableMouseAdapter extends MouseAdapter {
                 JMenuItem exile = new JMenuItem("exile");
                 exile.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        
+                        Game.client.send(new MoveCard(Zone.TABLE, Zone.EXILED,
+                                -1, source.getID()));
                     }
                 });
 

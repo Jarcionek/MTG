@@ -73,7 +73,8 @@ public class PlayerInfo extends JPanel {
         viewExiledButton = new JButton("Exiled");
         viewExiledButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Game.client.send(
+                        new Search(-1, null, Zone.EXILED, -1, playerID));
             }
         });
         viewExiledButton.setFocusable(false);

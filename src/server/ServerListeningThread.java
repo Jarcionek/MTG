@@ -64,7 +64,10 @@ public class ServerListeningThread extends Thread {
                             }
                             break;
                         case GRAVEYARD:
-                            s.cardsIDs = Server.game.graveyard(s.zoneOwner);
+                            s.cardsIDs = Server.game.graveyardView(s.zoneOwner);
+                            break;
+                        case EXILED:
+                            s.cardsIDs = Server.game.exiledView(s.zoneOwner);
                             break;
                     }
                     Server.sendToAllInvisible(s);
@@ -97,13 +100,11 @@ public class ServerListeningThread extends Thread {
                     Server.ready[id] = true;
                 }
             } catch (Exception ex) {
-                if (ex.getLocalizedMessage() != null
-                        && ex.getLocalizedMessage().equals("Connection reset")) {
+                Debug.p("ServerListeningThread (id=" + id + ") error while " +
+                            "dealing with " + object + ": " + ex);
+                if ("Connection reset".equals(ex.getLocalizedMessage())) {
                     Server.disconnect(id);
                     break;
-                } else {
-                    Debug.p("ServerListeningThread (id=" + id + ") error while " +
-                            "dealing with " + object + ": " + ex);
                 }
             }
         }
@@ -150,11 +151,13 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case EXILED:
-//                        Server.game.tableExile(mc.cardID);
+                        if (Server.game.tableExile(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case LIBRARY:
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
                         if (Server.game.tablePutOnTopOfLibrary(mc.cardID)) {
                             mc.requestor = id;

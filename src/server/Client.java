@@ -116,7 +116,19 @@ public class Client extends Thread {
                             CardViewer.createViewerInFrame(s.cardsIDs,
                                     Zone.GRAVEYARD, game.getSize(),
                                     game.getPlayerName(s.zoneOwner)
-                                    + "'s graveyard");
+                                    + "'s graveyard ("
+                                    + s.cardsIDs.length + " cards)");
+                            break;
+                        case EXILED:
+                            game.log("", game.getPlayerName(s.requestor)
+                                    + " searches "
+                                    + game.getPlayerName(s.zoneOwner)
+                                    + "'s exiled zone");
+                            CardViewer.createViewerInFrame(s.cardsIDs,
+                                    Zone.EXILED, game.getSize(),
+                                    game.getPlayerName(s.zoneOwner)
+                                    + "'s exiled zone (" + s.cardsIDs.length
+                                    + " cards)");
                             break;
                     }
 
@@ -177,11 +189,9 @@ public class Client extends Thread {
                     game.setCardsList(((CardsList) object).list);
                 }
             } catch (Exception ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 Debug.p("Error while dealing with " + object + ": " + ex,
                         Debug.E);
-                if (ex.getLocalizedMessage() != null
-                        && ex.getLocalizedMessage().equals("Connection reset")) {
+                if ("Connection reset".equals(ex.getLocalizedMessage())) {
                     break;
                 }
             }
@@ -234,12 +244,13 @@ public class Client extends Thread {
                                     + " from table on its owner's graveyard");
                         break;
                     case EXILED:
-
+                        game.log(mc.cardID, false,
+                                game.getPlayerName(mc.requestor) + " exiles "
+                                + Game.getCardName(mc.cardID)
+                                + " from the table");
                         break;
                     case LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
                         game.changeLibrarySize(mc.requestor, 1);
                         game.log(mc.cardID, false, game.getPlayerName(mc.requestor)

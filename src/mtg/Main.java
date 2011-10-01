@@ -299,6 +299,8 @@ public class Main extends JFrame {
  * choose a card at random from your hand
  * add +1/+1 and -1/-1 counters to cards
  * add notes to cards?
+ * enlarging card while searching any zone closes CardViewer - it should
+ *          be moved from JFrame into a component of Game
  */
 
 /** //FIXME

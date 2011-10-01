@@ -234,12 +234,19 @@ class Game {
         }
     }
 
-    synchronized void tableExile(String cardID) {
-//        if (table.contains(cardID)) {
-//            int player = cardID.charAt(0) - 'A';
-//            exiled[player].addCard(table.removeCard(cardID));
-//            //TODO
-//        }
+    /**
+     * Exiles requested card from the table to card's owner's exile zone.
+     * @param cardID card's ID
+     * @return true if card was on the table and has been moved, false otherwise
+     */
+    synchronized boolean tableExile(String cardID) {
+        if (table.contains(cardID)) {
+            int player = cardID.charAt(0) - 'A';
+            exiled[player].addCard(table.removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
     }
 
                     ////////////////////////////////////////
@@ -249,7 +256,7 @@ class Game {
      * @param player player
      * @return array of cards IDs
      */
-    synchronized String[] graveyard(int player) {
+    synchronized String[] graveyardView(int player) {
         Card[] x = graveyard[player].getLast(graveyard[player].getSize());
         String[] result = new String[x.length];
         for (int i = 0; i < result.length; i++) {
@@ -258,8 +265,15 @@ class Game {
         return result;
     }
 
-    synchronized void playerViewExiled(int requestor, int target) {
+                    ////////////////////////////////////////
 
+    synchronized String[] exiledView(int player) {
+        Card[] x = exiled[player].getLast(exiled[player].getSize());
+        String[] result = new String[x.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = x[i].ID;
+        }
+        return result;
     }
 
                     ////////////////////////////////////////
