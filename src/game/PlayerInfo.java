@@ -11,11 +11,15 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
+import mtg.Zone;
+import server.flags.Search;
 
 /**
  * @author Jaroslaw Pawlak
  */
 public class PlayerInfo extends JPanel {
+
+    private int playerID;
 
     /**
      * name of a player
@@ -34,9 +38,10 @@ public class PlayerInfo extends JPanel {
     private JButton poisonButton;
     private JButton healthButton;
 
-    public PlayerInfo(String name) {
+    public PlayerInfo(int playerID, String playerName) {
         super();
-        createComponents(name);
+        this.playerID = playerID;
+        createComponents(playerName);
         createGUI();
     }
 
@@ -59,7 +64,8 @@ public class PlayerInfo extends JPanel {
         viewGraveyardButton = new JButton("Graveyard");
         viewGraveyardButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Game.client.send(
+                        new Search(-1, null, Zone.GRAVEYARD, -1, playerID));
             }
         });
         viewGraveyardButton.setFocusable(false);

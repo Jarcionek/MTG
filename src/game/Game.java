@@ -70,7 +70,7 @@ public class Game extends JFrame {
 
         playersInfo = new PlayerInfo[players];
         for (int i = 0; i < playersInfo.length; i++) {
-            playersInfo[i] = new PlayerInfo("...waiting...");
+            playersInfo[i] = new PlayerInfo(i, "...waiting...");
         }
 
         playerLibrary = new CurrentPlayerLibrary();

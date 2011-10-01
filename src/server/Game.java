@@ -192,17 +192,13 @@ class Game {
 
 
     /**
-     * Moves requested card from the table to requested player's hand.
-     * //FIXME on both client and server side it is allowed that a card
-     * is taken to the hand of a player who is not this card's owner - it
-     * should be blocked in both client and server.
-     * @param player
+     * Moves requested card from the table to card's owner's hand.
      * @param cardID
      * @return true if card moved, false otherwise
      */
-    synchronized boolean tableTake(int player, String cardID) {
+    synchronized boolean tableTake(String cardID) {
         if (table.contains(cardID)) {
-            hand[player].addCard(table.removeCard(cardID));
+            hand[cardID.charAt(0) - 'A'].addCard(table.removeCard(cardID));
             return true;
         } else {
             return false;
@@ -210,18 +206,14 @@ class Game {
     }
 
     /**
-     * Moves requested card from the table onto the top of requested player's
-     * library.
-     * //FIXME on both client and server side it is allowed that a card
-     * is moved to the library of a player who is not this card's owner - it
-     * should be blocked in both client and server.
-     * @param player
-     * @param cardID
+     * Moves requested card from the table onto the top of card's
+     * owner's library.
+     * @param cardID card's ID
      * @return true if card has been moved, false otherwise
      */
-    synchronized boolean tablePutOnTopOfLibrary(int player, String cardID) {
+    synchronized boolean tablePutOnTopOfLibrary(String cardID) {
         if (table.contains(cardID)) {
-            library[player].addCard(table.removeCard(cardID));
+            library[cardID.charAt(0) - 'A'].addCard(table.removeCard(cardID));
             return true;
         } else {
             return false;
@@ -229,14 +221,17 @@ class Game {
     }
 
     /**
-     * to graveyard
+     * Moves requested card from the table to its owner's graveyard.
+     * @param cardID card's ID
+     * @return true if card has been moved, false otherwise
      */
-    synchronized void tableDestroy(String cardID) {
-//        if (table.contains(cardID)) {
-//            int player = cardID.charAt(0) - 'A';
-//            graveyard[player].addCard(table.removeCard(cardID));
-//            //TODO
-//        }
+    synchronized boolean tableDestroy(String cardID) {
+        if (table.contains(cardID)) {
+            graveyard[cardID.charAt(0) - 'A'].addCard(table.removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     synchronized void tableExile(String cardID) {
@@ -249,19 +244,31 @@ class Game {
 
                     ////////////////////////////////////////
 
-    synchronized void playerViewGraveyard(int requestor, int target) {
-
+    /**
+     * Returns an array of cards' IDs in a player's graveyard
+     * @param player player
+     * @return array of cards IDs
+     */
+    synchronized String[] graveyard(int player) {
+        Card[] x = graveyard[player].getLast(graveyard[player].getSize());
+        String[] result = new String[x.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = x[i].ID;
+        }
+        return result;
     }
 
     synchronized void playerViewExiled(int requestor, int target) {
 
     }
 
-    synchronized void playerSetPoison(int requstor, int target, int value) {
+                    ////////////////////////////////////////
+
+    synchronized void playerSetPoison(int target, int value) {
 
     }
 
-    synchronized void playerSetHealth(int requstor, int target, int value) {
+    synchronized void playerSetHealth(int target, int value) {
 
     }
 

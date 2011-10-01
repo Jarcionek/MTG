@@ -92,20 +92,32 @@ public class Client extends Thread {
                 // SEARCH
                 } else if (object.getClass().equals(Search.class)) {
                     Search s = (Search) object;
-                    if (s.zone == Zone.LIBRARY) {
-                        if (s.amount == -1) {
+                    switch (s.zone) {
+                        case LIBRARY:
+                            if (s.amount == -1) {
+                                game.log("", game.getPlayerName(s.requestor)
+                                        + " searches library");
+                            } else {
+                                game.log("", game.getPlayerName(s.requestor)
+                                        + " looks at the " + s.amount
+                                        + " top cards of library");
+                            }
+                            if (s.cardsIDs != null) {
+                                CardViewer.createViewerInFrame(s.cardsIDs,
+                                        Zone.LIBRARY, game.getSize(),
+                                        "Your library");
+                            }
+                            break;
+                        case GRAVEYARD:
                             game.log("", game.getPlayerName(s.requestor)
-                                    + " searches library");
-                        } else {
-                            game.log("", game.getPlayerName(s.requestor)
-                                    + " looks at the " + s.amount
-                                    + " top cards of library");
-                        }
-                        if (s.cardsIDs != null) {
+                                    + " searches "
+                                    + game.getPlayerName(s.zoneOwner)
+                                    + "'s graveyard");
                             CardViewer.createViewerInFrame(s.cardsIDs,
-                                    Zone.LIBRARY, game.getSize(),
-                                    "Your library");
-                        }
+                                    Zone.GRAVEYARD, game.getSize(),
+                                    game.getPlayerName(s.zoneOwner)
+                                    + "'s graveyard");
+                            break;
                     }
 
                 // SHUFFLE LIBRARY
@@ -210,14 +222,16 @@ public class Client extends Thread {
                     case HAND:
                         game.changeHandSize(mc.requestor, 1);
                         game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
-                                    + " takes " + Game.getCardName(mc.cardID)
-                                    + " from table to hand");
+                                    + " returns " + Game.getCardName(mc.cardID)
+                                    + " from table to its owner's hand");
                         if (playerName.equals(game.getPlayerName(mc.requestor))) {
                             game.cardAddToHand(mc.cardID);
                         }
                         break;
                     case GRAVEYARD:
-
+                        game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
+                                    + " puts " + Game.getCardName(mc.cardID)
+                                    + " from table on its owner's graveyard");
                         break;
                     case EXILED:
 
@@ -230,7 +244,7 @@ public class Client extends Thread {
                         game.changeLibrarySize(mc.requestor, 1);
                         game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
                                     + " puts " + Game.getCardName(mc.cardID)
-                                    + " on top of library");
+                                    + " on top of its owner's library");
                         break;
                 }
                 game.cardRemoveFromTable(mc.cardID);

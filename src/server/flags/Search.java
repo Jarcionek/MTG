@@ -13,16 +13,21 @@ public class Search extends Action {
     public String[] cardsIDs;
     public Zone zone;
     public int requestor;
+    public int zoneOwner;
 
-    public Search(int cards, String[] cardsID, Zone zone, int requestor) {
-        this.amount = cards;
-        this.cardsIDs = cardsID;
+    public Search(int amount, String[] cardsIDs, Zone zone, int requestor, int zoneOwner) {
+        this.amount = amount;
+        this.cardsIDs = cardsIDs;
         this.zone = zone;
         this.requestor = requestor;
+        this.zoneOwner = zoneOwner;
     }
 
+    /**
+     * zoneOwner = -1, cardsIDs = null
+     */
     public Search(int cards, Zone zone, int requestor) {
-        this(cards, null, zone, requestor);
+        this(cards, null, zone, requestor, -1);
     }
 
     @Override

@@ -75,7 +75,8 @@ public class OnTableMouseAdapter extends MouseAdapter {
                 JMenuItem moveToGraveyard = new JMenuItem("destroy");
                 moveToGraveyard.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-
+                        Game.client.send(new MoveCard(Zone.TABLE,
+                                Zone.GRAVEYARD, -1, source.getID()));
                     }
                 });
 

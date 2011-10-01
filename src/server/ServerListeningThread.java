@@ -56,9 +56,16 @@ public class ServerListeningThread extends Thread {
                 } else if (object.getClass().equals(Search.class)) {
                     Search s = (Search) object;
                     s.requestor = id;
-                    s.cardsIDs = Server.game.librarySearch(id, s.amount);
-                    if (s.amount >= Server.game.libraryGetSize(id)) {
-                        s.amount = -1;
+                    switch (s.zone) {
+                        case LIBRARY:
+                            s.cardsIDs = Server.game.librarySearch(id, s.amount);
+                            if (s.amount >= Server.game.libraryGetSize(id)) {
+                                s.amount = -1;
+                            }
+                            break;
+                        case GRAVEYARD:
+                            s.cardsIDs = Server.game.graveyard(s.zoneOwner);
+                            break;
                     }
                     Server.sendToAllInvisible(s);
 
@@ -131,12 +138,16 @@ public class ServerListeningThread extends Thread {
             case TABLE:
                 switch (mc.destination) {
                     case HAND:
-                        if (Server.game.tableTake(mc.requestor = id, mc.cardID)) {
+                        if (Server.game.tableTake(mc.cardID)) {
+                            mc.requestor = id;
                             Server.sendToAll(mc);
                         }
                         break;
                     case GRAVEYARD:
-//                        Server.game.tableDestroy(mc.cardID);
+                        if (Server.game.tableDestroy(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case EXILED:
 //                        Server.game.tableExile(mc.cardID);
@@ -145,9 +156,8 @@ public class ServerListeningThread extends Thread {
 
                         break;
                     case TOP_LIBRARY:
-                        if (Server.game.tablePutOnTopOfLibrary(
-                                mc.requestor = id,
-                                mc.cardID)) {
+                        if (Server.game.tablePutOnTopOfLibrary(mc.cardID)) {
+                            mc.requestor = id;
                             Server.sendToAll(mc);
                         }
                         break;
