@@ -131,7 +131,9 @@ public class ServerListeningThread extends Thread {
             case TABLE:
                 switch (mc.destination) {
                     case HAND:
-//                        Server.game.tableTake(mc.cardID);
+                        if (Server.game.tableTake(mc.requestor = id, mc.cardID)) {
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case GRAVEYARD:
 //                        Server.game.tableDestroy(mc.cardID);

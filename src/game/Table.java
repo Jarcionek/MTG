@@ -156,6 +156,16 @@ public class Table extends JScrollPane {
         return false;
     }
 
+    public void removeCard(String ID) {
+        for (Component c : table.getComponents()) {
+            if (c.getClass().equals(Card.class)
+                    && ((Card) c).getID().equals(ID)) {
+                table.remove(c);
+                table.repaint();
+            }
+        }
+    }
+
     /**
      * Removes all cards from the table.
      */

@@ -187,15 +187,21 @@ class Game {
     }
 
     /**
-     * to hand
+     * Moves requested card from the table to requested player's hand.
+     * //FIXME on both client and server side it is allowed that a card
+     * is taken to the hand of player who is not this card's owner - it should
+     * be blocked in both client and server.
+     * @param player
+     * @param cardID
+     * @return true if card moved, false otherwise
      */
-    synchronized void tableTake(String cardID) {
-//        if (table.contains(cardID)) {
-//            int player = cardID.charAt(0) - 'A';
-//            hand[player].addCard(table.removeCard(cardID));
-//            Server.sendToAll(
-//                    new MoveCard(MoveCard.TABLE, MoveCard.HAND, player, cardID));
-//        }
+    synchronized boolean tableTake(int player, String cardID) {
+        if (table.contains(cardID)) {
+            hand[player].addCard(table.removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

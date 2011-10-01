@@ -168,7 +168,7 @@ public class Game extends JFrame {
     }
 
     public void cardRemoveFromTable(String ID) {
-        
+        table.removeCard(ID);
     }
 
     public void cardDragOnTable(String ID, int newx, int newy) {

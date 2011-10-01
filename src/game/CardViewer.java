@@ -16,7 +16,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EtchedBorder;
 import mtg.Card;
 import mtg.Utilities;
 import mtg.Zone;

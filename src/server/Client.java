@@ -209,11 +209,12 @@ public class Client extends Thread {
                 switch (mc.destination) {
                     case HAND:
                         game.changeHandSize(mc.requestor, 1);
-
-//                        //TODO log
-//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-//                            game.cardAddToHand(mc.cardID);
-//                        }
+                        game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
+                                    + " takes " + Game.getCardName(mc.cardID)
+                                    + " from table to hand");
+                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+                            game.cardAddToHand(mc.cardID);
+                        }
                         break;
                     case GRAVEYARD:
 

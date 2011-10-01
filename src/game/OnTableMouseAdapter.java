@@ -9,7 +9,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import mtg.Card;
+import mtg.Zone;
 import server.flags.DragCard;
+import server.flags.MoveCard;
 import server.flags.TapCard;
 
 /**
@@ -65,18 +67,22 @@ public class OnTableMouseAdapter extends MouseAdapter {
                 JMenuItem moveToHand = new JMenuItem("return to hand");
                 moveToHand.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        Game.client.send(new MoveCard(
+                                Zone.TABLE, Zone.HAND, -1, source.getID()));
                     }
                 });
 
                 JMenuItem moveToGraveyard = new JMenuItem("destroy");
                 moveToGraveyard.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+
                     }
                 });
 
                 JMenuItem moveToLibrary = new JMenuItem("put on top of library");
                 moveToLibrary.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+
                     }
                 });
 
