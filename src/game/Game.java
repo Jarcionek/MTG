@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -75,7 +77,7 @@ public class Game extends JFrame {
 
         playerLibrary = new CurrentPlayerLibrary();
 
-        logger = new Logger(this);
+        logger = new Logger(table);
     }
 
     private void createGUILayout() {

@@ -23,27 +23,26 @@ public class Logger extends JPanel {
     private GridBagConstraints f;
     private GridBagConstraints s;
 
-    private Game game;
     private Table table;
 
     private JPanel content;
     private JScrollPane jsp;
 
-    public Logger(Game game) {
+    public Logger(Table table) {
         super(new GridLayout(1, 1));
 
-        this.game = game;
-        this.table = game.getTable();
+        this.table = table;
 
         content = new JPanel(new GridBagLayout());
 
         f = new GridBagConstraints();
-        f.gridx = 0;
         f.insets = new Insets(0, 2, 0, 5);
+        f.gridx = 0;
 
         s = new GridBagConstraints();
         s.insets = new Insets(2, 0, 3, 2);
         s.gridx = 1;
+        s.fill = GridBagConstraints.BOTH;
 
         content.add(new JLabel("Internal IP:"), f);
         content.add(createTextField(Utilities.getInternalIP()), s);

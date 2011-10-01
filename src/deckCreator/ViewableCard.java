@@ -6,6 +6,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +38,9 @@ public class ViewableCard extends JLabel implements Comparable<ViewableCard> {
         } catch (IOException e) {
             Debug.p("ViewableCard error: " + e, Debug.E);
         }
-        setIcon(new ImageIcon(Card.resize(img)));
-        setHorizontalAlignment(SwingConstants.CENTER);
-        addMouseListener(new MouseAdapter() {
+        this.setIcon(new ImageIcon(Card.resize(img)));
+        this.setHorizontalAlignment(SwingConstants.CENTER);
+        this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON3) {
@@ -46,35 +48,46 @@ public class ViewableCard extends JLabel implements Comparable<ViewableCard> {
                 }
             }
         });
+        this.addMouseWheelListener(new MouseWheelListener() {
+              JFrame x;
+              public void mouseWheelMoved(MouseWheelEvent e) {
+                  if (e.getUnitsToScroll() < 0) {
+                      x = ViewableCard.this.viewLarger(image);
+                  } else if (x != null) {
+                      x.dispose();
+                  }
+            }
+        });
     }
 
-    private void viewLarger(File file) {
-        final JFrame temp = new JFrame();
-        temp.setUndecorated(true);
-        temp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    private JFrame viewLarger(File file) {
+        final JFrame frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JLabel contentPane = new JLabel(new ImageIcon(file.getPath()));
         contentPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                temp.dispose();
+                frame.dispose();
             }
         });
-        temp.addFocusListener(new FocusAdapter() {
+        frame.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                temp.dispose();
+                frame.dispose();
             }
         });
 
-        temp.setContentPane(contentPane);
-        temp.pack();
+        frame.setContentPane(contentPane);
+        frame.pack();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        temp.setLocation(
-                (d.width - temp.getSize().width) / 2,
-                (d.height - temp.getSize().height) / 2
+        frame.setLocation(
+                (d.width - frame.getSize().width) / 2,
+                (d.height - frame.getSize().height) / 2
                 );
-        temp.setVisible(true);
+        frame.setVisible(true);
+        return frame;
     }
 
     @Override

@@ -2,6 +2,7 @@ package game;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import mtg.Card;
 import mtg.Zone;
 import server.flags.MoveCard;

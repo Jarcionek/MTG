@@ -10,7 +10,7 @@ public class Card {
     private Card() {}
 
     Card(String name) {
-        this.name = name;
+        this(name, null);
     }
 
     Card(String name, String ID) {

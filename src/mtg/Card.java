@@ -1,5 +1,6 @@
 package mtg;
 
+import game.Game;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -10,6 +11,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +59,18 @@ public final class Card extends JLabel {
         this.image = image;
         this.tapped = true;
         this.ID = ID;
+
+        this.addMouseWheelListener(new MouseWheelListener() {
+              JFrame x;
+              public void mouseWheelMoved(MouseWheelEvent e) {
+                  if (e.getUnitsToScroll() < 0) {
+                      x = Card.this.viewLarger();
+                  } else if (x != null) {
+                      x.dispose();
+                  }
+            }
+        });
+
         this.untap();
     }
 
@@ -192,31 +207,33 @@ public final class Card extends JLabel {
      * the centre of a screen. Frame is disposed when mouse button is released
      * while on the frame or when the focus is lost.
      */
-    public void viewLarger() {
-        final JFrame temp = new JFrame();
-        temp.setUndecorated(true);
-        temp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    public JFrame viewLarger() {
+        final JFrame frame = new JFrame();
+        frame.setUndecorated(true);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JLabel contentPane = new JLabel(new ImageIcon(image.getPath()));
         contentPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                temp.dispose();
+                frame.dispose();
             }
         });
-        temp.addFocusListener(new FocusAdapter() {
+        frame.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                temp.dispose();
+                frame.dispose();
             }
         });
 
-        temp.setContentPane(contentPane);
-        temp.pack();
+        frame.setContentPane(contentPane);
+        frame.pack();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        temp.setLocation((d.width - temp.getSize().width) / 2,
-                (d.height - temp.getSize().height) / 2);
-        temp.setVisible(true);
+        frame.setLocation((d.width - frame.getSize().width) / 2,
+                (d.height - frame.getSize().height) / 2);
+        frame.setVisible(true);
+        
+        return frame;
     }
 
 
