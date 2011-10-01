@@ -21,7 +21,7 @@ public class InSearcherMouseAdapter extends MouseAdapter {
     private boolean toGraveyard = true;
     private boolean toExiled = true;
 
-    private Zone type;
+    Zone type;
 
     private InSearcherMouseAdapter() {}
 

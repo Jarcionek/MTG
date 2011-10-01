@@ -31,7 +31,7 @@ public class Game extends JFrame {
     private CurrentPlayerLibrary playerLibrary;
     private Logger logger;
 
-    TreeMap<String, String> list;
+    private static TreeMap<String, String> list;
 
     private Game() {}
 
@@ -147,7 +147,7 @@ public class Game extends JFrame {
     }
 
     public void setCardsList(TreeMap<String, String> list) {
-        this.list = list;
+        Game.list = list;
     }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ public class Game extends JFrame {
         logger.log(cardID, onTable, text);
     }
 
-    public String getCardName(String cardID) {
+    public static String getCardName(String cardID) {
         return list.get(cardID);
     }
 

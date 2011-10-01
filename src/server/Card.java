@@ -37,4 +37,9 @@ public class Card {
         return hash;
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new Card(name, ID);
+    }
+
 }

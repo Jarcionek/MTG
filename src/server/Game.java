@@ -92,8 +92,20 @@ class Game {
         }
     }
 
-    synchronized void librarySearch(int player) {
-
+    /**
+     * Returns array of IDs of first <tt>amount</tt> top cards from
+     * <tt>player</tt>'s library.
+     * @param player player whom library is to be searched
+     * @param amount the amount of cards to be returned
+     * @return array of cards' IDs
+     */
+    synchronized String[] librarySearch(int player, int amount) {
+        Card[] x = library[player].getLast(amount);
+        String[] result = new String[x.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = x[i].ID;
+        }
+        return result;
     }
 
     /**
@@ -127,6 +139,15 @@ class Game {
      */
     synchronized void libraryShuffle(int player) {
         library[player].shuffle();
+    }
+
+    /**
+     * Returns size of <tt>player</tt>'s library.
+     * @param player player whose library size is to be returned
+     * @return size of a library
+     */
+    synchronized int libraryGetSize(int player) {
+        return library[player].getSize();
     }
 
     /**

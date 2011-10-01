@@ -1,5 +1,7 @@
 package server;
 
+import game.CardViewer;
+import game.Game;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import server.flags.*;
@@ -72,7 +74,7 @@ public class Client extends Thread {
                 if (object.getClass().equals(DragCard.class)) {
                     DragCard dc = (DragCard) object;
                     game.log(dc.ID, true, game.getPlayerName(dc.requestor)
-                            + " drags " + game.getCardName(dc.ID));
+                            + " drags " + Game.getCardName(dc.ID));
                     game.cardDragOnTable(dc.ID, dc.newxpos, dc.newypos);
                     
                 // TAP CARD
@@ -80,12 +82,31 @@ public class Client extends Thread {
                     TapCard tc = (TapCard) object;
                     game.log(tc.ID, true, game.getPlayerName(tc.requestor) + " "
                             + (tc.tapped? "taps" : "untaps")
-                            + " " + game.getCardName(tc.ID));
+                            + " " + Game.getCardName(tc.ID));
                     game.cardTap(tc.ID, tc.tapped);
 
                 // MOVE CARD
                 } else if (object.getClass().equals(MoveCard.class)) {
                     handleMoveCard((MoveCard) object);
+
+                // SEARCH
+                } else if (object.getClass().equals(Search.class)) {
+                    Search s = (Search) object;
+                    if (s.zone == Zone.LIBRARY) {
+                        if (s.amount == -1) {
+                            game.log("", game.getPlayerName(s.requestor)
+                                    + " searches library");
+                        } else {
+                            game.log("", game.getPlayerName(s.requestor)
+                                    + " looks at the " + s.amount
+                                    + " top cards of library");
+                        }
+                        if (s.cardsIDs != null) {
+                            CardViewer.createViewerInFrame(s.cardsIDs,
+                                    Zone.LIBRARY, game.getSize(),
+                                    "Your library");
+                        }
+                    }
 
                 // SHUFFLE LIBRARY
                 } else if (object.getClass().equals(Shuffle.class)) {
@@ -98,7 +119,7 @@ public class Client extends Thread {
                     if (r.source == Zone.TOP_LIBRARY) {
                         game.log(r.cardID, false, game.getPlayerName(r.requstor)
                                 + " reveals top card of library: "
-                                + game.getCardName(r.cardID));
+                                + Game.getCardName(r.cardID));
                     }
 
                 // REQUEST CARD - server requests client to send card's image
@@ -161,7 +182,7 @@ public class Client extends Thread {
                 switch (mc.destination) {
                     case TABLE:
                         game.log(mc.cardID, true, game.getPlayerName(mc.requestor)
-                                + " plays " + game.getCardName(mc.cardID));
+                                + " plays " + Game.getCardName(mc.cardID));
                         game.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
@@ -298,7 +319,7 @@ public class Client extends Thread {
                         game.changeHandSize(mc.requestor, 1);
                         if (mc.cardID != null) {
                             game.log(mc.cardID, false, "You draw "
-                                    + game.getCardName(mc.cardID));
+                                    + Game.getCardName(mc.cardID));
                             game.cardAddToHand(mc.cardID);
                         } else {
                             game.log(mc.cardID, false,
@@ -311,7 +332,7 @@ public class Client extends Thread {
                         game.log(mc.cardID, true,
                                 game.getPlayerName(mc.requestor)
                                 + " plays top card of library: "
-                                + game.getCardName(mc.cardID));
+                                + Game.getCardName(mc.cardID));
                         game.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:

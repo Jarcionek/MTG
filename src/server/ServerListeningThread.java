@@ -52,6 +52,16 @@ public class ServerListeningThread extends Thread {
                 } else if (object.getClass().equals(MoveCard.class)) {
                     handleMoveCard((MoveCard) object);
 
+                // SEARCH
+                } else if (object.getClass().equals(Search.class)) {
+                    Search s = (Search) object;
+                    s.requestor = id;
+                    s.cardsIDs = Server.game.librarySearch(id, s.amount);
+                    if (s.amount >= Server.game.libraryGetSize(id)) {
+                        s.amount = -1;
+                    }
+                    Server.sendToAllInvisible(s);
+
                 // SHUFFLE
                 } else if (object.getClass().equals(Shuffle.class)) {
                     Shuffle s = (Shuffle) object;
@@ -84,6 +94,9 @@ public class ServerListeningThread extends Thread {
                         && ex.getLocalizedMessage().equals("Connection reset")) {
                     Server.disconnect(id);
                     break;
+                } else {
+                    Debug.p("ServerListeningThread (id=" + id + ") error while " +
+                            "dealing with " + object + ": " + ex);
                 }
             }
         }

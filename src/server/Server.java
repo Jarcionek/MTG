@@ -221,6 +221,20 @@ public class Server extends Thread {
             }
         }
     }
+    
+    static void sendToAllInvisible(Search s) {
+        String[] cards = s.cardsIDs;
+        s.cardsIDs = null;
+        for (int i = 0; i < ready.length; i++) {
+            if (i == s.requestor) {
+                s.cardsIDs = cards;
+                Server.send(i, s);
+                s.cardsIDs = null;
+            } else {
+                Server.send(i, s);
+            }
+        }
+    }
 
     /**
      * Closes all streams and sockets of given player.

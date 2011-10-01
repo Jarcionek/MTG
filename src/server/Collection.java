@@ -2,6 +2,9 @@ package server;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import mtg.Debug;
 
 /**
  * @author Jaroslaw Pawlak
@@ -43,6 +46,35 @@ class Collection {
             return null;
         } else {
             return cards.get(cards.size() - 1);
+        }
+    }
+
+    /**
+     * Returns <code>amount</code> cards the most recently added to the
+     * collection. If amount = -1 then all cards are returned. For other
+     * negative amounts and 0 - empty array is returned. If amount
+     * is greater than a collection's size, all cards are returned.
+     * @param amount the number of cards to be returned
+     * @return array containing <code>amount</code> cards from the top of
+     * a collection
+     */
+    Card[] getLast(int amount) {
+        if (amount == -1 || amount >= cards.size()) {
+            Card[] r = new Card[cards.size()];
+            return cards.toArray(r);
+        } else if (amount == 0 || amount < -1) {
+            return new Card[0];
+        } else {
+            Card[] x = new Card[amount];
+            for (int i = 0; i < amount; i++) {
+                try {
+                    x[i] = (Card) cards.get(cards.size() - 1 - i).clone();
+                } catch (CloneNotSupportedException ex) {
+                    //this should never happen
+                    Debug.p(ex + " while cloning card", Debug.E);
+                }
+            }
+            return x;
         }
     }
 

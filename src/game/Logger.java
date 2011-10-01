@@ -74,7 +74,7 @@ public class Logger extends JPanel {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!onTable || !table.scrollToCard(cardID)) {
-                    new Card(Utilities.findPath(game.getCardName(cardID)))
+                    new Card(Utilities.findPath(Game.getCardName(cardID)))
                             .viewLarger();
                 }
             }

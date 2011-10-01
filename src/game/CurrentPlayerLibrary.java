@@ -3,16 +3,19 @@ package game;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import mtg.Zone;
 import server.flags.MoveCard;
 import server.flags.Reveal;
+import server.flags.Search;
 import server.flags.Shuffle;
 
 /**
@@ -49,8 +52,29 @@ public class CurrentPlayerLibrary extends JPanel {
         searchButton = new JButton("Search");
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //TODO show a panel to choose how many cards from the top are requested
-                throw new UnsupportedOperationException("Not supported yet.");
+                Object x = JOptionPane.showInputDialog(
+                        null,
+                        "How many cards from the top\n" +
+                        "of your library you would like to see?",
+                        "Search your library",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        null, "all");
+
+                if (x == null) {
+                    return;
+                }
+                
+                int value = 0;
+                if (((String) x).equalsIgnoreCase("all")) {
+                    value = -1;
+                } else {
+                    try {
+                        value = Integer.parseInt((String) x);
+                    } catch (NumberFormatException ex) {}
+                }
+
+                Game.client.send(new Search(value, Zone.LIBRARY, -1));
             }
         });
         searchButton.setFocusable(false);
