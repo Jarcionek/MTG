@@ -301,6 +301,7 @@ public class Main extends JFrame {
  * add notes to cards?
  * enlarging card while searching any zone closes CardViewer - it should
  *          be moved from JFrame into a component of Game
+ * chat?
  */
 
 /** //FIXME

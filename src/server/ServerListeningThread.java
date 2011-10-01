@@ -52,12 +52,27 @@ public class ServerListeningThread extends Thread {
                 } else if (object.getClass().equals(MoveCard.class)) {
                     handleMoveCard((MoveCard) object);
 
+                // CHANGE HP OR POISON COUNTERS
+                } else if (object.getClass().equals(Player.class)) {
+                    Player p = (Player) object;
+                    p.requestor = id;
+                    if (p.poisonOrHealth == Player.HEALTH) {
+                        Server.game.playerSetHealth(p.target, p.newValue);
+                        Server.sendToAll(p);
+                    } else if (p.poisonOrHealth == Player.POISON) {
+                        Server.game.playerSetPoison(p.target, p.newValue);
+                        Server.sendToAll(p);
+                    }
+
                 // SEARCH
                 } else if (object.getClass().equals(Search.class)) {
                     Search s = (Search) object;
                     s.requestor = id;
                     switch (s.zone) {
                         case LIBRARY:
+                            if (s.amount < -1 || s.amount == 0) {
+                                continue; // ignore client's request
+                            }
                             s.cardsIDs = Server.game.librarySearch(id, s.amount);
                             if (s.amount >= Server.game.libraryGetSize(id)) {
                                 s.amount = -1;

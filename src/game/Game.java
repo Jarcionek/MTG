@@ -189,6 +189,30 @@ public class Game extends JFrame {
         t.setText("" + (Integer.parseInt(t.getText()) + by));
     }
 
+    /**
+     * Sets health of given player to given value and returns old value.
+     * @param player player
+     * @param newValue new health
+     * @return old health
+     */
+    public int playerSetHealth(int player, int newValue) {
+        int t = Integer.parseInt(playersInfo[player].healthPointsValue.getText());
+        playersInfo[player].healthPointsValue.setText("" + newValue);
+        return t;
+    }
+
+    /**
+     * Sets posion counters of given player to given value and returns old value.
+     * @param player player
+     * @param newValue new amount of poison counters
+     * @return old amount of poison counters
+     */
+    public int playerSetPoison(int player, int newValue) {
+        int t = Integer.parseInt(playersInfo[player].poisonCountersValue.getText());
+        playersInfo[player].poisonCountersValue.setText("" + newValue);
+        return t;
+    }
+
 ////////////////////////////////////////////////////////////////////////////////
 
     public void log(String first, String second) {

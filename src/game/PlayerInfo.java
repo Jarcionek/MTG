@@ -6,12 +6,15 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import mtg.Zone;
+import server.flags.Player;
 import server.flags.Search;
 
 /**
@@ -82,7 +85,34 @@ public class PlayerInfo extends JPanel {
         poisonButton = new JButton("Poison");
         poisonButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                String[] examples = new String[] {"-1", "5", "+1"};
+                String x = (String) JOptionPane.showInputDialog(
+                        null,
+                        "Enter new amount of poison counters",
+                        "Change " + nameLabel.getText() + "'s poison counters",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        null, examples[new Random().nextInt(3)]);
+
+                if (x == null) {
+                    return;
+                }
+
+                int value = Integer.parseInt(poisonCountersValue.getText());
+                try {
+                    if (x.charAt(0) == '-') {
+                        value -= Integer.parseInt(x.substring(1));
+                    } else if (x.charAt(0) == '+') {
+                        value += Integer.parseInt(x.substring(1));
+                    } else {
+                        value = Integer.parseInt(x);
+                    }
+                } catch (NumberFormatException ex) {
+                    return;
+                }
+
+                Game.client.send(new Player(-1, playerID,
+                        value, Player.POISON));
             }
         });
         poisonButton.setFocusable(false);
@@ -90,7 +120,34 @@ public class PlayerInfo extends JPanel {
         healthButton = new JButton("Health");
         healthButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                String[] examples = new String[] {"-5", "20", "+5"};
+                String x = (String) JOptionPane.showInputDialog(
+                        null,
+                        "Enter new health value",
+                        "Change " + nameLabel.getText() + "'s health",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        null, examples[new Random().nextInt(3)]);
+
+                if (x == null) {
+                    return;
+                }
+
+                int value = Integer.parseInt(healthPointsValue.getText());
+                try {
+                    if (x.charAt(0) == '-') {
+                        value -= Integer.parseInt(x.substring(1));
+                    } else if (x.charAt(0) == '+') {
+                        value += Integer.parseInt(x.substring(1));
+                    } else {
+                        value = Integer.parseInt(x);
+                    }
+                } catch (NumberFormatException ex) {
+                    return;
+                }
+
+                Game.client.send(new Player(-1, playerID,
+                        value, Player.HEALTH));
             }
         });
         healthButton.setFocusable(false);

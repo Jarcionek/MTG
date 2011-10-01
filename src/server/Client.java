@@ -2,8 +2,6 @@ package server;
 
 import game.CardViewer;
 import game.Game;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import server.flags.*;
 import java.io.File;
 import java.io.IOException;
@@ -88,6 +86,23 @@ public class Client extends Thread {
                 // MOVE CARD
                 } else if (object.getClass().equals(MoveCard.class)) {
                     handleMoveCard((MoveCard) object);
+
+                // CHANGE HP OR POISON COUNTERS
+                } else if (object.getClass().equals(Player.class)) {
+                    Player p = (Player) object;
+                    if (p.poisonOrHealth == Player.HEALTH) {
+                        game.log("", game.getPlayerName(p.requestor)
+                                + " changes " + game.getPlayerName(p.target)
+                                + "'s health from "
+                                + game.playerSetHealth(p.target, p.newValue)
+                                + " to " + p.newValue);
+                    } else if (p.poisonOrHealth == Player.POISON) {
+                        game.log("", game.getPlayerName(p.requestor)
+                                + " changes " + game.getPlayerName(p.target)
+                                + "'s poison counters from "
+                                + game.playerSetPoison(p.target, p.newValue)
+                                + " to " + p.newValue);
+                    }
 
                 // SEARCH
                 } else if (object.getClass().equals(Search.class)) {

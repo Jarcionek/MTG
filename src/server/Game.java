@@ -279,11 +279,11 @@ class Game {
                     ////////////////////////////////////////
 
     synchronized void playerSetPoison(int target, int value) {
-
+        poison[target] = value;
     }
 
     synchronized void playerSetHealth(int target, int value) {
-
+        health[target] = value;
     }
 
 }

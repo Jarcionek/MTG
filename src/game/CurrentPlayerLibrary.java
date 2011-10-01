@@ -71,7 +71,9 @@ public class CurrentPlayerLibrary extends JPanel {
                 } else {
                     try {
                         value = Integer.parseInt((String) x);
-                    } catch (NumberFormatException ex) {}
+                    } catch (NumberFormatException ex) {
+                        return;
+                    }
                 }
 
                 Game.client.send(new Search(value, Zone.LIBRARY, -1));
