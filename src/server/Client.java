@@ -228,7 +228,9 @@ public class Client extends Thread {
                         break;
                     case TOP_LIBRARY:
                         game.changeLibrarySize(mc.requestor, 1);
-
+                        game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
+                                    + " puts " + Game.getCardName(mc.cardID)
+                                    + " on top of library");
                         break;
                 }
                 game.cardRemoveFromTable(mc.cardID);

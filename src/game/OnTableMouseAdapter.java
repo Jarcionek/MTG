@@ -82,7 +82,8 @@ public class OnTableMouseAdapter extends MouseAdapter {
                 JMenuItem moveToLibrary = new JMenuItem("put on top of library");
                 moveToLibrary.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-
+                        Game.client.send(new MoveCard(
+                                Zone.TABLE, Zone.TOP_LIBRARY, -1, source.getID()));
                     }
                 });
 

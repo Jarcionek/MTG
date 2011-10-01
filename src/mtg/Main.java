@@ -295,6 +295,7 @@ public class Main extends JFrame {
 }
 
 /** //TODO LIST
+ * check owner when taking card from the table
  * return random number from server (coin, die, specified borders)
  * choose a card at random from your hand
  * add +1/+1 and -1/-1 counters to cards
@@ -305,6 +306,9 @@ public class Main extends JFrame {
  * deck creator - small cards viewer still crashes occasionally while scrolling
  * deck creator - cards can be easily added or removed from the deck by
  *          accident, especially while viewing larger cards
+ */
+
+/** //FIXME problems at university computer
  * linux could not load a deck: IllegalArgumentException: Unicode
  * UI problems on some computers (use java one)
  */

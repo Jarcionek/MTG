@@ -150,6 +150,8 @@ class Game {
         return library[player].getSize();
     }
 
+                    ////////////////////////////////////////
+
     /**
      * Modifies server's game by moving requested card from hand to the table
      * if the hand really contained requested card.
@@ -186,11 +188,14 @@ class Game {
 //        }
     }
 
+                    ////////////////////////////////////////
+
+
     /**
      * Moves requested card from the table to requested player's hand.
      * //FIXME on both client and server side it is allowed that a card
-     * is taken to the hand of player who is not this card's owner - it should
-     * be blocked in both client and server.
+     * is taken to the hand of a player who is not this card's owner - it
+     * should be blocked in both client and server.
      * @param player
      * @param cardID
      * @return true if card moved, false otherwise
@@ -198,6 +203,25 @@ class Game {
     synchronized boolean tableTake(int player, String cardID) {
         if (table.contains(cardID)) {
             hand[player].addCard(table.removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves requested card from the table onto the top of requested player's
+     * library.
+     * //FIXME on both client and server side it is allowed that a card
+     * is moved to the library of a player who is not this card's owner - it
+     * should be blocked in both client and server.
+     * @param player
+     * @param cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean tablePutOnTopOfLibrary(int player, String cardID) {
+        if (table.contains(cardID)) {
+            library[player].addCard(table.removeCard(cardID));
             return true;
         } else {
             return false;
@@ -222,6 +246,8 @@ class Game {
 //            //TODO
 //        }
     }
+
+                    ////////////////////////////////////////
 
     synchronized void playerViewGraveyard(int requestor, int target) {
 

@@ -145,7 +145,11 @@ public class ServerListeningThread extends Thread {
 
                         break;
                     case TOP_LIBRARY:
-
+                        if (Server.game.tablePutOnTopOfLibrary(
+                                mc.requestor = id,
+                                mc.cardID)) {
+                            Server.sendToAll(mc);
+                        }
                         break;
                 }
                 break;
