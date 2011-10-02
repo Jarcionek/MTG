@@ -72,6 +72,13 @@ public class ViewableCard extends JLabel implements Comparable<ViewableCard> {
                 frame.dispose();
             }
         });
+        contentPane.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.getUnitsToScroll() > 0) {
+                    frame.dispose();
+                }
+            }
+        });
         frame.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {

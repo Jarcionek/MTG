@@ -112,7 +112,7 @@ public class ServerFrame extends JFrame {
                         jfc.showOpenDialog(ServerFrame.this);
                         java.io.File f = jfc.getSelectedFile();
                                 mtg.Deck deckblah = mtg.Deck.load(f);
-                        new Client("Jarcionek", "localhost",
+                        new game.Client("Jarcionek", "localhost",
                                 Integer.parseInt(portField.getText()), deckblah);
                         
                     } catch (IOException ex) {

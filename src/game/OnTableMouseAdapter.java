@@ -89,18 +89,10 @@ public class OnTableMouseAdapter extends MouseAdapter {
                     }
                 });
 
-                JMenuItem enlarge = new JMenuItem("view large");
-                enlarge.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        source.viewLarger();
-                    }
-                });
-
                 popupMenu.add(moveToGraveyard);
                 popupMenu.add(moveToHand);
                 popupMenu.add(moveToLibrary);
                 popupMenu.add(exile);
-                popupMenu.add(enlarge);
 
                 popupMenu.show(source, e.getX(), e.getY());
             } else {

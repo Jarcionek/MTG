@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import server.Client;
 import server.ServerFrame;
 
 /**
@@ -131,7 +130,7 @@ public class Main extends JFrame {
                 int port = Integer.parseInt(
                         JOptionPane.showInputDialog(Main.this, "port:", "56789"));
                 try {
-                    new Client("Jarek", ip, port, deck);
+                    new game.Client("Jarek", ip, port, deck);
                     Main.this.setVisible(false);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -153,7 +152,7 @@ public class Main extends JFrame {
                 Main.this.dispose();
                 Deck d = Deck.load(new File(DECKS, "Blood Hunger.txt"));
                 try {
-                    new server.Client("BlahHlaB", "localhost", 56789, d);
+                    new game.Client("BlahHlaB", "localhost", 56789, d);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -302,9 +301,16 @@ public class Main extends JFrame {
  * enlarging card while searching any zone closes CardViewer - it should
  *          be moved from JFrame into a component of Game
  * chat?
+ * boolean reveal in MoveCard is not neccessary - the only two non-public zones
+ *          are player's hand and library so there are only two moves which
+ *          may not be seen to other players:
+ *          1. from hand onto top of a library
+ *          2. from top library to hand...
+ *          damn... 3. search library, reveal and take
  */
 
 /** //FIXME
+ * logger does not scroll correctly when changing health of poison
  * deck creator - small cards viewer still crashes occasionally while scrolling
  * deck creator - cards can be easily added or removed from the deck by
  *          accident, especially while viewing larger cards
@@ -313,4 +319,28 @@ public class Main extends JFrame {
 /** //FIXME problems at university computer
  * linux could not load a deck: IllegalArgumentException: Unicode
  * UI problems on some computers (use java one)
+ */
+
+/** //TODO to implement for now - MoveCard from -> to
+HAND		TABLE           done
+HAND		LIBRARY
+HAND		LIBRARY-HIDDEN
+HAND		GRAVEYARD
+HAND		EXILED
+
+LIBRARY		TABLE           first
+LIBRARY		HAND
+LIBRARY		HAND-HIDDEN
+LIBRARY		GRAVEYARD
+LIBRARY		EXILED
+
+GRAVEYARD	TABLE           first
+GRAVEYARD	HAND
+GRAVEYARD	LIBRARY
+GRAVEYARD	EXILED
+
+EXILED		TABLE           first
+EXILED		LIBRARY
+EXILED		GRAVEYARD
+EXILED		HAND
  */

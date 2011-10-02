@@ -48,7 +48,7 @@ public class CardViewer extends JPanel {
      * @param card a card to be added
      */
     public void addCard(Card card) {
-        if (listener.type == Zone.HAND) {
+        if (listener.getType() == Zone.HAND) {
 
             /* Add a non-basic land card in a proper lixicographical position
              * or before the first found basic land. Basic lands are always added
@@ -137,16 +137,12 @@ public class CardViewer extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         final CardViewer cardViewer = new CardViewer(new InSearcherMouseAdapter(zone));
-        cardViewer.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                frame.dispose();
-            }
-        });
         frame.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                frame.dispose();
+                if (frame.getMousePosition() == null) {
+                    frame.dispose();
+                }
             }
         });
 

@@ -1,8 +1,11 @@
 package game;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import mtg.Card;
 import mtg.Zone;
 import server.flags.MoveCard;
@@ -16,13 +19,12 @@ import server.flags.MoveCard;
  */
 public class InSearcherMouseAdapter extends MouseAdapter {
 
-    private boolean play = true;
     private boolean toHand = true;
     private boolean toLibrary = true;
     private boolean toGraveyard = true;
     private boolean toExiled = true;
 
-    Zone type;
+    private Zone type;
 
     private InSearcherMouseAdapter() {}
 
@@ -41,11 +43,15 @@ public class InSearcherMouseAdapter extends MouseAdapter {
         }
     }
 
+    Zone getType() {
+        return type;
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         final Card source = (Card) e.getSource();
 
-        if (type.equals(Zone.HAND)
+        if (type.equals(Zone.HAND) //TODO remove it to avoid accidental click?
                 && e.getButton() == MouseEvent.BUTTON1) {
             Game.client.send(
                     new MoveCard(Zone.HAND, Zone.TABLE, -1, source.getID()));
@@ -53,46 +59,72 @@ public class InSearcherMouseAdapter extends MouseAdapter {
         
         if (e.getButton() == MouseEvent.BUTTON3) {
             if (e.getClickCount() == 1) {
-//                JPopupMenu popupMenu = new JPopupMenu();
-//
-//                JMenuItem exile = new JMenuItem("exile");
-//                exile.addActionListener(new ActionListener() {
-//                    public void actionPerformed(ActionEvent e) {
-//                    }
-//                });
-//
-//                JMenuItem moveToHand = new JMenuItem("return to hand");
-//                moveToHand.addActionListener(new ActionListener() {
-//                    public void actionPerformed(ActionEvent e) {
-//                    }
-//                });
-//
-//                JMenuItem moveToGraveyard = new JMenuItem("destroy");
-//                moveToGraveyard.addActionListener(new ActionListener() {
-//                    public void actionPerformed(ActionEvent e) {
-//                    }
-//                });
-//
-//                JMenuItem moveToLibrary = new JMenuItem("put on top of library");
-//                moveToLibrary.addActionListener(new ActionListener() {
-//                    public void actionPerformed(ActionEvent e) {
-//                    }
-//                });
-//
-//                if (toHand) {
-//                    popupMenu.add(moveToHand);
-//                }
-//                if (toGraveyard) {
-//                    popupMenu.add(moveToGraveyard);
-//                }
-//                if (toLibrary) {
-//                    popupMenu.add(moveToLibrary);
-//                }
-//                if (toExiled) {
-//                    popupMenu.add(exile);
-//                }
-//
-//                popupMenu.show(source, e.getX(), e.getY());
+                JPopupMenu popupMenu = new JPopupMenu();
+
+                JMenuItem play = new JMenuItem("play");
+                play.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        send(Zone.TABLE, source.getID());
+                    }
+                });
+
+                JMenuItem exile = new JMenuItem("exile");
+                exile.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToHandHidden = new JMenuItem("take to hand");
+                moveToHandHidden.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToHand = new JMenuItem("reveal and take to hand");
+                moveToHand.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToGraveyard = new JMenuItem("put onto graveyard");
+                moveToGraveyard.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToLibraryHidden = new JMenuItem("put on top of library");
+                moveToLibraryHidden.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                JMenuItem moveToLibrary = new JMenuItem("reveal and put on top of library");
+                moveToLibrary.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+
+                popupMenu.add(play);
+                if (toHand) {
+                    popupMenu.add(moveToHand);
+                    if (type == Zone.LIBRARY) {
+                        popupMenu.add(moveToHandHidden);
+                    }
+                }
+                if (toGraveyard) {
+                    popupMenu.add(moveToGraveyard);
+                }
+                if (toLibrary) {
+                    popupMenu.add(moveToLibrary);
+                    if (type == Zone.HAND) {
+                        popupMenu.add(moveToLibraryHidden);
+                    }
+                }
+                if (toExiled) {
+                    popupMenu.add(exile);
+                }
+
+                popupMenu.show(source, e.getX(), e.getY());
             } else {
                 source.viewLarger();
             }
@@ -104,6 +136,14 @@ public class InSearcherMouseAdapter extends MouseAdapter {
         Card source = (Card) e.getSource();
         CardViewer cv = (CardViewer) source.getParent();
         cv.showCards(source);
+    }
+
+    private void send(Zone target, String cardID, boolean reveal) {
+        Game.client.send(new MoveCard(type, target, -1, cardID, reveal));
+    }
+
+    private void send(Zone target, String cardID) {
+        send(target, cardID, true);
     }
     
 }

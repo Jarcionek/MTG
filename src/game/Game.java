@@ -17,7 +17,6 @@ import mtg.Card;
 import mtg.Main;
 import mtg.Utilities;
 import mtg.Zone;
-import server.Client;
 
 /**
  * @author Jaroslaw Pawlak

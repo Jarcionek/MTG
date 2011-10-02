@@ -1,7 +1,5 @@
-package server;
+package game;
 
-import game.CardViewer;
-import game.Game;
 import server.flags.*;
 import java.io.File;
 import java.io.IOException;
