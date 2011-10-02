@@ -36,6 +36,20 @@ public class ServerListeningThread extends Thread {
             try {
                 object = ois.readObject();
 
+                if (!Server.areAllPlayersConnected()) {
+                     //REQUEST CARD
+                    if (object.getClass().equals(RequestCard.class)) {
+                        RequestCard t = ((RequestCard) object);
+                        Socket s = fileSocket.accept();
+                        Utilities.sendFile(new File(Utilities.findPath(t.name)), s);
+                        s.close();
+                    // READY
+                    } else if (object.getClass().equals(Ready.class)) {
+                        Server.ready[id] = true;
+                    }
+                    continue;
+                }
+
                 // DRAG
                 if (object.getClass().equals(DragCard.class)) {
                     DragCard dc = (DragCard) object;
@@ -103,18 +117,10 @@ public class ServerListeningThread extends Thread {
                         r.requstor = id;
                         Server.sendToAll(r);
                     }
-
-                // REQUEST CARD
-                } else if (object.getClass().equals(RequestCard.class)) {
-                    RequestCard t = ((RequestCard) object);
-                    Socket s = fileSocket.accept();
-                    Utilities.sendFile(new File(Utilities.findPath(t.name)), s);
-                    s.close();
-                // READY
-                } else if (object.getClass().equals(Ready.class)) {
-                    Server.ready[id] = true;
                 }
             } catch (Exception ex) {
+//                Logger.getLogger(ServerListeningThread.class.getName())
+//                        .log(Level.SEVERE, null, ex);
                 Debug.p("ServerListeningThread (id=" + id + ") error while " +
                             "dealing with " + object + ": " + ex);
                 if ("Connection reset".equals(ex.getLocalizedMessage())) {
@@ -246,14 +252,16 @@ public class ServerListeningThread extends Thread {
             case TOP_LIBRARY:
                 switch (mc.destination) {
                     case HAND:
-                        card = Server.game.libraryDraw(id);
-                        Server.sendToAllInvisible(new MoveCard(Zone.TOP_LIBRARY,
-                                Zone.HAND, id, card.ID));
+                        if ((card = Server.game.libraryDraw(id)) != null) {
+                            Server.sendToAllInvisible(new MoveCard(
+                                    Zone.TOP_LIBRARY, Zone.HAND, id, card.ID));
+                        }
                         break;
                     case TABLE:
-                        card = Server.game.libraryPlayTop(id);
-                        Server.sendToAll(new MoveCard(
-                                Zone.TOP_LIBRARY, Zone.TABLE, id, card.ID));
+                        if ((card = Server.game.libraryPlayTop(id)) != null){
+                            Server.sendToAll(new MoveCard(
+                                    Zone.TOP_LIBRARY, Zone.TABLE, id, card.ID));
+                        }
                         break;
                     case GRAVEYARD:
 

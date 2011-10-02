@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -214,12 +215,12 @@ public class Game extends JFrame {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    public void log(String first, String second) {
-        logger.log(first, second);
+    public void log(String first, String second, Color color) {
+        logger.log(first, second, color);
     }
 
-    public void log(String cardID, boolean onTable, String text) {
-        logger.log(cardID, onTable, text);
+    public void log(String cardID, boolean onTable, String text, Color color) {
+        logger.log(cardID, onTable, text, color);
     }
 
     public static String getCardName(String cardID) {

@@ -1,5 +1,7 @@
 package game;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,6 +22,22 @@ import mtg.Utilities;
  * @author Jaroslaw Pawlak
  */
 public class Logger extends JPanel {
+    public static Color C_DRAG = Color.black;
+    public static Color C_DRAW = Color.blue;
+    public static Color C_TAP = Color.lightGray;
+    public static Color C_CHANGE_HP = new Color(175, 175, 0); //dark yellow
+    public static Color C_MOVE_DESTROY = Color.red;
+    public static Color C_MOVE_EXILE = Color.red;
+    public static Color C_MOVE_PLAY = new Color(0, 128, 0); //dark green
+    public static Color C_MOVE_TO_HAND = Color.magenta;
+    public static Color C_MOVE_TO_LIBRARY = new Color(192, 128, 0); //dark orange
+    public static Color C_SEARCH_LIBRARY = new Color(192, 128, 0); //dark orange
+    public static Color C_SEARCH_GRAVEYARD = Color.black;
+    public static Color C_SEARCH_EXILED = Color.black;
+    public static Color C_SHUFFLE = Color.blue;
+    public static Color C_REVEAL = Color.blue;
+
+
     private GridBagConstraints f;
     private GridBagConstraints s;
 
@@ -45,18 +63,18 @@ public class Logger extends JPanel {
         s.fill = GridBagConstraints.BOTH;
 
         content.add(new JLabel("Internal IP:"), f);
-        content.add(createTextField(Utilities.getInternalIP()), s);
+        content.add(createTextField(Utilities.getInternalIP(), Color.black), s);
         content.add(new JLabel("External IP:"), f);
-        content.add(createTextField(Utilities.getExternalIP()), s);
+        content.add(createTextField(Utilities.getExternalIP(), Color.black), s);
 
         jsp = new JScrollPane(content);
         this.add(jsp);
     }
 
-    public void log(String first, String second) {
+    public void log(String first, String second, Color color) {
         reduceSize();
         content.add(new JLabel(first), f);
-        content.add(createTextField(second), s);
+        content.add(createTextField(second, color), s);
         content.revalidate();
         content.repaint();
         SwingUtilities.invokeLater(new Runnable() {
@@ -67,19 +85,24 @@ public class Logger extends JPanel {
         });
     }
 
-    public void log(final String cardID, final boolean onTable, String text) {
+    public void log(final String cardID, final boolean onTable, String text,
+            Color color) {
         reduceSize();
-        JButton button = new JButton("show");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (!onTable || !table.scrollToCard(cardID)) {
-                    new Card(Utilities.findPath(Game.getCardName(cardID)))
-                            .viewLarger();
+        if (cardID != null) {
+            JButton button = new JButton("show");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (!onTable || !table.scrollToCard(cardID)) {
+                        new Card(Utilities.findPath(Game.getCardName(cardID)))
+                                .viewLarger();
+                    }
                 }
-            }
-        });
-        content.add(button, f);
-        content.add(createTextField(text), s);
+            });
+            content.add(button, f);
+        } else {
+            content.add(new JLabel(), f);
+        }
+        content.add(createTextField(text, color), s);
         content.revalidate();
         content.repaint();
         SwingUtilities.invokeLater(new Runnable() {
@@ -97,11 +120,12 @@ public class Logger extends JPanel {
         }
     }
 
-    private static JTextField createTextField(String text) {
+    private static JTextField createTextField(String text, Color color) {
         JTextField tf = new JTextField(text);
         tf.setEditable(false);
         tf.setBorder(null);
         tf.setFont(new Font("Arial", Font.PLAIN, 12));
+        tf.setForeground(color);
         return tf;
     }
 }

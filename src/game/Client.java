@@ -1,9 +1,8 @@
 package game;
 
-import java.awt.AWTException;
-import java.awt.Robot;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.awt.Color;
 import server.flags.*;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +23,7 @@ public class Client extends Thread {
     private String serverIP;
     private int fileTransferPort;
 
-    private game.Game game;
+    private game.Game g;
 
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
@@ -60,8 +59,8 @@ public class Client extends Thread {
         //TODO in case players have the same name, here changed name must be
         //      obtained from the server
 
-        game = new game.Game(players, Client.this);
-        game.log("Connected to", ip + ":" + port);
+        g = new game.Game(players, Client.this);
+        g.log("Connected to", ip + ":" + port, Color.black);
     }
 
     @Override
@@ -75,17 +74,17 @@ public class Client extends Thread {
                 // DRAG
                 if (object.getClass().equals(DragCard.class)) {
                     DragCard dc = (DragCard) object;
-                    game.log(dc.ID, true, game.getPlayerName(dc.requestor)
-                            + " drags " + Game.getCardName(dc.ID));
-                    game.cardDragOnTable(dc.ID, dc.newxpos, dc.newypos);
+                    g.log(dc.ID, true, g.getPlayerName(dc.requestor)
+                            + " drags " + Game.getCardName(dc.ID), game.Logger.C_DRAG);
+                    g.cardDragOnTable(dc.ID, dc.newxpos, dc.newypos);
                     
                 // TAP CARD
                 } else if (object.getClass().equals(TapCard.class)) {
                     TapCard tc = (TapCard) object;
-                    game.log(tc.ID, true, game.getPlayerName(tc.requestor) + " "
+                    g.log(tc.ID, true, g.getPlayerName(tc.requestor) + " "
                             + (tc.tapped? "taps" : "untaps")
-                            + " " + Game.getCardName(tc.ID));
-                    game.cardTap(tc.ID, tc.tapped);
+                            + " " + Game.getCardName(tc.ID), game.Logger.C_TAP);
+                    g.cardTap(tc.ID, tc.tapped);
 
                 // MOVE CARD
                 } else if (object.getClass().equals(MoveCard.class)) {
@@ -95,17 +94,17 @@ public class Client extends Thread {
                 } else if (object.getClass().equals(Player.class)) {
                     Player p = (Player) object;
                     if (p.poisonOrHealth == Player.HEALTH) {
-                        game.log("", game.getPlayerName(p.requestor)
-                                + " changes " + game.getPlayerName(p.target)
+                        g.log("", g.getPlayerName(p.requestor)
+                                + " changes " + g.getPlayerName(p.target)
                                 + "'s health from "
-                                + game.playerSetHealth(p.target, p.newValue)
-                                + " to " + p.newValue);
+                                + g.playerSetHealth(p.target, p.newValue)
+                                + " to " + p.newValue, game.Logger.C_CHANGE_HP);
                     } else if (p.poisonOrHealth == Player.POISON) {
-                        game.log("", game.getPlayerName(p.requestor)
-                                + " changes " + game.getPlayerName(p.target)
+                        g.log("", g.getPlayerName(p.requestor)
+                                + " changes " + g.getPlayerName(p.target)
                                 + "'s poison counters from "
-                                + game.playerSetPoison(p.target, p.newValue)
-                                + " to " + p.newValue);
+                                + g.playerSetPoison(p.target, p.newValue)
+                                + " to " + p.newValue, game.Logger.C_CHANGE_HP);
                     }
 
                 // SEARCH
@@ -114,41 +113,43 @@ public class Client extends Thread {
                     switch (s.zone) {
                         case LIBRARY:
                             if (s.amount == -1) {
-                                game.log("", game.getPlayerName(s.requestor)
-                                        + " searches library");
+                                g.log("", g.getPlayerName(s.requestor)
+                                        + " searches library",
+                                        game.Logger.C_SEARCH_LIBRARY);
                             } else {
-                                game.log("", game.getPlayerName(s.requestor)
+                                g.log("", g.getPlayerName(s.requestor)
                                         + " looks at the " + s.amount
-                                        + " top cards of library");
+                                        + " top cards of library",
+                                        game.Logger.C_SEARCH_LIBRARY);
                             }
                             if (s.cardsIDs != null) {
                                 CardViewer.createViewerInFrame(s.cardsIDs,
-                                        Zone.LIBRARY, game.getSize(),
+                                        Zone.LIBRARY, g.getSize(),
                                         "Your library");
                             }
                             break;
                         case GRAVEYARD:
-                            game.log("", game.getPlayerName(s.requestor)
+                            g.log("", g.getPlayerName(s.requestor)
                                     + " searches "
-                                    + game.getPlayerName(s.zoneOwner)
-                                    + "'s graveyard");
+                                    + g.getPlayerName(s.zoneOwner)
+                                    + "'s graveyard", game.Logger.C_SEARCH_GRAVEYARD);
                             if (s.cardsIDs != null) {
                                 CardViewer.createViewerInFrame(s.cardsIDs,
-                                        Zone.GRAVEYARD, game.getSize(),
-                                        game.getPlayerName(s.zoneOwner)
+                                        Zone.GRAVEYARD, g.getSize(),
+                                        g.getPlayerName(s.zoneOwner)
                                         + "'s graveyard ("
                                         + s.cardsIDs.length + " cards)");
                             }
                             break;
                         case EXILED:
-                            game.log("", game.getPlayerName(s.requestor)
+                            g.log("", g.getPlayerName(s.requestor)
                                     + " searches "
-                                    + game.getPlayerName(s.zoneOwner)
-                                    + "'s exiled zone");
+                                    + g.getPlayerName(s.zoneOwner)
+                                    + "'s exiled zone", game.Logger.C_SEARCH_EXILED);
                             if (s.cardsIDs != null) {
                             CardViewer.createViewerInFrame(s.cardsIDs,
-                                    Zone.EXILED, game.getSize(),
-                                    game.getPlayerName(s.zoneOwner)
+                                    Zone.EXILED, g.getSize(),
+                                    g.getPlayerName(s.zoneOwner)
                                     + "'s exiled zone (" + s.cardsIDs.length
                                     + " cards)");
                             }
@@ -158,15 +159,16 @@ public class Client extends Thread {
                 // SHUFFLE LIBRARY
                 } else if (object.getClass().equals(Shuffle.class)) {
                     Shuffle s = (Shuffle) object;
-                    game.log("", game.getPlayerName(s.owner) + " shuffles library");
+                    g.log("", g.getPlayerName(s.owner) + " shuffles library",
+                            game.Logger.C_SHUFFLE);
 
                 // REVEAL
                 } else if (object.getClass().equals(Reveal.class)) {
                     Reveal r = (Reveal) object;
                     if (r.source == Zone.TOP_LIBRARY) {
-                        game.log(r.cardID, false, game.getPlayerName(r.requstor)
+                        g.log(r.cardID, false, g.getPlayerName(r.requstor)
                                 + " reveals top card of library: "
-                                + Game.getCardName(r.cardID));
+                                + Game.getCardName(r.cardID), game.Logger.C_REVEAL);
                     }
 
                 // REQUEST CARD - server requests client to send card's image
@@ -182,7 +184,7 @@ public class Client extends Thread {
                     CheckDeck cd = ((CheckDeck) object);
                     Deck d = cd.deck;
 
-                    game.addPlayer(cd.owner);
+                    g.addPlayer(cd.owner);
 
                     for (int j = 0; j < d.getArraySize(); j++) {
                         if (Utilities.findPath(d.getArrayNames(j)) == null) {
@@ -205,11 +207,11 @@ public class Client extends Thread {
                             + " " + ((CheckDeck) object).owner + "'s "
                             + d.getName() + ".txt"));
 
-                    game.setPlayerLibrarySize(cd.owner, d.getDeckSize());
+                    g.setPlayerLibrarySize(cd.owner, d.getDeckSize());
 
                 // CARDS LIST
                 } else if (object.getClass().equals(CardsList.class)) {
-                    game.setCardsList(((CardsList) object).list);
+                    g.setCardsList(((CardsList) object).list);
                 }
             } catch (Exception ex) {
                 if ("Connection reset".equals(ex.getLocalizedMessage())) {
@@ -229,8 +231,8 @@ public class Client extends Thread {
         if (mc.cardID == null) {
             owner = "his";
         } else {
-            owner = game.getPlayerName(mc.cardID.charAt(0) - 'A');
-            if (owner.equals(game.getPlayerName(mc.requestor))) {
+            owner = g.getPlayerName(mc.cardID.charAt(0) - 'A');
+            if (owner.equals(g.getPlayerName(mc.requestor))) {
                 owner = "his";
             } else if (owner.equals(playerName)) {
                 owner = "your";
@@ -242,9 +244,10 @@ public class Client extends Thread {
             case HAND:
                 switch (mc.destination) {
                     case TABLE:
-                        game.log(mc.cardID, true, game.getPlayerName(mc.requestor)
-                                + " plays " + Game.getCardName(mc.cardID));
-                        game.cardAddToTable(mc.cardID);
+                        g.log(mc.cardID, true, g.getPlayerName(mc.requestor)
+                                + " plays " + Game.getCardName(mc.cardID),
+                                game.Logger.C_MOVE_PLAY);
+                        g.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
 
@@ -253,67 +256,72 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
-                game.changeHandSize(mc.requestor, -1);
-                if (playerName.equals(game.getPlayerName(mc.requestor))) {
-                    game.cardRemoveFromHand(mc.cardID);
+                g.changeHandSize(mc.requestor, -1);
+                if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                    g.cardRemoveFromHand(mc.cardID);
                 }
                 break;
             case TABLE:
                 switch (mc.destination) {
                     case HAND:
-                        game.changeHandSize(mc.requestor, 1);
-                        game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
+                        g.changeHandSize(mc.requestor, 1);
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
                                     + " returns " + Game.getCardName(mc.cardID)
-                                    + " from table to " + owner + " hand");
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-                            game.cardAddToHand(mc.cardID);
+                                    + " from table to " + owner + " hand",
+                                game.Logger.C_MOVE_TO_HAND);
+                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                            g.cardAddToHand(mc.cardID);
                         }
                         break;
                     case GRAVEYARD:
-                        game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
                                     + " puts " + Game.getCardName(mc.cardID)
-                                    + " from table on " + owner + " graveyard");
+                                    + " from table on " + owner + " graveyard",
+                                game.Logger.C_MOVE_DESTROY);
                         break;
                     case EXILED:
-                        game.log(mc.cardID, false,
-                                game.getPlayerName(mc.requestor) + " exiles "
+                        g.log(mc.cardID, false,
+                                g.getPlayerName(mc.requestor) + " exiles "
                                 + Game.getCardName(mc.cardID)
-                                + " from the table");
+                                + " from the table",
+                                game.Logger.C_MOVE_EXILE);
                         break;
                     case LIBRARY:
                         throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
-                        game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
+                        g.changeLibrarySize(mc.requestor, 1);
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
                                     + " puts " + Game.getCardName(mc.cardID)
-                                    + " on top of " + owner + " library");
+                                    + " on top of " + owner + " library",
+                                game.Logger.C_MOVE_TO_LIBRARY);
                         break;
                 }
-                game.cardRemoveFromTable(mc.cardID);
+                g.cardRemoveFromTable(mc.cardID);
                 break;
             case GRAVEYARD:
                 switch (mc.destination) {
                     case HAND:
-                        game.changeHandSize(mc.requestor, 1);
+                        g.changeHandSize(mc.requestor, 1);
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
                     case TABLE:
-                        game.log(mc.cardID, true, game.getPlayerName(mc.requestor)
+                        g.log(mc.cardID, true, g.getPlayerName(mc.requestor)
                                 + " plays " + Game.getCardName(mc.cardID)
-                                + " from " + owner + " graveyard");
-                        game.cardAddToTable(mc.cardID);
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+                                + " from " + owner + " graveyard",
+                                game.Logger.C_MOVE_PLAY);
+                        g.cardAddToTable(mc.cardID);
+                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
                             CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                         }
                         break;
@@ -321,11 +329,11 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
@@ -333,7 +341,7 @@ public class Client extends Thread {
             case EXILED:
                 switch (mc.destination) {
                     case HAND:
-                        game.changeHandSize(mc.requestor, 1);
+                        g.changeHandSize(mc.requestor, 1);
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
@@ -347,11 +355,11 @@ public class Client extends Thread {
 
                         break;
                     case LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, 1);
 
                         break;
                     case TOP_LIBRARY:
-                        game.changeLibrarySize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, 1);
 
                         break;
                 }
@@ -359,30 +367,30 @@ public class Client extends Thread {
             case LIBRARY:
                 switch (mc.destination) {
                     case HAND:
-                        game.changeLibrarySize(mc.requestor, -1);
-                        game.changeHandSize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, -1);
+                        g.changeHandSize(mc.requestor, 1);
 //                        //TODO log
 //                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
 //                            game.cardAddToHand(mc.cardID);
 //                        }
                         break;
                     case TABLE:
-                        game.changeLibrarySize(mc.requestor, -1);
-                        game.log(mc.cardID, true,
-                                game.getPlayerName(mc.requestor) + " puts "
+                        g.changeLibrarySize(mc.requestor, -1);
+                        g.log(mc.cardID, true,
+                                g.getPlayerName(mc.requestor) + " puts "
                                 + Game.getCardName(mc.cardID) + " from library "
-                                + "onto table");
-                        game.cardAddToTable(mc.cardID);
-                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+                                + "onto table", game.Logger.C_MOVE_PLAY);
+                        g.cardAddToTable(mc.cardID);
+                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
                             CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                         }
                         break;
                     case GRAVEYARD:
-                        game.changeLibrarySize(mc.requestor, -1);
+                        g.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case EXILED:
-                        game.changeLibrarySize(mc.requestor, -1);
+                        g.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case TOP_LIBRARY:
@@ -393,32 +401,35 @@ public class Client extends Thread {
             case TOP_LIBRARY:
                 switch (mc.destination) {
                     case HAND:
-                        game.changeLibrarySize(mc.requestor, -1);
-                        game.changeHandSize(mc.requestor, 1);
+                        g.changeLibrarySize(mc.requestor, -1);
+                        g.changeHandSize(mc.requestor, 1);
                         if (mc.cardID != null) {
-                            game.log(mc.cardID, false, "You draw "
-                                    + Game.getCardName(mc.cardID));
-                            game.cardAddToHand(mc.cardID);
+                            g.log(mc.cardID, false, "You draw "
+                                    + Game.getCardName(mc.cardID),
+                                    game.Logger.C_MOVE_TO_HAND);
+                            g.cardAddToHand(mc.cardID);
                         } else {
-                            game.log(mc.cardID, false,
-                                    game.getPlayerName(mc.requestor)
-                                    + " draws a card");
+                            g.log(mc.cardID, false,
+                                    g.getPlayerName(mc.requestor)
+                                    + " draws a card",
+                                    game.Logger.C_MOVE_TO_HAND);
                         }
                         break;
                     case TABLE:
-                        game.changeLibrarySize(mc.requestor, -1);
-                        game.log(mc.cardID, true,
-                                game.getPlayerName(mc.requestor)
+                        g.changeLibrarySize(mc.requestor, -1);
+                        g.log(mc.cardID, true,
+                                g.getPlayerName(mc.requestor)
                                 + " plays top card of " + owner + " library: "
-                                + Game.getCardName(mc.cardID));
-                        game.cardAddToTable(mc.cardID);
+                                + Game.getCardName(mc.cardID),
+                                game.Logger.C_MOVE_PLAY);
+                        g.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
-                        game.changeLibrarySize(mc.requestor, -1);
+                        g.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case EXILED:
-                        game.changeLibrarySize(mc.requestor, -1);
+                        g.changeLibrarySize(mc.requestor, -1);
 
                         break;
                     case LIBRARY:

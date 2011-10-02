@@ -37,6 +37,8 @@ public class Server extends Thread {
 
     static Game game;
 
+    private static boolean gameInitialised = false;
+
     private Server() {}
 
     /**
@@ -171,7 +173,13 @@ public class Server extends Thread {
             }
         }
 
+        Server.gameInitialised = true;
+
         Debug.p("Server main thread terminates");
+    }
+
+    synchronized static boolean areAllPlayersConnected() {
+        return gameInitialised;
     }
 
     /**
@@ -221,7 +229,13 @@ public class Server extends Thread {
             }
         }
     }
-    
+
+    /**
+     * Sends an search Action to all the players, but only requestor player
+     * receives list of cards. For other players it is only an information
+     * that a player is searching a zone.
+     * @param s Search action
+     */
     static void sendToAllInvisible(Search s) {
         String[] cards = s.cardsIDs;
         s.cardsIDs = null;

@@ -302,13 +302,8 @@ public class Main extends JFrame {
  * enlarging card while searching any zone closes CardViewer - it should
  *          be moved from JFrame into a component of Game
  * chat?
- * boolean reveal in MoveCard is not neccessary - the only two non-public zones
- *          are player's hand and library so there are only two moves which
- *          may not be seen to other players:
- *          1. from hand onto top of a library
- *          2. from top library to hand...
- *          damn... 3. search library, reveal and take
  * in ServerFrame add copy button which copies IP with port into the clipboard
+ * PlayerX taps CardY - change into PlayerX taps his CardY etc
  * Settings:
  *          1. name - by default computer name
  *          2. music volume
@@ -342,7 +337,7 @@ LIBRARY		HAND-HIDDEN
 LIBRARY		GRAVEYARD
 LIBRARY		EXILED
 
-GRAVEYARD	TABLE           first
+GRAVEYARD	TABLE           done
 GRAVEYARD	HAND
 GRAVEYARD	LIBRARY
 GRAVEYARD	EXILED
