@@ -154,23 +154,23 @@ public class Utilities {
      * @return external IP or error message
      */
     public static String getExternalIP() {
-        return "Disabled for testing";
-//        if (IP != null && System.currentTimeMillis() - IPtime < TIMEOUT * 1000) {
-//            return IP;
-//        }
-//        try {
-//            URL url = new URL("http://checkip.dyndns.org/");
-//            InputStream is = url.openStream();
-//            InputStreamReader isr = new InputStreamReader(is);
-//            BufferedReader br = new BufferedReader(isr);
-//            IPtime = System.currentTimeMillis();
-//            return IP = br.readLine()
-//                    .replace("<html><head><title>Current IP Check</title></head><body>Current IP Address: ", "")
-//                    .replace("</body></html>", "");
-//        } catch (Exception ex) {
-//            IP = null;
-//            return "Could not connect with http://checkip.dyndns.org/";
-//        }
+//        return "Disabled for testing";
+        if (IP != null && System.currentTimeMillis() - IPtime < TIMEOUT * 1000) {
+            return IP;
+        }
+        try {
+            URL url = new URL("http://checkip.dyndns.org/");
+            InputStream is = url.openStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            IPtime = System.currentTimeMillis();
+            return IP = br.readLine()
+                    .replace("<html><head><title>Current IP Check</title></head><body>Current IP Address: ", "")
+                    .replace("</body></html>", "");
+        } catch (Exception ex) {
+            IP = null;
+            return "Could not connect with http://checkip.dyndns.org/";
+        }
     }
 
     public static String getInternalIP() {

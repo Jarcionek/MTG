@@ -89,9 +89,6 @@ public class Server extends Thread {
                 newdeck = (CheckDeck) ois[i].readObject();
                 names[i] = checkName(newdeck.owner);
                 decks[i] = newdeck.deck;
-//                decks[i].save(new File(Main.DECKS_DL, Utilities
-//                        .getCurrentTimeForFile()+ " " + names[i] + "'s "
-//                        + decks[i].getName() + ".txt"));
                 oos[i].writeInt(port + i + 1);
                 oos[i].flush();
                 oos[i].writeInt(ready.length);

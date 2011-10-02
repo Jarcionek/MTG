@@ -81,9 +81,16 @@ public class Client extends Thread {
                 // TAP CARD
                 } else if (object.getClass().equals(TapCard.class)) {
                     TapCard tc = (TapCard) object;
+                    String owner;
+                    if (tc.requestor == tc.ID.charAt(0) - 'A') {
+                        owner = "his";
+                    } else {
+                        owner = g.getPlayerName(tc.ID.charAt(0) - 'A') + "'s";
+                    }
                     g.log(tc.ID, true, g.getPlayerName(tc.requestor) + " "
                             + (tc.tapped? "taps" : "untaps")
-                            + " " + Game.getCardName(tc.ID), game.Logger.C_TAP);
+                            + " " + owner + " "
+                            + Game.getCardName(tc.ID), game.Logger.C_TAP);
                     g.cardTap(tc.ID, tc.tapped);
 
                 // MOVE CARD
@@ -457,7 +464,7 @@ public class Client extends Thread {
                     case TOP_LIBRARY:
                         if (mc.reveal) {
                             g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
-                                    + " puts " + Game.getCardName(mc.cardID)
+                                    + " reveals " + Game.getCardName(mc.cardID)
                                     + " from his library on top of it",
                                     game.Logger.C_MOVE_TO_LIBRARY);
                         } else if (mc.cardID == null) {

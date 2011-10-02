@@ -23,7 +23,7 @@ import mtg.Utilities;
 public class Logger extends JPanel {
     public static final Color C_DRAG = Color.black;
     public static final Color C_DRAW = Color.blue;
-    public static final Color C_TAP = Color.lightGray;
+    public static final Color C_TAP = Color.gray;
     public static final Color C_CHANGE_HP = new Color(175, 175, 0); //dark yellow
     public static final Color C_MOVE_DESTROY = Color.red;
     public static final Color C_MOVE_EXILE = Color.red;

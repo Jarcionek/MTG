@@ -3,14 +3,13 @@ package server;
 import java.util.TreeMap;
 import mtg.Debug;
 import mtg.Deck;
-import server.flags.MoveCard;
 
 /**
  * @author Jaroslaw Pawlak
  *
  * None of Game's method should send anything to clients, a proper actions
  * have to be sent explicitly depending on these methods return values.
- *
+ * <p>
  * All of the methods must ensure that no illegal move is posibble, e.g.
  * if player's library is empty, player cannot draw a card so nothing has
  * to be sent to clients. Possibility of drawing a card from empty library

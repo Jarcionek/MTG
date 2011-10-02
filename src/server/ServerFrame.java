@@ -10,11 +10,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -112,7 +111,8 @@ public class ServerFrame extends JFrame {
                         jfc.showOpenDialog(ServerFrame.this);
                         java.io.File f = jfc.getSelectedFile();
                                 mtg.Deck deckblah = mtg.Deck.load(f);
-                        new game.Client("Jarcionek", "localhost",
+                        String name = JOptionPane.showInputDialog("your name:");
+                        new game.Client(name, "localhost",
                                 Integer.parseInt(portField.getText()), deckblah);
                         
                     } catch (IOException ex) {

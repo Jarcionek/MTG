@@ -1,7 +1,9 @@
 package mtg;
 
 import deckCreator.DeckCreator;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import server.ServerFrame;
 
@@ -29,6 +32,7 @@ import server.ServerFrame;
  * @author Jaroslaw Pawlak
  */
 public class Main extends JFrame {
+    public static final String VERSION = "beta 1.0";
 
     public static final File DIRECTORY
             = new File(System.getProperty("user.dir"), "MTG");
@@ -72,6 +76,55 @@ public class Main extends JFrame {
         super(TITLE);
 
         JPanel contentPane = new JPanel(null);
+
+        JLabel versionLabel = new JLabel(VERSION);
+        versionLabel.setForeground(Color.white);
+        versionLabel.setBounds(5, 5,
+                versionLabel.getPreferredSize().width,
+                versionLabel.getPreferredSize().height);
+        contentPane.add(versionLabel);
+
+        JLabel authorLabel = new JLabel("Made by Jaroslaw Pawlak");
+        authorLabel.setForeground(Color.white);
+        authorLabel.setBounds(745 - authorLabel.getPreferredSize().width, 5,
+                authorLabel.getPreferredSize().width,
+                authorLabel.getPreferredSize().height);
+        contentPane.add(authorLabel);
+
+        JLabel label1 = new JLabel("All names and images are the");
+        label1.setForeground(Color.lightGray);
+        label1.setBounds(745 - label1.getPreferredSize().width,
+                authorLabel.getBounds().y + authorLabel.getPreferredSize().height + 2,
+                label1.getPreferredSize().width,
+                label1.getPreferredSize().height);
+        contentPane.add(label1);
+
+        JLabel label2 = new JLabel("property of Wizards of the Coast");
+        label2.setForeground(Color.lightGray);
+        label2.setBounds(745 - label2.getPreferredSize().width,
+                label1.getBounds().y + label1.getPreferredSize().height + 2,
+                label2.getPreferredSize().width,
+                label2.getPreferredSize().height);
+        contentPane.add(label2);
+
+        JTextArea ta = new JTextArea(
+                "Coming up:\n" +
+                "- more cards and decks\n" +
+                "- saving player name and active deck\n" +
+                "- changing cards' sizes\n" +
+                "- tossing a coin, rolling a die\n" +
+                "- choosing a card at random\n" +
+                "- putting counters on permanents\n" +
+                "- music\n" +
+                "- improved deck creator"
+                );
+        ta.setFocusable(false);
+        ta.setEditable(false);
+        ta.setOpaque(false);
+        ta.setFont(new Font("Arial", Font.PLAIN, 12));
+        ta.setForeground(Color.yellow);
+        ta.setBounds(10, 140, ta.getPreferredSize().width, ta.getPreferredSize().height);
+        contentPane.add(ta);
 
         JButton deckCreator = new JButton("Deck creator");
         deckCreator.setOpaque(false);
@@ -121,6 +174,7 @@ public class Main extends JFrame {
         joinGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //TODO temp
+                String name = JOptionPane.showInputDialog("your name:");
                 JFileChooser jfc = new JFileChooser(DECKS);
                 jfc.setMultiSelectionEnabled(false);
                 jfc.showOpenDialog(Main.this);
@@ -130,7 +184,7 @@ public class Main extends JFrame {
                 int port = Integer.parseInt(
                         JOptionPane.showInputDialog(Main.this, "port:", "56789"));
                 try {
-                    new game.Client("Jarek", ip, port, deck);
+                    new game.Client(name, ip, port, deck);
                     Main.this.setVisible(false);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -140,8 +194,12 @@ public class Main extends JFrame {
         contentPane.add(joinGame);
 
         //TODO temp
-        JButton quickOnePlayerStart = new JButton("Quick one player game");
-        quickOnePlayerStart.setBounds(300, 200, 200, 100);
+        JButton quickOnePlayerStart = new JButton("Quick single player game");
+        quickOnePlayerStart.setOpaque(false);
+        quickOnePlayerStart.setFocusable(false);
+        quickOnePlayerStart.setBounds(580, 380,
+                quickOnePlayerStart.getPreferredSize().width,
+                quickOnePlayerStart.getPreferredSize().height);
         quickOnePlayerStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -183,12 +241,72 @@ public class Main extends JFrame {
     }
 
     private static void saveExampleCards() {
-        String [] wieldingSteelCards = {};
-        String [] realmOfIllusionCards = {};
-        String [] strengthOfStoneCards = {};
-        String [] guardiansOfTheWoodCards = {};
-        String [] ancientDepthsCards = {};
-        String [] dragonsRoarCards = {};
+        String[] wieldingSteelCards = {
+            "Brave the Elements.jpg",
+            "Elite Vanguard.jpg",
+            "Gideon's Lawkeeper.jpg",
+            "Infiltration Lens.jpg",
+            "Kitesail Apprentice.jpg",
+            "Kor Duelist.jpg",
+            "Trusty Machete.jpg",
+            "Angel's Feather.jpg",
+            "Glory Seeker.jpg",
+            "Kitesail.jpg",
+            "Kor Outfitter.jpg",
+            "Puresteel Paladin.jpg",
+            "Revoke Existence.jpg",
+            "Stoneforge Mystic.jpg",
+            "Sunspear Shikari.jpg",
+            "Arrest.jpg",
+            "Gideon's Avenger.jpg",
+            "Kor Hookmaster.jpg",
+            "Pennon Blade.jpg",
+            "Strider Harness.jpg",
+            "Sword of War and Peace.jpg",
+            "Congregate.jpg",
+            "Harmless Assault.jpg",
+            "Baneslayer Angel.jpg",
+            "Conqueror's Pledge.jpg",
+            "Serra Angel.jpg",
+            "Argentum Armor.jpg",
+            "Captain of the Watch.jpg",
+            "Archangel of Strife.jpg",
+            "Plains.jpg",
+        };
+        String[] realmOfIllusionCards = {};
+        String[] strengthOfStoneCards = {};
+        String[] guardiansOfTheWoodCards = {
+            "Elvish Eulogist.jpg",
+            "Elvish Lyrist.jpg",
+            "Ezuri's Archers.jpg",
+            "Joraga Warcaller.jpg",
+            "Might of the Masses.jpg",
+            "Norwood Ranger.jpg",
+            "Elvish Visionary.jpg",
+            "Nissa's Chosen.jpg",
+            "Plummet.jpg",
+            "Sylvan Ranger.jpg",
+            "Viridian Emissary.jpg",
+            "Eyeblight's Ending.jpg",
+            "Ezuri, Renegade Leader.jpg",
+            "Imperious Perfect.jpg",
+            "Jagged-Scar Archers.jpg",
+            "Maelstrom Pulse.jpg",
+            "Titania's Chosen.jpg",
+            "Viridian Shaman.jpg",
+            "Elvish Promenade.jpg",
+            "Heedless One.jpg",
+            "Lys Alana Huntmaster.jpg",
+            "Wildheart Invoker.jpg",
+            "Elven Riders.jpg",
+            "Essence Drain.jpg",
+            "Nath of the Gilt-Leaf.jpg",
+            "Epic Proportions.jpg",
+            "Forest.jpg",
+            "Swamp.jpg",
+        };
+        String[] ancientDepthsCards = {};
+        String[] dragonsRoarCards = {};
         String[] blooHungerCards = {
             "Barony Vampire.jpg",
             "Blade of the Bloodchief.jpg",
@@ -221,9 +339,46 @@ public class Main extends JFrame {
             "Vampire's Bite.jpg",
             "Vicious Hunger.jpg",
         };
-        String [] machinationsCards = {};
-        String [] unquenchableCards = {};
-        String [] apexPredatorsCards = {};
+        String[] machinationsCards = {
+            "Terramorphic Expanse.jpg",
+            "Signal Pest.jpg",
+            "Alpha Myr.jpg",
+            "Etherium Sculptor.jpg",
+            "Golem's Heart.jpg",
+            "Go for the Throat.jpg",
+            "Gust-Skimmer.jpg",
+            "Hunger of the Nim.jpg",
+            "Steel Overseer.jpg",
+            "Tidehollow Strix.jpg",
+            "Darksteel Plate.jpg",
+            "Dead Reckoning.jpg",
+            "Dispense Justice.jpg",
+            "Etched Champion.jpg",
+            "Master of Etherium.jpg",
+            "Pilgrim's Eye.jpg",
+            "Snapsail Glider.jpg",
+            "Stoic Rebuttal.jpg",
+            "Undermine.jpg",
+            "Sanctum Gargoyle.jpg",
+            "Seer's Sundial.jpg",
+            "Shape Anew.jpg",
+            "Sleep.jpg",
+            "Mirrorworks.jpg",
+            "Psychosis Crawler.jpg",
+            "Stone Golem.jpg",
+            "Venser's Journal.jpg",
+            "Razorfield Rhino.jpg",
+            "Wurmcoil Engine.jpg",
+            "Magister Sphinx.jpg",
+            "Razorfield Thresher.jpg",
+            "Soulquake.jpg",
+            "Darksteel Colossus.jpg",
+            "Swamp.jpg",
+            "Island.jpg",
+            "Plains.jpg",
+        };
+        String[] unquenchableCards = {};
+        String[] apexPredatorsCards = {};
 
         File examples = new File(CARDS, "Example");
 
@@ -233,31 +388,50 @@ public class Main extends JFrame {
         File guardiansOfTheWood = new File(examples, "Guardians of the Wood");
         File ancientDepths = new File(examples, "Ancient Depths");
         File dragonsRoar = new File(examples, "Dragon's Roar");
-        File bloodHunger = new File(examples, "Blood Hunger"); //TODO
+        File bloodHunger = new File(examples, "Blood Hunger");
         File machinations = new File(examples, "Machinations");
         File unquenchableFire = new File(examples, "Unquenchable Fire");
         File apexPredators = new File(examples, "Apex Predators");
 
+        for (String e : wieldingSteelCards) {
+            save("/resources/cards/" + e, new File(wieldingSteel, e));
+        }
+        for (String e : realmOfIllusionCards) {
+            save("/resources/cards/" + e, new File(realmOfIllusion, e));
+        }
+        for (String e : strengthOfStoneCards) {
+            save("/resources/cards/" + e, new File(strengthOfStone, e));
+        }
+        for (String e : guardiansOfTheWoodCards) {
+            save("/resources/cards/" + e, new File(guardiansOfTheWood, e));
+        }
+        for (String e : ancientDepthsCards) {
+            save("/resources/cards/" + e, new File(ancientDepths, e));
+        }
+        for (String e : dragonsRoarCards) {
+            save("/resources/cards/" + e, new File(dragonsRoar, e));
+        }
         for (String e : blooHungerCards) {
             save("/resources/cards/" + e, new File(bloodHunger, e));
         }
-
-
-        //TODO --- remove
-        String[] lands = {
-            "Forest.jpg",
-            "Island.jpg",
-            "Mountain.jpg",
-            "Plains.jpg",
-        };
-        for (String e : lands) {
-            save("/resources/cards/" + e, new File(examples, e));
+        for (String e : machinationsCards) {
+            save("/resources/cards/" + e, new File(machinations, e));
         }
-        //TODO --- remove
+        for (String e : unquenchableCards) {
+            save("/resources/cards/" + e, new File(unquenchableFire, e));
+        }
+        for (String e : apexPredatorsCards) {
+            save("/resources/cards/" + e, new File(apexPredators, e));
+        }
     }
 
     private static void saveExampleDecks() {
-        String[] decks = {"Blood Hunger.txt"}; //TODO
+        String[] decks = {
+            "Blood Hunger.txt",
+            "Guardians of the Wood.txt",
+            "Machinations.txt",
+            "Wielding Steel.txt",
+        }; //TODO
 
         for (String e : decks) {
             save("/resources/decks/" + e, new File(DECKS, e));
@@ -294,25 +468,26 @@ public class Main extends JFrame {
 }
 
 /** //TODO LIST
+ * DECKS!
+ * Settings 1: name - by default computer name
+ * Settings 3: active deck (here?)
+ * finish "create server" and "join to game" options
+ * Settings 4: card size multiplier (add static in Card and multiply by it
+ *          whenever card.W or H is used and for table size and cards positions)
  * player disconnected - move all his cards into exiled
  * return random number from server (coin, die, specified borders)
  * choose a card at random from your hand
  * add +1/+1 and -1/-1 counters to cards
  * add notes to cards?
- * enlarging card while searching any zone closes CardViewer - it should
- *          be moved from JFrame into a component of Game
  * chat?
- * move card library -> top of library + reveal/not reveal
  * game exit button
  * in ServerFrame add copy button which copies IP with port into the clipboard
+ * Settings 2: music volume
  * PlayerX taps CardY - change into PlayerX taps his CardY etc
  *          move requestor field into Action class
- * Settings:
- *          1. name - by default computer name
- *          2. music volume
- *          3. active deck (here?)
- *          4. card size multiplier (add static in Card and multiply by it
- *          whenever card.W or H is used and for table size and cards positions)
+ * finish deckCreator:
+ *          - better basic lands managament
+ *          - statistics on the right
  */
 
 /** //FIXME
