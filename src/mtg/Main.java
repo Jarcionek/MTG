@@ -294,6 +294,7 @@ public class Main extends JFrame {
 }
 
 /** //TODO LIST
+ * !! player disconnected - move all his cards into exiled
  * return random number from server (coin, die, specified borders)
  * choose a card at random from your hand
  * add +1/+1 and -1/-1 counters to cards

@@ -194,7 +194,7 @@ public class ServerFrame extends JFrame {
             ipValue.setText(ip);
         } else {
             messagesField.append(ip);
-            messagesField.append("Check your firewall and Internet connection\n");
+            messagesField.append(". Check your firewall and Internet connection\n");
         }
 
         int port = -1;
@@ -240,8 +240,12 @@ public class ServerFrame extends JFrame {
         }
 
         if (allOK) {
+            String IP = ipValue.getText();
+            if (!IP.matches("\\d+.\\d+.\\d+.\\d+")) {
+                IP = Utilities.getInternalIP();
+            }
             messagesField.append("Your are about to create a server at "
-                    + ipValue.getText() + ":" + port + ".\n");
+                    + IP + ":" + port + ".\n");
             messagesField.append("Press \"create\" to confirm.\n");
         }
 

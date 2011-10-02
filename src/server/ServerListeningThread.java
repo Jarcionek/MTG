@@ -187,7 +187,10 @@ public class ServerListeningThread extends Thread {
 
                         break;
                     case TABLE:
-
+                        if (Server.game.graveyardPlay(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case EXILED:
 

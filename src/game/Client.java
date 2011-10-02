@@ -1,5 +1,9 @@
 package game;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import server.flags.*;
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +46,7 @@ public class Client extends Thread {
             throws IOException {
         Socket s = new Socket(ip, port);
         serverIP = ip;
-        this.playerName = playerName;
+        this.playerName = playerName; //TODO remove, look below
         Debug.p("Connected to " + ip + ":" + port);
 
         oos = new ObjectOutputStream(s.getOutputStream());
@@ -53,6 +57,8 @@ public class Client extends Thread {
         ois = new ObjectInputStream(s.getInputStream());
         fileTransferPort = ois.readInt();
         int players = ois.readInt();
+        //TODO in case players have the same name, here changed name must be
+        //      obtained from the server
 
         game = new game.Game(players, Client.this);
         game.log("Connected to", ip + ":" + port);
@@ -126,22 +132,26 @@ public class Client extends Thread {
                                     + " searches "
                                     + game.getPlayerName(s.zoneOwner)
                                     + "'s graveyard");
-                            CardViewer.createViewerInFrame(s.cardsIDs,
-                                    Zone.GRAVEYARD, game.getSize(),
-                                    game.getPlayerName(s.zoneOwner)
-                                    + "'s graveyard ("
-                                    + s.cardsIDs.length + " cards)");
+                            if (s.cardsIDs != null) {
+                                CardViewer.createViewerInFrame(s.cardsIDs,
+                                        Zone.GRAVEYARD, game.getSize(),
+                                        game.getPlayerName(s.zoneOwner)
+                                        + "'s graveyard ("
+                                        + s.cardsIDs.length + " cards)");
+                            }
                             break;
                         case EXILED:
                             game.log("", game.getPlayerName(s.requestor)
                                     + " searches "
                                     + game.getPlayerName(s.zoneOwner)
                                     + "'s exiled zone");
+                            if (s.cardsIDs != null) {
                             CardViewer.createViewerInFrame(s.cardsIDs,
                                     Zone.EXILED, game.getSize(),
                                     game.getPlayerName(s.zoneOwner)
                                     + "'s exiled zone (" + s.cardsIDs.length
                                     + " cards)");
+                            }
                             break;
                     }
 
@@ -202,16 +212,32 @@ public class Client extends Thread {
                     game.setCardsList(((CardsList) object).list);
                 }
             } catch (Exception ex) {
-                Debug.p("Error while dealing with " + object + ": " + ex,
-                        Debug.E);
                 if ("Connection reset".equals(ex.getLocalizedMessage())) {
+                    Debug.p("Server closed", Debug.CE);
                     break;
+                } else {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    Debug.p("Client error while dealing with " + object + ": " + ex,
+                            Debug.E);
                 }
             }
         }
     }
 
     private void handleMoveCard(MoveCard mc) {
+        String owner;
+        if (mc.cardID == null) {
+            owner = "his";
+        } else {
+            owner = game.getPlayerName(mc.cardID.charAt(0) - 'A');
+            if (owner.equals(game.getPlayerName(mc.requestor))) {
+                owner = "his";
+            } else if (owner.equals(playerName)) {
+                owner = "your";
+            } else {
+                owner += "'s";
+            }
+        }
         switch (mc.source) {
             case HAND:
                 switch (mc.destination) {
@@ -246,7 +272,7 @@ public class Client extends Thread {
                         game.changeHandSize(mc.requestor, 1);
                         game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
                                     + " returns " + Game.getCardName(mc.cardID)
-                                    + " from table to its owner's hand");
+                                    + " from table to " + owner + " hand");
                         if (playerName.equals(game.getPlayerName(mc.requestor))) {
                             game.cardAddToHand(mc.cardID);
                         }
@@ -254,7 +280,7 @@ public class Client extends Thread {
                     case GRAVEYARD:
                         game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
                                     + " puts " + Game.getCardName(mc.cardID)
-                                    + " from table on its owner's graveyard");
+                                    + " from table on " + owner + " graveyard");
                         break;
                     case EXILED:
                         game.log(mc.cardID, false,
@@ -268,7 +294,7 @@ public class Client extends Thread {
                         game.changeLibrarySize(mc.requestor, 1);
                         game.log(mc.cardID, false, game.getPlayerName(mc.requestor)
                                     + " puts " + Game.getCardName(mc.cardID)
-                                    + " on top of its owner's library");
+                                    + " on top of " + owner + " library");
                         break;
                 }
                 game.cardRemoveFromTable(mc.cardID);
@@ -283,8 +309,13 @@ public class Client extends Thread {
 //                        }
                         break;
                     case TABLE:
-//                        //TODO log
-//                        game.cardAddToTable(mc.cardID);
+                        game.log(mc.cardID, true, game.getPlayerName(mc.requestor)
+                                + " plays " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " graveyard");
+                        game.cardAddToTable(mc.cardID);
+                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+                            CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
+                        }
                         break;
                     case EXILED:
 
@@ -342,7 +373,9 @@ public class Client extends Thread {
                                 + Game.getCardName(mc.cardID) + " from library "
                                 + "onto table");
                         game.cardAddToTable(mc.cardID);
-                        CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
+                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
+                            CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
+                        }
                         break;
                     case GRAVEYARD:
                         game.changeLibrarySize(mc.requestor, -1);
@@ -376,7 +409,7 @@ public class Client extends Thread {
                         game.changeLibrarySize(mc.requestor, -1);
                         game.log(mc.cardID, true,
                                 game.getPlayerName(mc.requestor)
-                                + " plays top card of library: "
+                                + " plays top card of " + owner + " library: "
                                 + Game.getCardName(mc.cardID));
                         game.cardAddToTable(mc.cardID);
                         break;

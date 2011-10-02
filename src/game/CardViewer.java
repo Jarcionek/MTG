@@ -25,6 +25,7 @@ import mtg.Zone;
  */
 public class CardViewer extends JPanel {
     private static CardViewer mostRecentCardViewer;
+    private static JLabel mostRecentCardViewerLabel;
 
     private ArrayList<Card> cards;
     private InSearcherMouseAdapter listener;
@@ -133,7 +134,8 @@ public class CardViewer extends JPanel {
         this.repaint();
     }
 
-    public static void createViewerInFrame(String[] cardsID, Zone zone, Dimension gameSize, String info) {
+    public static void createViewerInFrame(String[] cardsID, Zone zone,
+            Dimension gameSize, String info) {
         final JFrame frame = new JFrame();
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -156,12 +158,12 @@ public class CardViewer extends JPanel {
                 gameSize.width - Card.W * 2 : cardsID.length * Card.W;
         mostRecentCardViewer.setPreferredSize(new Dimension(width, Card.H));
 
-        JLabel infoLabel = new JLabel(info);
-        infoLabel.setHorizontalAlignment(JLabel.CENTER);
-        infoLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+        mostRecentCardViewerLabel = new JLabel(info);
+        mostRecentCardViewerLabel.setHorizontalAlignment(JLabel.CENTER);
+        mostRecentCardViewerLabel.setFont(new Font("Arial", Font.PLAIN, 24));
 
         JPanel contentPane = new JPanel(new BorderLayout(3, 3));
-        contentPane.add(infoLabel, BorderLayout.NORTH);
+        contentPane.add(mostRecentCardViewerLabel, BorderLayout.NORTH);
         contentPane.add(mostRecentCardViewer, BorderLayout.CENTER);
         contentPane.setBorder(BorderFactory.createLineBorder(Color.GREEN, 3));
 
@@ -183,9 +185,21 @@ public class CardViewer extends JPanel {
     }
 
     public static void removeCardFromCurrentlyOpenCardViewer(String cardID) {
+        Card previous;
         for (Card e : mostRecentCardViewer.cards) {
+            previous = e;
             if (e.getID().equals(cardID)) {
                 mostRecentCardViewer.cards.remove(e);
+                mostRecentCardViewer.showCards(previous);
+                String x = mostRecentCardViewerLabel.getText();
+                if (x.contains(" cards)")) {
+                    int value = Integer.parseInt(
+                            x.substring(x.lastIndexOf("(") + 1,
+                            x.lastIndexOf(" ")));
+                    mostRecentCardViewerLabel.setText(
+                            x.substring(0, x.lastIndexOf("(") + 1)
+                            + (value - 1) + " cards)");
+                }
                 break;
             }
         }

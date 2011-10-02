@@ -1,6 +1,7 @@
 package server;
 
 import java.util.TreeMap;
+import mtg.Debug;
 import mtg.Deck;
 import server.flags.MoveCard;
 
@@ -13,7 +14,7 @@ import server.flags.MoveCard;
  * All of the methods must ensure that no illegal move is posibble, e.g.
  * if player's library is empty, player cannot draw a card so nothing has
  * to be sent to clients. Possibility of drawing a card from empty library
- * should be disabled at client side, but a server has to be error-safe.
+ * should be also disabled at client side, but a server has to be error-safe.
  */
 class Game {
     private Collection[] library;
@@ -70,10 +71,20 @@ class Game {
         }
     }
 
+    /**
+     * Returns a list of cards' names and IDs assigned to them. ID assignment
+     * is random and cannot be predicted, however consecutive cards in a library
+     * have consecutive IDs, e.g. if a player has 60 cards in library, top card
+     * of his library is X59, the next is X58 and so on, so it is recommended
+     * to shuffle libraries before play.
+     * @return list of cards and IDs assigned to them
+     */
     TreeMap<String, String> getAllCardsList() {
         return cardsList;
     }
 
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// LIBRARY ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -167,7 +178,9 @@ class Game {
         return library[player].getSize();
     }
 
-                    ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////// HAND //////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Modifies server's game by moving requested card from hand to the table
@@ -205,7 +218,9 @@ class Game {
 //        }
     }
 
-                    ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////// TABLE /////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
     /**
@@ -215,7 +230,12 @@ class Game {
      */
     synchronized boolean tableTake(String cardID) {
         if (table.contains(cardID)) {
-            hand[cardID.charAt(0) - 'A'].addCard(table.removeCard(cardID));
+            int player = cardID.charAt(0) - 'A';
+            if (player < 0 || player > library.length) {
+                Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+                return false;
+            }
+            hand[player].addCard(table.removeCard(cardID));
             return true;
         } else {
             return false;
@@ -230,7 +250,12 @@ class Game {
      */
     synchronized boolean tablePutOnTopOfLibrary(String cardID) {
         if (table.contains(cardID)) {
-            library[cardID.charAt(0) - 'A'].addCard(table.removeCard(cardID));
+            int player = cardID.charAt(0) - 'A';
+            if (player < 0 || player > library.length) {
+                Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+                return false;
+            }
+            library[player].addCard(table.removeCard(cardID));
             return true;
         } else {
             return false;
@@ -244,7 +269,12 @@ class Game {
      */
     synchronized boolean tableDestroy(String cardID) {
         if (table.contains(cardID)) {
-            graveyard[cardID.charAt(0) - 'A'].addCard(table.removeCard(cardID));
+            int player = cardID.charAt(0) - 'A';
+            if (player < 0 || player > library.length) {
+                Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+                return false;
+            }
+            graveyard[player].addCard(table.removeCard(cardID));
             return true;
         } else {
             return false;
@@ -259,6 +289,10 @@ class Game {
     synchronized boolean tableExile(String cardID) {
         if (table.contains(cardID)) {
             int player = cardID.charAt(0) - 'A';
+            if (player < 0 || player > library.length) {
+                Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+                return false;
+            }
             exiled[player].addCard(table.removeCard(cardID));
             return true;
         } else {
@@ -266,7 +300,9 @@ class Game {
         }
     }
 
-                    ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// GRAVEYARD ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns an array of cards' IDs in a player's graveyard
@@ -282,7 +318,29 @@ class Game {
         return result;
     }
 
-                    ////////////////////////////////////////
+    /**
+     * Moves requested card from owner's graveyard onto the table.
+     * Returns true if a card has been moved and false if a card was not in
+     * the graveyard.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean graveyardPlay(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (graveyard[player].contains(cardID)) {
+            table.addCard(graveyard[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// EXILED /////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
     synchronized String[] exiledView(int player) {
         Card[] x = exiled[player].getLast(exiled[player].getSize());
@@ -293,7 +351,9 @@ class Game {
         return result;
     }
 
-                    ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// OTHER //////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
     synchronized void playerSetPoison(int target, int value) {
         poison[target] = value;
