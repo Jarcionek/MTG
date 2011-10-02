@@ -45,7 +45,6 @@ public class Client extends Thread {
             throws IOException {
         Socket s = new Socket(ip, port);
         serverIP = ip;
-        this.playerName = playerName; //TODO remove, look below
         Debug.p("Connected to " + ip + ":" + port);
 
         oos = new ObjectOutputStream(s.getOutputStream());
@@ -54,10 +53,13 @@ public class Client extends Thread {
         oos.flush();
 
         ois = new ObjectInputStream(s.getInputStream());
+        try {
+            this.playerName = (String) ois.readObject();
+        } catch (ClassNotFoundException ex) {
+            Debug.p("Error while receiving name from server", Debug.E);
+        }
         fileTransferPort = ois.readInt();
         int players = ois.readInt();
-        //TODO in case players have the same name, here changed name must be
-        //      obtained from the server
 
         g = new game.Game(players, Client.this);
         g.log("Connected to", ip + ":" + port, Color.black);

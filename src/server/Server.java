@@ -87,8 +87,11 @@ public class Server extends Thread {
 
                 // exchange basic info
                 newdeck = (CheckDeck) ois[i].readObject();
-                names[i] = checkName(newdeck.owner);
+                newdeck.owner = checkName(newdeck.owner, true);
+                names[i] = newdeck.owner;
                 decks[i] = newdeck.deck;
+                oos[i].writeObject(names[i]);
+                oos[i].flush();
                 oos[i].writeInt(port + i + 1);
                 oos[i].flush();
                 oos[i].writeInt(ready.length);
@@ -265,14 +268,19 @@ public class Server extends Thread {
         oos[player] = null;
     }
 
-    static String checkName(String name) {
-        name = name.replaceAll("\\W", "");
+    static String checkName(String name, boolean org) {
+        if (org) {
+            name = name.replaceAll("\\W", "");
+        }
+        if (name.length() == 0) {
+            return checkName("PLAYER", true);
+        }
         if (name.length() > 15) {
             name = name.substring(0, 15);
         }
         for (int i = 0; i < names.length; i++) {
             if (name.equals(names[i])) {
-                return checkName(name + "-");
+                return checkName(name + "-", false);
             }
         }
         return name;

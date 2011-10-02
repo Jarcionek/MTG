@@ -32,7 +32,7 @@ import server.ServerFrame;
  * @author Jaroslaw Pawlak
  */
 public class Main extends JFrame {
-    public static final String VERSION = "beta 1.0";
+    public static final String VERSION = "beta 1.01";
 
     public static final File DIRECTORY
             = new File(System.getProperty("user.dir"), "MTG");
@@ -210,7 +210,7 @@ public class Main extends JFrame {
                 Main.this.dispose();
                 Deck d = Deck.load(new File(DECKS, "Blood Hunger.txt"));
                 try {
-                    new game.Client("BlahHlaB", "localhost", 56789, d);
+                    new game.Client("Single_Player", "localhost", 56789, d);
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
