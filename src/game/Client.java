@@ -337,8 +337,12 @@ public class Client extends Thread {
                         break;
                     case TABLE:
                         game.changeLibrarySize(mc.requestor, -1);
-//                        //TODO log
-//                        game.cardAddToTable(mc.cardID);
+                        game.log(mc.cardID, true,
+                                game.getPlayerName(mc.requestor) + " puts "
+                                + Game.getCardName(mc.cardID) + " from library "
+                                + "onto table");
+                        game.cardAddToTable(mc.cardID);
+                        CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                         break;
                     case GRAVEYARD:
                         game.changeLibrarySize(mc.requestor, -1);

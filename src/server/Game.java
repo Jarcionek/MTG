@@ -134,6 +134,23 @@ class Game {
     }
 
     /**
+     * Moves the requested card of player's library onto the table and returns
+     * true. If card is not in player's library returns false and does nothing.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card is in the library and has been moved,
+     * false otherwise
+     */
+    synchronized boolean libraryPlay(int player, String cardID) {
+        if (library[player].contains(cardID)) {
+            table.addCard(library[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Shuffles library of requested player.
      * @param player player
      */

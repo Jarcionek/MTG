@@ -4,10 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import mtg.Zone;
  * @author Jaroslaw Pawlak
  */
 public class CardViewer extends JPanel {
+    private static CardViewer mostRecentCardViewer;
+
     private ArrayList<Card> cards;
     private InSearcherMouseAdapter listener;
 
@@ -136,11 +138,15 @@ public class CardViewer extends JPanel {
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        final CardViewer cardViewer = new CardViewer(new InSearcherMouseAdapter(zone));
+        mostRecentCardViewer = new CardViewer(new InSearcherMouseAdapter(zone));
         frame.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (frame.getMousePosition() == null) {
+                Point p = MouseInfo.getPointerInfo().getLocation();
+                Dimension d = frame.getSize();
+                Point l = frame.getLocation();
+                if (p.x < l.x || p.x > l.x + d.width
+                        || p.y < l.y || p.y > l.y + d.height) {
                     frame.dispose();
                 }
             }
@@ -148,7 +154,7 @@ public class CardViewer extends JPanel {
 
         int width = cardsID.length * Card.W > gameSize.width - Card.W * 2?
                 gameSize.width - Card.W * 2 : cardsID.length * Card.W;
-        cardViewer.setPreferredSize(new Dimension(width, Card.H));
+        mostRecentCardViewer.setPreferredSize(new Dimension(width, Card.H));
 
         JLabel infoLabel = new JLabel(info);
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -156,7 +162,7 @@ public class CardViewer extends JPanel {
 
         JPanel contentPane = new JPanel(new BorderLayout(3, 3));
         contentPane.add(infoLabel, BorderLayout.NORTH);
-        contentPane.add(cardViewer, BorderLayout.CENTER);
+        contentPane.add(mostRecentCardViewer, BorderLayout.CENTER);
         contentPane.setBorder(BorderFactory.createLineBorder(Color.GREEN, 3));
 
         frame.setContentPane(contentPane);
@@ -165,14 +171,23 @@ public class CardViewer extends JPanel {
                 (gameSize.height - frame.getSize().height) / 2);
 
         for (String id : cardsID) {
-            cardViewer.addCard(new Card(Utilities.findPath(Game.getCardName(id))));
+            mostRecentCardViewer.addCard(new Card(Utilities.findPath(Game.getCardName(id)), id));
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                cardViewer.showCards(null);
+                mostRecentCardViewer.showCards(null);
             }
         });
 
         frame.setVisible(true);
+    }
+
+    public static void removeCardFromCurrentlyOpenCardViewer(String cardID) {
+        for (Card e : mostRecentCardViewer.cards) {
+            if (e.getID().equals(cardID)) {
+                mostRecentCardViewer.cards.remove(e);
+                break;
+            }
+        }
     }
 }

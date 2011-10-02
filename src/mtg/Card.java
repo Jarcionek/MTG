@@ -252,11 +252,21 @@ public final class Card extends JLabel {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj != null
-                && obj.getClass().equals(Card.class)
-                && this.ID != null
-                && ((Card) obj).ID != null
-                && this.ID.equals(((Card) obj).ID);
+        if (obj != null && obj.getClass().equals(Card.class)) {
+            if (this.ID == null || ((Card) obj).ID == null) {
+                Debug.p("Comparing cards with null ID!", Debug.W);
+                return false;
+            } else {
+                return this.ID.equals(((Card) obj).ID);
+            }
+        } else {
+            return false;
+        }
+//        return obj != null
+//                && obj.getClass().equals(Card.class)
+//                && this.ID != null
+//                && ((Card) obj).ID != null
+//                && this.ID.equals(((Card) obj).ID);
     }
 
     @Override

@@ -225,7 +225,9 @@ public class ServerListeningThread extends Thread {
 
                         break;
                     case TABLE:
-
+                        if (Server.game.libraryPlay(mc.requestor = id, mc.cardID)) {
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case GRAVEYARD:
 

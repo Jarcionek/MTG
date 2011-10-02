@@ -307,6 +307,13 @@ public class Main extends JFrame {
  *          1. from hand onto top of a library
  *          2. from top library to hand...
  *          damn... 3. search library, reveal and take
+ * in ServerFrame add copy button which copies IP with port into the clipboard
+ * Settings:
+ *          1. name - by default computer name
+ *          2. music volume
+ *          3. active deck (here?)
+ *          4. card size multiplier (add static in Card and multiply by it
+ *          whenever card.W or H is used and for table size and cards positions)
  */
 
 /** //FIXME
@@ -328,7 +335,7 @@ HAND		LIBRARY-HIDDEN
 HAND		GRAVEYARD
 HAND		EXILED
 
-LIBRARY		TABLE           first
+LIBRARY		TABLE           done
 LIBRARY		HAND
 LIBRARY		HAND-HIDDEN
 LIBRARY		GRAVEYARD
