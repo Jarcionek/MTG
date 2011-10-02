@@ -37,7 +37,6 @@ public class InSearcherMouseAdapter extends MouseAdapter {
         this.type = type;
         switch (type) {
             case HAND: toHand = false; break;
-            case LIBRARY: toLibrary = false; break;
             case GRAVEYARD: toGraveyard = false; break;
             case EXILED: toExiled = false; break;
         }
@@ -50,16 +49,11 @@ public class InSearcherMouseAdapter extends MouseAdapter {
     @Override
     public void mouseClicked(MouseEvent e) {
         final Card source = (Card) e.getSource();
-
-        if (type.equals(Zone.HAND) //TODO remove it to avoid accidental click?
-                && e.getButton() == MouseEvent.BUTTON1) {
-            Game.client.send(
-                    new MoveCard(Zone.HAND, Zone.TABLE, -1, source.getID()));
-        }
         
         if (e.getButton() == MouseEvent.BUTTON3) {
             if (e.getClickCount() == 1) {
                 JPopupMenu popupMenu = new JPopupMenu();
+                CardViewer.setPopupMenu(popupMenu);
 
                 JMenuItem play = new JMenuItem("play");
                 play.addActionListener(new ActionListener() {
@@ -71,36 +65,48 @@ public class InSearcherMouseAdapter extends MouseAdapter {
                 JMenuItem exile = new JMenuItem("exile");
                 exile.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        send(Zone.EXILED, source.getID(), true);
                     }
                 });
 
                 JMenuItem moveToHandHidden = new JMenuItem("take to hand");
                 moveToHandHidden.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        send(Zone.HAND, source.getID(), false);
                     }
                 });
 
                 JMenuItem moveToHand = new JMenuItem("reveal and take to hand");
                 moveToHand.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        send(Zone.HAND, source.getID(), true);
                     }
                 });
 
                 JMenuItem moveToGraveyard = new JMenuItem("put onto graveyard");
                 moveToGraveyard.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        send(Zone.GRAVEYARD, source.getID(), true);
                     }
                 });
 
                 JMenuItem moveToLibraryHidden = new JMenuItem("put on top of library");
                 moveToLibraryHidden.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        send(Zone.TOP_LIBRARY, source.getID(), false);
+                        if (type == Zone.LIBRARY) {
+                            CardViewer.moveCardToFront(source);
+                        }
                     }
                 });
 
                 JMenuItem moveToLibrary = new JMenuItem("reveal and put on top of library");
                 moveToLibrary.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        send(Zone.TOP_LIBRARY, source.getID(), true);
+                        if (type == Zone.LIBRARY) {
+                            CardViewer.moveCardToFront(source);
+                        }
                     }
                 });
 
@@ -116,7 +122,7 @@ public class InSearcherMouseAdapter extends MouseAdapter {
                 }
                 if (toLibrary) {
                     popupMenu.add(moveToLibrary);
-                    if (type == Zone.HAND) {
+                    if (type == Zone.HAND || type == Zone.LIBRARY) {
                         popupMenu.add(moveToLibraryHidden);
                     }
                 }

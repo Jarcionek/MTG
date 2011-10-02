@@ -294,7 +294,7 @@ public class Main extends JFrame {
 }
 
 /** //TODO LIST
- * !! player disconnected - move all his cards into exiled
+ * player disconnected - move all his cards into exiled
  * return random number from server (coin, die, specified borders)
  * choose a card at random from your hand
  * add +1/+1 and -1/-1 counters to cards
@@ -302,8 +302,11 @@ public class Main extends JFrame {
  * enlarging card while searching any zone closes CardViewer - it should
  *          be moved from JFrame into a component of Game
  * chat?
+ * move card library -> top of library + reveal/not reveal
+ * game exit button
  * in ServerFrame add copy button which copies IP with port into the clipboard
  * PlayerX taps CardY - change into PlayerX taps his CardY etc
+ *          move requestor field into Action class
  * Settings:
  *          1. name - by default computer name
  *          2. music volume
@@ -313,7 +316,7 @@ public class Main extends JFrame {
  */
 
 /** //FIXME
- * logger does not scroll correctly when changing health of poison
+ * logger does not scroll correctly when changing health or poison
  * deck creator - small cards viewer still crashes occasionally while scrolling
  * deck creator - cards can be easily added or removed from the deck by
  *          accident, especially while viewing larger cards
@@ -322,28 +325,4 @@ public class Main extends JFrame {
 /** //FIXME problems at university computer
  * linux could not load a deck: IllegalArgumentException: Unicode
  * UI problems on some computers (use java one)
- */
-
-/** //TODO to implement for now - MoveCard from -> to
-HAND		TABLE           done
-HAND		LIBRARY
-HAND		LIBRARY-HIDDEN
-HAND		GRAVEYARD
-HAND		EXILED
-
-LIBRARY		TABLE           done
-LIBRARY		HAND
-LIBRARY		HAND-HIDDEN
-LIBRARY		GRAVEYARD
-LIBRARY		EXILED
-
-GRAVEYARD	TABLE           done
-GRAVEYARD	HAND
-GRAVEYARD	LIBRARY
-GRAVEYARD	EXILED
-
-EXILED		TABLE           first
-EXILED		LIBRARY
-EXILED		GRAVEYARD
-EXILED		HAND
  */

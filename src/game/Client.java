@@ -114,12 +114,12 @@ public class Client extends Thread {
                         case LIBRARY:
                             if (s.amount == -1) {
                                 g.log("", g.getPlayerName(s.requestor)
-                                        + " searches library",
+                                        + " searches his library",
                                         game.Logger.C_SEARCH_LIBRARY);
                             } else {
                                 g.log("", g.getPlayerName(s.requestor)
                                         + " looks at the " + s.amount
-                                        + " top cards of library",
+                                        + " top cards of his library",
                                         game.Logger.C_SEARCH_LIBRARY);
                             }
                             if (s.cardsIDs != null) {
@@ -159,7 +159,7 @@ public class Client extends Thread {
                 // SHUFFLE LIBRARY
                 } else if (object.getClass().equals(Shuffle.class)) {
                     Shuffle s = (Shuffle) object;
-                    g.log("", g.getPlayerName(s.owner) + " shuffles library",
+                    g.log("", g.getPlayerName(s.owner) + " shuffles his library",
                             game.Logger.C_SHUFFLE);
 
                 // REVEAL
@@ -167,7 +167,7 @@ public class Client extends Thread {
                     Reveal r = (Reveal) object;
                     if (r.source == Zone.TOP_LIBRARY) {
                         g.log(r.cardID, false, g.getPlayerName(r.requstor)
-                                + " reveals top card of library: "
+                                + " reveals top card of his library: "
                                 + Game.getCardName(r.cardID), game.Logger.C_REVEAL);
                     }
 
@@ -250,18 +250,39 @@ public class Client extends Thread {
                         g.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
-
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " discards " + Game.getCardName(mc.cardID)
+                                + " from his hand",
+                                game.Logger.C_MOVE_DESTROY);
                         break;
                     case EXILED:
-
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " exiles " + Game.getCardName(mc.cardID)
+                                + " from his hand",
+                                game.Logger.C_MOVE_EXILE);
                         break;
                     case LIBRARY:
-                        g.changeLibrarySize(mc.requestor, 1);
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
                         g.changeLibrarySize(mc.requestor, 1);
-
+                        if (mc.reveal) {
+                            g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                    + " reveals " + Game.getCardName(mc.cardID)
+                                    + " from his hand and puts it "
+                                    + "on top of his library",
+                                    game.Logger.C_MOVE_TO_LIBRARY);
+                        } else if (mc.cardID == null) {
+                            g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                    + " puts a card from his hand on "
+                                    + "top of his library",
+                                    game.Logger.C_MOVE_TO_LIBRARY);
+                        } else {
+                            g.log(mc.cardID, false, "You put "
+                                    + Game.getCardName(mc.cardID)
+                                    + " from your hand on "
+                                    + " top of your library",
+                                    game.Logger.C_MOVE_TO_LIBRARY);
+                        }
                         break;
                 }
                 g.changeHandSize(mc.requestor, -1);
@@ -310,10 +331,13 @@ public class Client extends Thread {
                 switch (mc.destination) {
                     case HAND:
                         g.changeHandSize(mc.requestor, 1);
-//                        //TODO log
-//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-//                            game.cardAddToHand(mc.cardID);
-//                        }
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " takes " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " graveyard to his hand",
+                                game.Logger.C_MOVE_PLAY);
+                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                            g.cardAddToHand(mc.cardID);
+                        }
                         break;
                     case TABLE:
                         g.log(mc.cardID, true, g.getPlayerName(mc.requestor)
@@ -321,47 +345,67 @@ public class Client extends Thread {
                                 + " from " + owner + " graveyard",
                                 game.Logger.C_MOVE_PLAY);
                         g.cardAddToTable(mc.cardID);
-                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
-                            CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
-                        }
                         break;
                     case EXILED:
-
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " exiles " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " graveyard",
+                                game.Logger.C_MOVE_EXILE);
                         break;
                     case LIBRARY:
-                        g.changeLibrarySize(mc.requestor, 1);
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
                         g.changeLibrarySize(mc.requestor, 1);
-
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " puts " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " graveyard on top of "
+                                + owner + " library",
+                                game.Logger.C_MOVE_TO_LIBRARY);
                         break;
+                }
+                if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                    CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                 }
                 break;
             case EXILED:
                 switch (mc.destination) {
                     case HAND:
                         g.changeHandSize(mc.requestor, 1);
-//                        //TODO log
-//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-//                            game.cardAddToHand(mc.cardID);
-//                        }
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " takes " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " exiled zone to his hand",
+                                game.Logger.C_MOVE_TO_HAND);
+                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                            g.cardAddToHand(mc.cardID);
+                        }
                         break;
                     case TABLE:
-//                        //TODO log
-//                        game.cardAddToTable(mc.cardID);
+                        g.log(mc.cardID, true, g.getPlayerName(mc.requestor)
+                                + " plays " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " exiled zone",
+                                game.Logger.C_MOVE_PLAY);
+                        g.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
-
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " moves " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " exiled zone to his"
+                                + " graveyard",
+                                game.Logger.C_MOVE_DESTROY);
                         break;
                     case LIBRARY:
-                        g.changeLibrarySize(mc.requestor, 1);
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
                         g.changeLibrarySize(mc.requestor, 1);
-
+                        g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                + " puts " + Game.getCardName(mc.cardID)
+                                + " from " + owner + " graveyard on top of "
+                                + owner + " library",
+                                game.Logger.C_MOVE_TO_LIBRARY);
                         break;
+                }
+                if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                    CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                 }
                 break;
             case LIBRARY:
@@ -369,33 +413,68 @@ public class Client extends Thread {
                     case HAND:
                         g.changeLibrarySize(mc.requestor, -1);
                         g.changeHandSize(mc.requestor, 1);
-//                        //TODO log
-//                        if (playerName.equals(game.getPlayerName(mc.requestor))) {
-//                            game.cardAddToHand(mc.cardID);
-//                        }
+                        if (mc.reveal) {
+                            g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                    + " takes " + Game.getCardName(mc.cardID)
+                                    + " from his library to hand",
+                                    game.Logger.C_MOVE_TO_HAND);
+                        } else if (mc.cardID == null) {
+                            g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                    + " takes a card from his library to hand",
+                                    game.Logger.C_MOVE_TO_HAND);
+                        } else {
+                            g.log(mc.cardID, false, "You take "
+                                    + Game.getCardName(mc.cardID)
+                                    + " from your library to hand",
+                                    game.Logger.C_MOVE_TO_HAND);
+                        }
+                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                            g.cardAddToHand(mc.cardID);
+                        }
                         break;
                     case TABLE:
                         g.changeLibrarySize(mc.requestor, -1);
                         g.log(mc.cardID, true,
                                 g.getPlayerName(mc.requestor) + " puts "
-                                + Game.getCardName(mc.cardID) + " from library "
+                                + Game.getCardName(mc.cardID) + " from his library "
                                 + "onto table", game.Logger.C_MOVE_PLAY);
                         g.cardAddToTable(mc.cardID);
-                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
-                            CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
-                        }
                         break;
                     case GRAVEYARD:
                         g.changeLibrarySize(mc.requestor, -1);
-
+                        g.log(mc.cardID, false,
+                                g.getPlayerName(mc.requestor) + " puts "
+                                + Game.getCardName(mc.cardID) + " from his library "
+                                + "onto his graveyard", game.Logger.C_MOVE_DESTROY);
                         break;
                     case EXILED:
                         g.changeLibrarySize(mc.requestor, -1);
-
+                        g.log(mc.cardID, false,
+                                g.getPlayerName(mc.requestor) + " exiles "
+                                + Game.getCardName(mc.cardID) + " from his library",
+                                game.Logger.C_MOVE_EXILE);
                         break;
                     case TOP_LIBRARY:
-
+                        if (mc.reveal) {
+                            g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                    + " puts " + Game.getCardName(mc.cardID)
+                                    + " from his library on top of it",
+                                    game.Logger.C_MOVE_TO_LIBRARY);
+                        } else if (mc.cardID == null) {
+                            g.log(mc.cardID, false, g.getPlayerName(mc.requestor)
+                                    + " puts a card from his library on top of it",
+                                    game.Logger.C_MOVE_TO_LIBRARY);
+                        } else {
+                            g.log(mc.cardID, false, "You put "
+                                    + Game.getCardName(mc.cardID)
+                                    + " from your library on top of it",
+                                    game.Logger.C_MOVE_TO_LIBRARY);
+                        }
                         break;
+                }
+                if (playerName.equals(g.getPlayerName(mc.requestor))
+                        && mc.destination != Zone.TOP_LIBRARY) {
+                    CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                 }
                 break;
             case TOP_LIBRARY:
@@ -425,16 +504,11 @@ public class Client extends Thread {
                         g.cardAddToTable(mc.cardID);
                         break;
                     case GRAVEYARD:
-                        g.changeLibrarySize(mc.requestor, -1);
-
-                        break;
+                        throw new UnsupportedOperationException(); //TODO this move is legal
                     case EXILED:
-                        g.changeLibrarySize(mc.requestor, -1);
-
-                        break;
+                        throw new UnsupportedOperationException(); //TODO this move is legal
                     case LIBRARY:
-
-                        break;
+                        throw new UnsupportedOperationException();
                 }
                 break;
         }

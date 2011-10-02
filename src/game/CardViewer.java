@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseListener;
@@ -15,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import mtg.Card;
 import mtg.Utilities;
@@ -24,6 +23,7 @@ import mtg.Zone;
  * @author Jaroslaw Pawlak
  */
 public class CardViewer extends JPanel {
+    private static JPopupMenu mostRecentPopupMenu;
     private static CardViewer mostRecentCardViewer;
     private static JLabel mostRecentCardViewerLabel;
 
@@ -144,11 +144,9 @@ public class CardViewer extends JPanel {
         frame.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                Point p = MouseInfo.getPointerInfo().getLocation();
-                Dimension d = frame.getSize();
-                Point l = frame.getLocation();
-                if (p.x < l.x || p.x > l.x + d.width
-                        || p.y < l.y || p.y > l.y + d.height) {
+                if (!Card.isAnyCardEnlarged() &&
+                        (mostRecentPopupMenu == null
+                        || !mostRecentPopupMenu.isShowing())) {
                     frame.dispose();
                 }
             }
@@ -203,5 +201,15 @@ public class CardViewer extends JPanel {
                 break;
             }
         }
+    }
+
+    public static void setPopupMenu(JPopupMenu popupMenu) {
+        mostRecentPopupMenu = popupMenu;
+    }
+
+    public static void moveCardToFront(Card card) {
+        mostRecentCardViewer.cards.remove(card);
+        mostRecentCardViewer.cards.add(0, card);
+        mostRecentCardViewer.showCards(null);
     }
 }

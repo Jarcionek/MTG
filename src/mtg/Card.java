@@ -33,6 +33,8 @@ import javax.swing.JLabel;
  * @author Jaroslaw Pawlak
  */
 public final class Card extends JLabel {
+    private static boolean isAnyCardEnlarged;
+
     /**
      * Card's width.
      */
@@ -208,6 +210,7 @@ public final class Card extends JLabel {
      * while on the frame or when the focus is lost.
      */
     public JFrame viewLarger() {
+        isAnyCardEnlarged = true;
         final JFrame frame = new JFrame();
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -217,12 +220,14 @@ public final class Card extends JLabel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 frame.dispose();
+                isAnyCardEnlarged = false;
             }
         });
         contentPane.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.getUnitsToScroll() > 0) {
                     frame.dispose();
+                    isAnyCardEnlarged = false;
                 }
             }
         });
@@ -230,6 +235,7 @@ public final class Card extends JLabel {
             @Override
             public void focusLost(FocusEvent e) {
                 frame.dispose();
+                isAnyCardEnlarged = false;
             }
         });
 
@@ -284,6 +290,10 @@ public final class Card extends JLabel {
     }
 
     ///// STATIC /////
+
+    public static boolean isAnyCardEnlarged() {
+        return isAnyCardEnlarged;
+    }
 
     /**
      * Returns true if <code>name</code> is equal "plains", "island", "swamp",

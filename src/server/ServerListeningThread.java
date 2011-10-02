@@ -138,22 +138,32 @@ public class ServerListeningThread extends Thread {
                 switch (mc.destination) {
                     case TABLE:
                         if (Server.game.handPlay(id, mc.cardID)) {
-                            Server.sendToAll(
-                                    new MoveCard(Zone.HAND,
-                                    Zone.TABLE, id, mc.cardID));
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
                         }
                         break;
                     case GRAVEYARD:
-//                        Server.game.handDestroy(id, mc.cardID);
+                        if (Server.game.handDestroy(id, mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case EXILED:
-//                        Server.game.handExile(id, mc.cardID);
+                        if (Server.game.handExile(id, mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case LIBRARY:
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
-
+                        if (Server.game.handToLibrary(mc.requestor = id, mc.cardID)) {
+                            if (mc.reveal) {
+                                Server.sendToAll(mc);
+                            } else {
+                                Server.sendToAllInvisible(mc);
+                            }
+                        }
                         break;
                 }
                 break;
@@ -190,7 +200,10 @@ public class ServerListeningThread extends Thread {
             case GRAVEYARD:
                 switch (mc.destination) {
                     case HAND:
-
+                        if (Server.game.graveyardToHand(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case TABLE:
                         if (Server.game.graveyardPlay(mc.cardID)) {
@@ -199,39 +212,61 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case EXILED:
-
+                        if (Server.game.graveyardExile(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case LIBRARY:
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
-
+                        if (Server.game.graveyardToLibrary(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                 }
                 break;
             case EXILED:
                 switch (mc.destination) {
                     case HAND:
-
+                        if (Server.game.exiledToHand(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case TABLE:
-
+                        if (Server.game.exiledPlay(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case GRAVEYARD:
-
+                        if (Server.game.exiledToGraveyard(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case LIBRARY:
-
-                        break;
+                        throw new UnsupportedOperationException();
                     case TOP_LIBRARY:
-
+                        if (Server.game.exiledToLibrary(mc.cardID)) {
+                            mc.requestor = id;
+                            Server.sendToAll(mc);
+                        }
                         break;
                 }
                 break;
             case LIBRARY:
                 switch (mc.destination) {
                     case HAND:
-
+                        if (Server.game.libraryToHand(mc.requestor = id, mc.cardID)) {
+                            if (mc.reveal) {
+                                Server.sendToAll(mc);
+                            } else {
+                                Server.sendToAllInvisible(mc);
+                            }
+                        }
                         break;
                     case TABLE:
                         if (Server.game.libraryPlay(mc.requestor = id, mc.cardID)) {
@@ -239,13 +274,23 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case GRAVEYARD:
-
+                        if (Server.game.libraryDestroy(mc.requestor = id, mc.cardID)) {
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case EXILED:
-
+                        if (Server.game.libraryExile(mc.requestor = id, mc.cardID)) {
+                            Server.sendToAll(mc);
+                        }
                         break;
                     case TOP_LIBRARY:
-
+                        if (Server.game.libraryToTop(mc.requestor = id, mc.cardID)) {
+                            if (mc.reveal) {
+                                Server.sendToAll(mc);
+                            } else {
+                                Server.sendToAllInvisible(mc);
+                            }
+                        }
                         break;
                 }
                 break;
@@ -264,14 +309,11 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case GRAVEYARD:
-
-                        break;
+                        throw new UnsupportedOperationException(); //TODO this move is legal
                     case EXILED:
-
-                        break;
+                        throw new UnsupportedOperationException(); //TODO this move is legal
                     case LIBRARY:
-
-                        break;
+                        throw new UnsupportedOperationException();
                 }
                 break;
         }

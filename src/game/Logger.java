@@ -1,7 +1,6 @@
 package game;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,21 +21,20 @@ import mtg.Utilities;
  * @author Jaroslaw Pawlak
  */
 public class Logger extends JPanel {
-    public static Color C_DRAG = Color.black;
-    public static Color C_DRAW = Color.blue;
-    public static Color C_TAP = Color.lightGray;
-    public static Color C_CHANGE_HP = new Color(175, 175, 0); //dark yellow
-    public static Color C_MOVE_DESTROY = Color.red;
-    public static Color C_MOVE_EXILE = Color.red;
-    public static Color C_MOVE_PLAY = new Color(0, 128, 0); //dark green
-    public static Color C_MOVE_TO_HAND = Color.magenta;
-    public static Color C_MOVE_TO_LIBRARY = new Color(192, 128, 0); //dark orange
-    public static Color C_SEARCH_LIBRARY = new Color(192, 128, 0); //dark orange
-    public static Color C_SEARCH_GRAVEYARD = Color.black;
-    public static Color C_SEARCH_EXILED = Color.black;
-    public static Color C_SHUFFLE = Color.blue;
-    public static Color C_REVEAL = Color.blue;
-
+    public static final Color C_DRAG = Color.black;
+    public static final Color C_DRAW = Color.blue;
+    public static final Color C_TAP = Color.lightGray;
+    public static final Color C_CHANGE_HP = new Color(175, 175, 0); //dark yellow
+    public static final Color C_MOVE_DESTROY = Color.red;
+    public static final Color C_MOVE_EXILE = Color.red;
+    public static final Color C_MOVE_PLAY = new Color(0, 128, 0); //dark green
+    public static final Color C_MOVE_TO_HAND = Color.magenta;
+    public static final Color C_MOVE_TO_LIBRARY = new Color(192, 128, 0); //dark orange
+    public static final Color C_SEARCH_LIBRARY = new Color(192, 128, 0); //dark orange
+    public static final Color C_SEARCH_GRAVEYARD = Color.black;
+    public static final Color C_SEARCH_EXILED = Color.black;
+    public static final Color C_SHUFFLE = Color.blue;
+    public static final Color C_REVEAL = Color.blue;
 
     private GridBagConstraints f;
     private GridBagConstraints s;

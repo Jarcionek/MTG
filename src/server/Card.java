@@ -4,6 +4,7 @@ package server;
  * @author Jaroslaw Pawlak
  */
 public class Card {
+
     String name;
     String ID;
 

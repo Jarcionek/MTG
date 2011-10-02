@@ -162,6 +162,74 @@ class Game {
     }
 
     /**
+     * Moves the requested card of player's library to his hand and returns
+     * true. If card is not in player's library returns false and does nothing.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card is in the library and has been moved,
+     * false otherwise
+     */
+    synchronized boolean libraryToHand(int player, String cardID) {
+        if (library[player].contains(cardID)) {
+            hand[player].addCard(library[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Moves the requested card of player's library onto the top of it and returns
+     * true. If card is not in player's library returns false and does nothing.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card is in the library and has been moved,
+     * false otherwise
+     */
+    synchronized boolean libraryToTop(int player, String cardID) {
+        if (library[player].contains(cardID)) {
+            library[player].addCard(library[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves the requested card of player's library onto his graveyard and returns
+     * true. If card is not in player's library returns false and does nothing.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card is in the library and has been moved,
+     * false otherwise
+     */
+    synchronized boolean libraryDestroy(int player, String cardID) {
+        if (library[player].contains(cardID)) {
+            graveyard[player].addCard(library[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Exiles the requested card of player's library and returns
+     * true. If card is not in player's library returns false and does nothing.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card is in the library and has been moved,
+     * false otherwise
+     */
+    synchronized boolean libraryExile(int player, String cardID) {
+        if (library[player].contains(cardID)) {
+            exiled[player].addCard(library[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Shuffles library of requested player.
      * @param player player
      */
@@ -200,22 +268,54 @@ class Game {
     }
 
     /**
-     * to graveyard
+     * Moves requested card from requsted player's hand on top of his library.
+     * Returns true if card has been moved or false if card was not in
+     * player's hand.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
      */
-    synchronized void handDestroy(int player, String cardID) {
-//        if (hand[player].contains(cardID)) {
-//            graveyard[player].addCard(hand[player].removeCard(cardID));
-//            Server.sendToAll(
-//                    new MoveCard(MoveCard.HAND, MoveCard.GRAVEYARD, player, cardID));
-//        }
+    synchronized boolean handToLibrary(int player, String cardID) {
+        if (hand[player].contains(cardID)) {
+            library[player].addCard(hand[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    synchronized void handExile(int player, String cardID) {
-//        if (hand[player].contains(cardID)) {
-//            exiled[player].addCard(hand[player].removeCard(cardID));
-//            Server.sendToAll(
-//                    new MoveCard(MoveCard.HAND, MoveCard.EXILED, player, cardID));
-//        }
+    /**
+     * Moves requested card from requsted player's hand to his graveyard.
+     * Returns true if card has been moved or false if card was not in
+     * player's hand.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean handDestroy(int player, String cardID) {
+        if (hand[player].contains(cardID)) {
+            graveyard[player].addCard(hand[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Exiles requested card from requsted player's hand.
+     * Returns true if card has been moved or false if card was not in
+     * player's hand.
+     * @param player player
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean handExile(int player, String cardID) {
+        if (hand[player].contains(cardID)) {
+            exiled[player].addCard(hand[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
     }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +438,66 @@ class Game {
         }
     }
 
+    /**
+     * Moves requested card from owner's graveyard to his hand.
+     * Returns true if a card has been moved and false if a card was not in
+     * the graveyard.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean graveyardToHand(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (graveyard[player].contains(cardID)) {
+            hand[player].addCard(graveyard[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves requested card from owner's graveyard to his exiled zone.
+     * Returns true if a card has been moved and false if a card was not in
+     * the graveyard.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean graveyardExile(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (graveyard[player].contains(cardID)) {
+            exiled[player].addCard(graveyard[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves requested card from owner's graveyard onto the top of his library.
+     * Returns true if a card has been moved and false if a card was not in
+     * the graveyard.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean graveyardToLibrary(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (graveyard[player].contains(cardID)) {
+            library[player].addCard(graveyard[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// EXILED /////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -349,6 +509,85 @@ class Game {
             result[i] = x[i].ID;
         }
         return result;
+    }
+
+    /**
+     * Moves requested card from owner's exiled zone onto the table.
+     * Returns true if a card has been moved and false if a card was not in 
+     * exiled zone.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean exiledPlay(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (exiled[player].contains(cardID)) {
+            table.addCard(exiled[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves requested card from owner's exiled zone to his hand.
+     * Returns true if a card has been moved and false if a card was not in
+     * exiled zone.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean exiledToHand(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (exiled[player].contains(cardID)) {
+            hand[player].addCard(exiled[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves requested card from owner's exiled zone onto his graveyard.
+     * Returns true if a card has been moved and false if a card was not in
+     * exiled zone.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean exiledToGraveyard(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (exiled[player].contains(cardID)) {
+            graveyard[player].addCard(exiled[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Moves requested card from owner's exiled zone on the top of his library.
+     * Returns true if a card has been moved and false if a card was not exiled.
+     * @param cardID cardID
+     * @return true if card has been moved, false otherwise
+     */
+    synchronized boolean exiledToLibrary(String cardID) {
+        int player = cardID.charAt(0) - 'A';
+        if (player < 0 || player > library.length) {
+            Debug.p("Received non-exisitng card's ID: " + cardID, Debug.W);
+            return false;
+        } else if (exiled[player].contains(cardID)) {
+            library[player].addCard(exiled[player].removeCard(cardID));
+            return true;
+        } else {
+            return false;
+        }
     }
 
 ////////////////////////////////////////////////////////////////////////////////
