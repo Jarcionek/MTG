@@ -35,6 +35,7 @@ public class Logger extends JPanel {
     public static final Color C_SEARCH_EXILED = Color.black;
     public static final Color C_SHUFFLE = Color.blue;
     public static final Color C_REVEAL = Color.blue;
+    public static final Color C_DISCONNECT = Color.pink;
 
     private GridBagConstraints f;
     private GridBagConstraints s;
@@ -96,6 +97,7 @@ public class Logger extends JPanel {
                     }
                 }
             });
+            button.setFocusable(false);
             content.add(button, f);
         } else {
             content.add(new JLabel(), f);
@@ -118,9 +120,9 @@ public class Logger extends JPanel {
         }
     }
 
-    private static JTextField createTextField(String text, Color color) {
-        JTextField tf = new JTextField(text);
-        tf.setEditable(false);
+    private static JLabel createTextField(String text, Color color) {
+        JLabel tf = new JLabel(text);
+//        tf.setEditable(false);
         tf.setBorder(null);
         tf.setFont(new Font("Arial", Font.PLAIN, 12));
         tf.setForeground(color);

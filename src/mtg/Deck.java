@@ -20,9 +20,9 @@ public class Deck implements Serializable {
 
     public Deck() {
         deckName = null;
-        names = new ArrayList<String>(15);
-        amounts = new ArrayList<Integer>(15);
-        paths = new ArrayList<File>(15);
+        names = new ArrayList<>(15);
+        amounts = new ArrayList<>(15);
+        paths = new ArrayList<>(15);
     }
 
     public boolean isCardInDeck(String name) {
@@ -200,19 +200,23 @@ public class Deck implements Serializable {
      */
     public boolean save(File file) {
         checkPaths();
-        try {
-            file.getParentFile().mkdirs();
-            if (!file.exists()) {
+        file.getParentFile().mkdirs();
+        if (!file.exists()) {
+            try {
                 file.createNewFile();
+            } catch (IOException ex) {
+                Debug.p("Deck file could not be created: "
+                        + file + ": " + ex, Debug.E);
+                return false;
             }
-            Writer bf = new OutputStreamWriter(
-                    new FileOutputStream(file), "Unicode");
+        }
+        try (Writer bf = new OutputStreamWriter(
+                new FileOutputStream(file), "Unicode")) {
             for (int i = 0; i < names.size(); i++) {
                 bf.write(names.get(i) + ";"
                         + amounts.get(i) + ";"
-                        + paths.get(i) + "\r\n");
+                        + paths.get(i) + System.getProperty("line.separator"));
             }
-            bf.close();
         } catch (IOException ex) {
             Debug.p("Deck could not be saved to file "
                     + file + ": " + ex, Debug.E);
@@ -228,9 +232,8 @@ public class Deck implements Serializable {
      * @return deck or null if loading failed
      */
     public static Deck load(File file) {
-        try {
+        try (Scanner in = new Scanner(file, "Unicode")) {
             Deck result = new Deck();
-            Scanner in = new Scanner(file, "Unicode");
             String line;
             while (in.hasNextLine()) {
                 line = in.nextLine();
@@ -242,7 +245,6 @@ public class Deck implements Serializable {
                     Debug.p("Ignored line while loading a deck: " + line, Debug.W);
                 }
             }
-            in.close();
             result.deckName = Utilities.getName(file);
             return result;
         } catch (Exception ex) {
@@ -260,7 +262,7 @@ public class Deck implements Serializable {
      */
     private void checkPaths() {
         if (paths == null) {
-            paths = new ArrayList<File>(getArraySize());
+            paths = new ArrayList<>(getArraySize());
         }
         for (int i = paths.size(); i < getArraySize(); i++) {
             paths.add(i, null);

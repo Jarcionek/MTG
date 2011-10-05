@@ -17,8 +17,14 @@ public class CheckDeck extends Action {
     }
 
     public CheckDeck(String owner, Deck deck) {
+        super(-1);
         this.owner = owner;
         this.deck = deck;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", owner = " + owner + ")";
     }
 
 }

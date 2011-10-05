@@ -48,7 +48,7 @@ public class Debug {
     public static void p(Object message, int type) {
         if (type == W) {
             if (warning) {
-               print(message);
+               print("WARNING: " + message);
             }
         } else if (type == I) {
             if (info) {
@@ -56,10 +56,10 @@ public class Debug {
             }
         } else if (type == E) {
             if (error) {
-               print(message);
+               print("ERROR: " + message);
             }
         } else if (type == CE) {
-            JOptionPane.showMessageDialog(null, print(message),
+            JOptionPane.showMessageDialog(null, print("CRITICAL ERROR: " + message),
                     Main.TITLE, JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } else {

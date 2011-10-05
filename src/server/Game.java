@@ -10,7 +10,7 @@ import mtg.Deck;
  * None of Game's method should send anything to clients, a proper actions
  * have to be sent explicitly depending on these methods return values.
  * <p>
- * All of the methods must ensure that no illegal move is posibble, e.g.
+ * All of the methods must ensure that no illegal move is possible, e.g.
  * if player's library is empty, player cannot draw a card so nothing has
  * to be sent to clients. Possibility of drawing a card from empty library
  * should be also disabled at client side, but a server has to be error-safe.
@@ -40,7 +40,7 @@ class Game {
         }
         poison = new int[decks.length];
 
-        cardsList = new TreeMap<String, String>();
+        cardsList = new TreeMap<>();
 
         //create and shuffle libraries
         //p - player, c - card, ci - cardInstance
@@ -599,6 +599,19 @@ class Game {
 
     synchronized void playerSetHealth(int target, int value) {
         health[target] = value;
+    }
+
+    /**
+     * Exiles all cards owned by player. Sets players health and poison to 0.
+     * @param player killed player
+     */
+    synchronized void kill(int player) {
+        library[player].transferCardsTo(exiled[player], player);
+        hand[player].transferCardsTo(exiled[player], player);
+        graveyard[player].transferCardsTo(exiled[player], player);
+        table.transferCardsTo(exiled[player], player);
+        health[player] = 0;
+        poison[player] = 0;
     }
 
 }

@@ -11,7 +11,7 @@ class Collection {
     private ArrayList<Card> cards;
 
     Collection() {
-        cards = new ArrayList<Card>();
+        cards = new ArrayList<>();
     }
 
     void addCard(Card card) {
@@ -40,7 +40,7 @@ class Collection {
      * @return the last card in the collection or null if a collection is empty
      */
     Card getLast() {
-        if (cards.size() == 0) {
+        if (cards.isEmpty()) {
             return null;
         } else {
             return cards.get(cards.size() - 1);
@@ -93,6 +93,20 @@ class Collection {
             t = cards.get(i);
             cards.set(i, cards.get(n));
             cards.set(n, t);
+        }
+    }
+    
+    /**
+     * Moves all cards owned by requested player from <code>this</code>
+     * collection to <code>c</code> collection.
+     * @param c target collection
+     * @param player player
+     */
+    void transferCardsTo(Collection c, int player) {
+        for (int i = 0; i < cards.size(); i++) {
+            if (cards.get(i).ID.charAt(0) == player + 'A') {
+                c.addCard(cards.remove(i--));
+            }
         }
     }
 }

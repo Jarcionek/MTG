@@ -7,16 +7,21 @@ package server.flags;
  * of this card.
  */
 public class DragCard extends Action {
-    public int requestor;
     public String ID;
     public int newxpos;
     public int newypos;
 
     public DragCard(int requestor, String ID, int newxpos, int newypos) {
-        this.requestor = requestor;
+        super(requestor);
         this.ID = ID;
         this.newxpos = newxpos;
         this.newypos = newypos;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", ID = " + ID + ", newxpos = " + newxpos
+                + ", newypos = " + newypos + ")";
     }
 
 }

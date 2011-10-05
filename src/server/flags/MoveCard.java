@@ -12,7 +12,7 @@ import mtg.Zone;
  * must specify those. <code>reveal</code> determines if a card has to be shown
  * to other players - because table, graveyard and exiled zones are public,
  * it matters only when moving a card between player's library and hand, in
- * other cases this field is ingored.
+ * other cases this field is ignored.
  * <p>
  * Card moved to graveyard, hand, exiled or library from anywhere is always
  * moved into owner's zone. If player requests to move a card from graveyard
@@ -21,7 +21,6 @@ import mtg.Zone;
 public class MoveCard extends Action {
     public Zone source;
     public Zone destination;
-    public int requestor;
     public String cardID;
     /**
      * It is only used by events sent by client if moving a card between
@@ -36,9 +35,9 @@ public class MoveCard extends Action {
      */
     public MoveCard(Zone source, Zone destination, int requestor,
             String cardID, boolean reveal) {
+        super(requestor);
         this.source = source;
         this.destination = destination;
-        this.requestor = requestor;
         this.cardID = cardID;
         this.reveal = reveal;
     }
@@ -53,9 +52,8 @@ public class MoveCard extends Action {
 
     @Override
     public String toString() {
-        return super.toString() + "(source = " + source + ", destination = "
-                + destination + ", requestor = " + requestor + ", cardID = "
-                + cardID + ")";
+        return super.toString() + ", source = " + source + ", destination = "
+                + destination + ", cardID = " + cardID + ")";
     }
 
 }

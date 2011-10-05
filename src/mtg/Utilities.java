@@ -73,17 +73,19 @@ public class Utilities {
     public static void receiveFile(File path, Socket socket)
             throws FileNotFoundException, IOException  {
         path.getParentFile().mkdirs();
-        BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(path));
+        try (BufferedInputStream bis
+                = new BufferedInputStream(socket.getInputStream());
+                BufferedOutputStream bos
+                = new BufferedOutputStream(new FileOutputStream(path))) {
+            
 
-        byte[] b = new byte[256];
-        int read = -1;
+            byte[] b = new byte[256];
+            int read = -1;
 
-        while ((read = bis.read(b)) >= 0) {
-            bos.write(b, 0, read);
+            while ((read = bis.read(b)) >= 0) {
+                bos.write(b, 0, read);
+            }
         }
-        bos.close();
-        bis.close();
     }
 
     /**
@@ -93,16 +95,16 @@ public class Utilities {
      * @throws IOException
      */
     public static void sendFile(File file, Socket socket) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-
-        byte[] b = new byte[256];
-        int read = -1;
-        while ((read = bis.read(b)) >= 0) {
-            bos.write(b, 0, read);
+        try (BufferedOutputStream bos
+                = new BufferedOutputStream(socket.getOutputStream());
+                BufferedInputStream bis
+                = new BufferedInputStream(new FileInputStream(file))) {
+            byte[] b = new byte[256];
+            int read = -1;
+            while ((read = bis.read(b)) >= 0) {
+                bos.write(b, 0, read);
+            }
         }
-        bis.close();
-        bos.close();
     }
 
     /**
@@ -120,8 +122,8 @@ public class Utilities {
     }
 
     /**
-     * Returns file extension or null if file is a directory or does not
-     * contain "."
+     * Returns file extension (without ".") or null if file
+     * is a directory or does not contain "."
      * @param file file
      * @return file extension or null if none
      */
@@ -179,5 +181,21 @@ public class Utilities {
         } catch (UnknownHostException ex) {
             return null;
         }
+    }
+    
+    /**
+     * Removes all non-word characters from the string and returns
+     * first 15 characters of it.
+     * @param name name to be checked
+     * @return modified name
+     */
+    public static String checkName(String name) {
+        name = name.replaceAll("\\W", "");
+        if (name.length() == 0) {
+            name = "PLAYER";
+        } else if (name.length() > 15) {
+            name = name.substring(0, 15);
+        }
+        return name;
     }
 }

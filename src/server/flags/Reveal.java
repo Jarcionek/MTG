@@ -5,17 +5,21 @@ import mtg.Zone;
 /**
  * @author Jaroslaw Pawlak
  *
- * This object detones that a player has revelaed a card to all other players
+ * This object denotes that a player has revealed a card to all other players
  * from specified zone.
  */
 public class Reveal extends Action {
     public Zone source;
-    public int requstor;
     public String cardID;
 
-    public Reveal(Zone source, int requstor, String cardID) {
+    public Reveal(Zone source, int requestor, String cardID) {
+        super(requestor);
         this.source = source;
-        this.requstor = requstor;
         this.cardID = cardID;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", source = " + source + ", cardID = " + cardID + ")";
     }
 }

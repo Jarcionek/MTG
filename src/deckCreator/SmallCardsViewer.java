@@ -71,7 +71,7 @@ public class SmallCardsViewer extends JScrollPane {
             }
         };
 
-        cards = new ArrayList<ViewableCard>();
+        cards = new ArrayList<>();
         panel = new JPanel(new GridLayout(1, 0));
         panel.setPreferredSize(new Dimension(0, Card.H));
 

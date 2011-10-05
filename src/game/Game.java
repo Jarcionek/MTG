@@ -3,12 +3,27 @@ package game;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.util.TreeMap;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -30,19 +45,27 @@ public class Game extends JFrame {
     private PlayerInfo[] playersInfo;
     private CurrentPlayerLibrary playerLibrary;
     private Logger logger;
+    
+    private JButton exit;
 
     private static TreeMap<String, String> list;
 
     private Game() {}
 
-    public Game(int players, Client client) {
+    public Game(int players, final Client client) {
         super(Main.TITLE);
         Game.client = client;
 
         createGUIComponents(players);
         createGUILayout();
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                client.closeClient();
+            }
+        });
         this.setUndecorated(true);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
@@ -76,6 +99,16 @@ public class Game extends JFrame {
         playerLibrary = new CurrentPlayerLibrary();
 
         logger = new Logger(table);
+        
+        exit = new JButton("Leave game");
+        exit.setFocusable(false);
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.closeClient();
+                Game.this.dispose();
+            }
+        });
     }
 
     private void createGUILayout() {
@@ -101,7 +134,30 @@ public class Game extends JFrame {
         handPanel.add(hand);
         handPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
+        
+        JPanel leftInnerPanel = new JPanel(new GridBagLayout()); //TODO move it somewhere else
+        int outside = 2;
+        int between = 3;
+        int b = 5;
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.fill = GridBagConstraints.BOTH;
+        JLabel title = new JLabel("Menu");
+        title.setHorizontalAlignment(JLabel.CENTER);
+        title.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                BorderFactory.createEmptyBorder(b, b, b, b)));
+        c.insets = new Insets(outside, outside, between, outside);
+        leftInnerPanel.add(title, c);
+        c.insets = new Insets(0, outside, outside, outside);
+        leftInnerPanel.add(exit, c);
+        
+        JPanel leftOuterPanel = new JPanel(new BorderLayout());
+        leftOuterPanel.add(leftInnerPanel, BorderLayout.NORTH);
+        
+        
         JPanel bottom = new JPanel(new BorderLayout());
+        bottom.add(leftOuterPanel, BorderLayout.WEST);
         bottom.add(handPanel, BorderLayout.CENTER);
         bottom.add(playerLibrary, BorderLayout.EAST);
 
@@ -211,6 +267,16 @@ public class Game extends JFrame {
         int t = Integer.parseInt(playersInfo[player].poisonCountersValue.getText());
         playersInfo[player].poisonCountersValue.setText("" + newValue);
         return t;
+    }
+    
+    void kill(int player) {
+        playersInfo[player].nameLabel.setText("(dead) "
+                + playersInfo[player].nameLabel.getText());
+        playersInfo[player].handSizeValue.setText("0");
+        playersInfo[player].healthPointsValue.setText("0");
+        playersInfo[player].librarySizeValue.setText("0");
+        playersInfo[player].poisonCountersValue.setText("0");
+        table.removeCards(player);
     }
 
 ////////////////////////////////////////////////////////////////////////////////

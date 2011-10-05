@@ -12,14 +12,13 @@ public class Search extends Action {
     public int amount;
     public String[] cardsIDs;
     public Zone zone;
-    public int requestor;
     public int zoneOwner;
 
     public Search(int amount, String[] cardsIDs, Zone zone, int requestor, int zoneOwner) {
+        super(requestor);
         this.amount = amount;
         this.cardsIDs = cardsIDs;
         this.zone = zone;
-        this.requestor = requestor;
         this.zoneOwner = zoneOwner;
     }
 
@@ -40,8 +39,8 @@ public class Search extends Action {
         }
         x += "}";
         x = x.replace(",}", "}");
-        return super.toString() + "(amount=" + amount + ",cardsIDs=" + x
-                + ",zone=" + zone + ",requestor=" + requestor;
+        return super.toString() + ", amount = " + amount + ", cardsIDs = " + x
+                + ", zone = " + zone + ")";
     }
 
 }

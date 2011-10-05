@@ -12,11 +12,11 @@ public final class Library implements Serializable {
     private ArrayList<Card> cards;
 
     public Library() {
-        cards = new ArrayList<Card>(15);
+        cards = new ArrayList<>(15);
     };
 
     public Library(Deck deck) {
-        cards = new ArrayList<Card>(deck.getDeckSize());
+        cards = new ArrayList<>(deck.getDeckSize());
 
         for (int i = 0; i < deck.getArraySize(); i++) {
             String path = deck.getArrayFiles(i).getPath();

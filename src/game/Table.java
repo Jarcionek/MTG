@@ -21,7 +21,7 @@ public class Table extends JScrollPane {
      * movement event will not be sent to the server and in the client's table
      * that card will be moved to the original position
      */
-    public static final int mistakeMargin = Card.W / 8;
+    public static final int mistakeMargin = 0; //Card.W / 8;
 
 
     /*
@@ -37,11 +37,11 @@ public class Table extends JScrollPane {
             = new Dimension((15 * Card.W + 14 * gap) * 2 + 2 * Card.H,
             (5 * Card.H + 4 * gap) * 2 + 2 * Card.H);
     public static final Dimension FOUR_PLAYERS
-            = TWO_PLAYERS; //TODO
+            = TWO_PLAYERS; //TODO define table size for 3-4 players
     public static final Dimension SIX_PLAYERS
-            = TWO_PLAYERS; //TODO
+            = TWO_PLAYERS; //TODO define table size for 5-6 players
     public static final Dimension EIGHT_PLAYERS
-            = TWO_PLAYERS; //TODO
+            = TWO_PLAYERS; //TODO define table size for 7-8 players
     
     private JPanel table;
 
@@ -162,15 +162,30 @@ public class Table extends JScrollPane {
                     && ((Card) c).getID().equals(ID)) {
                 table.remove(c);
                 table.repaint();
+                return;
             }
         }
+    }
+    
+    /**
+     * Removes all cards own by <code>player</code> from the table
+     * @param player 
+     */
+    public void removeCards(int player) {
+        for (Component c : table.getComponents()) {
+            if (c.getClass().equals(Card.class)
+                    && ((Card) c).getID().charAt(0) == player + 'A') {
+                table.remove(c);
+            }
+        }
+        table.repaint();
     }
 
     /**
      * Removes all cards from the table.
      */
     @Override
-    public final void removeAll() {
+    public final void removeAll() { //TODO is it used anywhere?
         table.removeAll();
         JLabel centre = new JLabel();
         centre.setSize(Card.W, Card.H);

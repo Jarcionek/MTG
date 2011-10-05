@@ -39,7 +39,7 @@ public class CardViewer extends JPanel {
     public CardViewer(InSearcherMouseAdapter listener) {
         super(null);
         this.listener = listener;
-        this.cards = new ArrayList<Card>(60);
+        this.cards = new ArrayList<>(60);
         this.setPreferredSize(new Dimension(Card.W * 2, Card.H));
     }
 

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mtg.Debug;
 import mtg.Utilities;
 import mtg.Zone;
@@ -29,38 +31,33 @@ public class ServerListeningThread extends Thread {
 
     @Override
     public void run() {
-        Debug.p("Server Listening Thread ID = " + id + " started");
-        Object object = null;
-        while (true) {
+        Debug.p("SLT: Server Listening Thread ID = " + id + " started");
+        Action object;
+        while (!isInterrupted()) {
             object = null;
             try {
-                object = ois.readObject();
+                object = (Action) ois.readObject();
+                object.requestor = id;
+                Debug.p("SLT: Server received: " + object);
+                
+                // DISCONNECT
+                if (object.getClass().equals(Disconnect.class)) {
+                    Server.sendToAllExcept(id, object);
+                    Server.disconnect(id);
+                    break;
+                }
 
-                if (!Server.areAllPlayersConnected()) {
-                     //REQUEST CARD
-                    if (object.getClass().equals(RequestCard.class)) {
-                        RequestCard t = ((RequestCard) object);
-                        Socket s = fileSocket.accept();
-                        Utilities.sendFile(new File(Utilities.findPath(t.name)), s);
-                        s.close();
-                    // READY
-                    } else if (object.getClass().equals(Ready.class)) {
-                        Server.ready[id] = true;
-                    }
-                    continue;
+                if (Server.getStatus() != Server.PLAYERS_CONNECTED) {
+                    continue; //game not started yet
                 }
 
                 // DRAG
                 if (object.getClass().equals(DragCard.class)) {
-                    DragCard dc = (DragCard) object;
-                    dc.requestor = id;
-                    Server.sendToAll(dc);
+                    Server.sendToAll(object);
 
                 // TAP CARD
                 } else if (object.getClass().equals(TapCard.class)) {
-                    TapCard tc = (TapCard) object;
-                    tc.requestor = id;
-                    Server.sendToAll(tc);
+                    Server.sendToAll(object);
 
                 // MOVE CARD
                 } else if (object.getClass().equals(MoveCard.class)) {
@@ -69,7 +66,6 @@ public class ServerListeningThread extends Thread {
                 // CHANGE HP OR POISON COUNTERS
                 } else if (object.getClass().equals(Player.class)) {
                     Player p = (Player) object;
-                    p.requestor = id;
                     if (p.poisonOrHealth == Player.HEALTH) {
                         Server.game.playerSetHealth(p.target, p.newValue);
                         Server.sendToAll(p);
@@ -81,7 +77,6 @@ public class ServerListeningThread extends Thread {
                 // SEARCH
                 } else if (object.getClass().equals(Search.class)) {
                     Search s = (Search) object;
-                    s.requestor = id;
                     switch (s.zone) {
                         case LIBRARY:
                             if (s.amount < -1 || s.amount == 0) {
@@ -103,10 +98,8 @@ public class ServerListeningThread extends Thread {
 
                 // SHUFFLE
                 } else if (object.getClass().equals(Shuffle.class)) {
-                    Shuffle s = (Shuffle) object;
-                    s.owner = id;
                     Server.game.libraryShuffle(id);
-                    Server.sendToAll(s);
+                    Server.sendToAll(object);
 
                 // REVEAL
                 } else if (object.getClass().equals(Reveal.class)) {
@@ -114,18 +107,36 @@ public class ServerListeningThread extends Thread {
                     if (c != null) {
                         Reveal r = (Reveal) object;
                         r.cardID = c.ID;
-                        r.requstor = id;
                         Server.sendToAll(r);
                     }
+                    
+                 //REQUEST CARD
+                } else if (object.getClass().equals(RequestCard.class)) {
+                    RequestCard t = ((RequestCard) object);
+                    try (Socket s = fileSocket.accept()) {
+                        Utilities.sendFile(
+                                new File(Utilities.findPath(t.name)), s);
+                    }
+                } else if (object.getClass().equals(Ready.class)) {
+                    Server.ready[id] = true;
                 }
             } catch (Exception ex) {
-//                Logger.getLogger(ServerListeningThread.class.getName())
-//                        .log(Level.SEVERE, null, ex);
-                Debug.p("ServerListeningThread (id=" + id + ") error while " +
-                            "dealing with " + object + ": " + ex);
-                if ("Connection reset".equals(ex.getLocalizedMessage())) {
-                    Server.disconnect(id);
-                    break;
+                String t = ex.getLocalizedMessage() != null?
+                        ex.getLocalizedMessage() : "";
+                switch (t) {
+                    case "Connection reset":
+                        Debug.p("Connection to player " + id + " has been lost");
+                        Server.sendToAllExcept(id, new Disconnect(id, false));
+                        Server.disconnect(id); //TODO 
+                    case "socket closed":
+                        //this happens when player is disconnected by server
+                        //(closed socket, this thread interrupted)"
+                        return;
+                    default:
+                        Debug.p("SLT: ServerListeningThread (id=" + id + ") error "
+                                + "while dealing with " + object + ": " + ex);                   
+//                        Logger.getLogger(this.getClass().getName())
+//                                .log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -155,7 +166,7 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case LIBRARY:
-                        throw new UnsupportedOperationException();
+                        throw new UnsupportedOperationException("Illegal move");
                     case TOP_LIBRARY:
                         if (Server.game.handToLibrary(mc.requestor = id, mc.cardID)) {
                             if (mc.reveal) {
@@ -188,7 +199,7 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case LIBRARY:
-                        throw new UnsupportedOperationException();
+                        throw new UnsupportedOperationException("Illegal move");
                     case TOP_LIBRARY:
                         if (Server.game.tablePutOnTopOfLibrary(mc.cardID)) {
                             mc.requestor = id;
@@ -218,7 +229,7 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case LIBRARY:
-                        throw new UnsupportedOperationException();
+                        throw new UnsupportedOperationException("Illegal move");
                     case TOP_LIBRARY:
                         if (Server.game.graveyardToLibrary(mc.cardID)) {
                             mc.requestor = id;
@@ -248,7 +259,7 @@ public class ServerListeningThread extends Thread {
                         }
                         break;
                     case LIBRARY:
-                        throw new UnsupportedOperationException();
+                        throw new UnsupportedOperationException("Illegal move");
                     case TOP_LIBRARY:
                         if (Server.game.exiledToLibrary(mc.cardID)) {
                             mc.requestor = id;
@@ -313,7 +324,7 @@ public class ServerListeningThread extends Thread {
                     case EXILED:
                         throw new UnsupportedOperationException(); //TODO this move is legal
                     case LIBRARY:
-                        throw new UnsupportedOperationException();
+                        throw new UnsupportedOperationException("Illegal move");
                 }
                 break;
         }

@@ -8,4 +8,13 @@ package server.flags;
  */
 public class Ready extends Action {
 
+    public Ready() {
+        super(-1);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ")";
+    }
+    
 }

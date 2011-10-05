@@ -12,6 +12,13 @@ public class CardsList extends Action {
     public TreeMap<String, String> list;
 
     public CardsList(TreeMap<String, String> list) {
+        super(-1);
         this.list = list;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ")";
+    }
+    
 }

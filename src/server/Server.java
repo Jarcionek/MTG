@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mtg.Debug;
 import mtg.Deck;
 import mtg.Main;
@@ -17,9 +19,21 @@ import mtg.Zone;
  * @author Jaroslaw Pawlak
  */
 public class Server extends Thread {
-
-    private static Thread serverMainThread;
-
+    /**
+     * Main server thread is running and awaiting connections.
+     */
+    public static final int RUNNING = 0;
+    /**
+     * Players have connected, game has been initialised, main server thread
+     * id dead. Some of SLTs are alive. 
+     */
+    public static final int PLAYERS_CONNECTED = 1;
+    /**
+     * Game has been initialised, but all players have already left it. Main
+     * server thread and all SLTs are dead.
+     */
+    public static final int DEAD = 2;
+    
     private static int port;
 
     private static ServerSocket ss;
@@ -37,7 +51,7 @@ public class Server extends Thread {
 
     static Game game;
 
-    private static boolean gameInitialised = false;
+    private static Server serverMainThread;
 
     private Server() {}
 
@@ -74,7 +88,7 @@ public class Server extends Thread {
     @Override
     public void run() {
         for (int i = 0; i < ready.length; i++) {
-            Debug.p("waiting for player " + i + "/" + ready.length);
+            Debug.p("Server: waiting for player " + i + "/" + ready.length);
             ready[i] = false;
             CheckDeck newdeck = null;
             
@@ -87,7 +101,7 @@ public class Server extends Thread {
 
                 // exchange basic info
                 newdeck = (CheckDeck) ois[i].readObject();
-                newdeck.owner = checkName(newdeck.owner, true);
+                newdeck.owner = checkName(Utilities.checkName(newdeck.owner));
                 names[i] = newdeck.owner;
                 decks[i] = newdeck.deck;
                 oos[i].writeObject(names[i]);
@@ -104,22 +118,26 @@ public class Server extends Thread {
                         send(i, new RequestCard(decks[i].getArrayNames(j)));
 
                         // receive file
-                        Socket t = fileSocket[i].accept();
-                        Utilities.receiveFile(new File(Main.CARDS_DL, 
-                                decks[i].getArrayNames(j) + ".jpg"), t);
-                        t.close();
+                        try (Socket t = fileSocket[i].accept()) {
+                            Utilities.receiveFile(new File(Main.CARDS_DL, 
+                                    decks[i].getArrayNames(j) + ".jpg"), t);
+                        }
                     }
                 }
-                Debug.p("Missing cards downloaded");
+                Debug.p("Server: Missing cards downloaded");
 
                 // start listening to the new client
                 serverListeningThreads[i]
                         = new ServerListeningThread(i, ois[i], fileSocket[i]);
                 serverListeningThreads[i].start();
             } catch (Exception ex) {
-                String ip = socket[i].getLocalAddress() == null?
+                if (getStatus() != RUNNING) {
+                    return;
+                }
+                Logger.getLogger(Server.this.getName()).log(Level.SEVERE, null, ex);
+                String ip = socket[i] == null? null : socket[i].getLocalAddress() == null?
                     "not received" : "" + socket[i].getLocalAddress();
-                String msg = "Error while dealing with player " + i + ": "
+                String msg = "Server: Error while dealing with player " + i + ": "
                         + "IP = " + ip + ", name = " + names[i]
                         + ", exception = " + ex;
                 Debug.p(msg, Debug.W);
@@ -138,11 +156,14 @@ public class Server extends Thread {
                 send(prev, newdeck);
                 // send already connected clients' decks to the new client
                 send(i, new CheckDeck(names[prev], decks[prev]));
+                if (!serverListeningThreads[prev].isAlive()) { //INIT KILL
+                    send(i, new Disconnect(prev, true));
+                }
             }
 
             send(i, newdeck);
         }
-        Debug.p("Game initialisation finished", Debug.I);
+        Debug.p("Server: Game initialisation finished", Debug.I);
 
         boolean allReady = false;
         while (!allReady) {
@@ -164,22 +185,40 @@ public class Server extends Thread {
         }
 
         for (int p = 0; p < ready.length; p++) {
-            game.libraryShuffle(p);
-            sendToAll(new Shuffle(p));
-            for (int c = 0; c < 7; c++) {
-                Card card = game.libraryDraw(p);
-                sendToAllInvisible(new MoveCard(Zone.TOP_LIBRARY,
-                        Zone.HAND, p, card.ID));
+            if (serverListeningThreads[p].isAlive()) {
+                game.libraryShuffle(p);
+                sendToAll(new Shuffle(p));
+                for (int c = 0; c < 7; c++) {
+                    Card card = game.libraryDraw(p);
+                    if (card != null) {
+                        sendToAllInvisible(new MoveCard(Zone.TOP_LIBRARY,
+                                Zone.HAND, p, card.ID));
+                    }
+                }
+            } else { //INIT KILL - player disconnected before game started
+                game.kill(p);
             }
         }
 
-        Server.gameInitialised = true;
-
-        Debug.p("Server main thread terminates");
+        Debug.p("Server: Server main thread terminates");
     }
 
-    synchronized static boolean areAllPlayersConnected() {
-        return gameInitialised;
+    public synchronized static int getStatus() {
+        if (serverMainThread == null) {
+            return DEAD;
+        } else if (serverMainThread.isAlive()
+                && !serverMainThread.isInterrupted()) {
+            return RUNNING;
+        } else if (serverListeningThreads == null) {
+            return DEAD; //when server has been closed
+        } else {
+            for (ServerListeningThread slt : serverListeningThreads) {
+                if (slt != null && slt.isAlive() && !slt.isInterrupted()) {
+                    return PLAYERS_CONNECTED;
+                }
+            }
+            return DEAD;
+        }
     }
 
     /**
@@ -193,7 +232,7 @@ public class Server extends Thread {
                 oos[player].writeObject(object);
                 oos[player].flush();
             } catch (IOException ex) {
-                Debug.p("Error while sending " + object + " to player "
+                Debug.p("Server: Error while sending " + object + " to player "
                         + player + ": " + ex, Debug.E);
             }
         }
@@ -206,6 +245,19 @@ public class Server extends Thread {
     static void sendToAll(Action object) {
         for (int i = 0; i < ready.length; i++) {
             send(i, object);
+        }
+    }
+    
+    /**
+     * Sends an action to all players except specified player.
+     * @param player player to be ignored
+     * @param object action to be sent
+     */
+    static void sendToAllExcept(int player, Action object) {
+        for (int i = 0; i < ready.length; i++) {
+            if (i != player) {
+                send(i, object);
+            }
         }
     }
 
@@ -251,36 +303,83 @@ public class Server extends Thread {
     }
 
     /**
-     * Closes all streams and sockets of given player.
+     * Closes all streams and sockets of given player. It should be used when
+     * clients sends information about its disconnection. Game is modified
+     * (player's cards are exiled) and if no one is connected
+     * a server is closed.
      * @param player player
      */
     static void disconnect(int player) {
-        Debug.p("Player " + player + " - " + names[player] + " disconneced");
-        try {
-            socket[player].close();
-        } catch (IOException ex) {}
+        disconnectOnly(player);
+        if (game != null) {
+            game.kill(player);
+        }
+        if (getStatus() == DEAD) { //last client disconnects
+            closeServerNoOneConnected();
+        }
+    }
+    
+    /**
+     * Just disconnects requested player by closing all their streams
+     * and sockets and assigning null to their references. If player is already
+     * disconnected, it does nothing.
+     * @param player player
+     */
+    private static void disconnectOnly(int player) {
+        if (socket[player] != null) {
+            Debug.p("Server: Player " + player + " (" + names[player] + ") disconneced");
+            if (serverListeningThreads[player] != null) {
+                serverListeningThreads[player].interrupt();
+            }
+            try {
+                socket[player].close();
+            } catch (IOException ex) {}
+            socket[player] = null;
+            ois[player] = null;
+            oos[player] = null;
+        }
         try {
             fileSocket[player].close();
+            fileSocket[player] = null;
+        } catch (IOException | NullPointerException ex) {}
+    }
+    
+    /**
+     * Informs all players about server closure, disconnects all clients
+     * and closes a server with no client connected to it.
+     */
+    public static void closeServer() {
+        sendToAll(new Disconnect(-1, true));
+        for (int i = 0; i < ready.length; i++) {
+            disconnectOnly(i);
+        }
+        closeServerNoOneConnected();
+    }
+    
+    /**
+     * Closes all sockets and streams and assigns nulls to their references.
+     */
+    private static void closeServerNoOneConnected() {
+        serverMainThread.interrupt();
+        try {
+            ss.close();
         } catch (IOException ex) {}
-        fileSocket[player] = null;
-        socket[player] = null;
-        ois[player] = null;
-        oos[player] = null;
+        //let gc do the rest
+        ss = null;
+        serverListeningThreads = null;
+        socket = null;
+        fileSocket = null;
+        oos = null;
+        ois = null;
+        decks = null;
+        names = null;
+        Debug.p("Server: Server closed");
     }
 
-    static String checkName(String name, boolean org) {
-        if (org) {
-            name = name.replaceAll("\\W", "");
-        }
-        if (name.length() == 0) {
-            return checkName("PLAYER", true);
-        }
-        if (name.length() > 15) {
-            name = name.substring(0, 15);
-        }
+    private static String checkName(String name) {
         for (int i = 0; i < names.length; i++) {
             if (name.equals(names[i])) {
-                return checkName(name + "-", false);
+                return checkName(name + "-");
             }
         }
         return name;
