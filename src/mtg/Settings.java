@@ -25,7 +25,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.ToolTipManager;
 import javax.swing.filechooser.FileFilter;
@@ -42,9 +41,6 @@ public class Settings {
     private static final String LAST_CREATED_PORT = "last port";
     private static final String LAST_CREATED_PLAYERS = "last players";
     private static final String LAST_CREATED_JOINED = "last joined";
-    private static final String C_SIZE = "cards size";
-    private static final int C_SIZE_MIN = 25; // in %
-    private static final int C_SIZE_MAX = 200; // in %
 
     private static HashMap<String, Object> settings;
     
@@ -58,7 +54,6 @@ public class Settings {
         settings.put(LAST_CREATED_PORT, 56789);
         settings.put(LAST_CREATED_PLAYERS, 2);
         settings.put(LAST_CREATED_JOINED, true);
-        settings.put(C_SIZE, 100);
         try (Scanner s = new Scanner(FILE, "Unicode")) {
             while (s.hasNextLine()) {
                 String[] l = s.nextLine().split(":", 2);
@@ -87,15 +82,6 @@ public class Settings {
                             if (l[1].equalsIgnoreCase("true")
                                     || l[1].equalsIgnoreCase("false")) {
                                 settings.put(l[0], Boolean.parseBoolean(l[1]));
-                            }
-                            break;
-                        case C_SIZE:
-                            if (l[1].matches("\\d{2,3}")) {
-                                int value = Integer.parseInt(l[1]);
-                                if (value < C_SIZE_MIN || value > C_SIZE_MAX) {
-                                    break;
-                                }
-                                settings.put(l[0], value);
                             }
                             break;
                     }
@@ -161,19 +147,6 @@ public class Settings {
         });
         message.add(nametf, s);
         
-        message.add(new JLabel("Cards' size:"), f);
-        JSlider slid = new JSlider(C_SIZE_MIN, C_SIZE_MAX, (int) settings.get(C_SIZE));
-        Hashtable<Integer, JLabel> dict = new Hashtable<>();
-        dict.put(C_SIZE_MIN, new JLabel(C_SIZE_MIN + "%"));
-        dict.put(100, new JLabel("100%"));
-        dict.put(C_SIZE_MAX, new JLabel(C_SIZE_MAX + "%"));
-        slid.setLabelTable(dict); //it requires obsolete dictionary, not map...
-        slid.setPaintLabels(true);
-        slid.setMajorTickSpacing(25);
-        slid.setMinorTickSpacing(5);
-        slid.setPaintTicks(true);
-        message.add(slid, s);
-        
         message.add(new JLabel("Active deck:"), f);
         tempDeck = (File) settings.get(DECK);
         final JButton deckButton = new JButton(
@@ -203,11 +176,10 @@ public class Settings {
         });
         message.add(deckButton, s);
         
-        if(JOptionPane.showOptionDialog(parentFrame, message, "MTG Settings",
+        if(JOptionPane.showOptionDialog(parentFrame, message, Main.TITLE,
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
                 new String[] {"Apply", "Cancel"}, 0) == 0) {
             settings.put(NAME, nametf.getText());
-            settings.put(C_SIZE, slid.getValue());
             settings.put(DECK, tempDeck);
             save();
         }
@@ -254,14 +226,6 @@ public class Settings {
      */
     public static Deck getDeck() {
         return Deck.load((File) settings.get(DECK));
-    }
-
-    /**
-     * Returns card multiplier.
-     * @return card size multiplier
-     */
-    private static int c() {
-        return (int) settings.get(C_SIZE);
     }
     
     public static void setLastIP(String ip) {

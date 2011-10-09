@@ -3,7 +3,7 @@ package game;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
 /**
  * @author Jaroslaw Pawlak
@@ -29,18 +29,20 @@ public class TableDragListener extends MouseAdapter {
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        JComponent source = (JComponent) e.getSource();
+        
         int a = e.getX() - startX;
         int b = e.getY() - startY;
 
         a *= powerSteering;
         b *= powerSteering;
 
-        Rectangle r = ((JPanel) e.getSource()).getVisibleRect();
+        Rectangle r = source.getVisibleRect();
         r.x += a;
         r.y += b;
         startX = e.getX() + a;
         startY = e.getY() + b;
-
-        ((JPanel) e.getSource()).scrollRectToVisible(r);
+        
+        source.scrollRectToVisible(r);
     }
 }

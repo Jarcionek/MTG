@@ -12,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import mtg.Card;
 import mtg.Utilities;
@@ -21,21 +20,24 @@ import mtg.Utilities;
  * @author Jaroslaw Pawlak
  */
 public class Logger extends JPanel {
-    public static final Color C_DRAG = Color.black;
-    public static final Color C_DRAW = Color.blue;
-    public static final Color C_TAP = Color.gray;
-    public static final Color C_CHANGE_HP = new Color(175, 175, 0); //dark yellow
-    public static final Color C_MOVE_DESTROY = Color.red;
-    public static final Color C_MOVE_EXILE = Color.red;
-    public static final Color C_MOVE_PLAY = new Color(0, 128, 0); //dark green
-    public static final Color C_MOVE_TO_HAND = Color.magenta;
-    public static final Color C_MOVE_TO_LIBRARY = new Color(192, 128, 0); //dark orange
-    public static final Color C_SEARCH_LIBRARY = new Color(192, 128, 0); //dark orange
+    public static final Color C_DRAG             = Color.black;
+    public static final Color C_DRAW             = Color.blue;
+    public static final Color C_TAP              = Color.gray;
+    public static final Color C_CHANGE_HP        = Color.yellow.darker();
+    public static final Color C_MOVE_DESTROY     = Color.red;
+    public static final Color C_MOVE_EXILE       = Color.red;
+    public static final Color C_MOVE_PLAY        = Color.green.darker().darker();
+    public static final Color C_MOVE_TO_HAND     = Color.magenta;
+    public static final Color C_MOVE_TO_LIBRARY  = Color.orange.darker();
+    public static final Color C_SEARCH_LIBRARY   = Color.orange.darker();
     public static final Color C_SEARCH_GRAVEYARD = Color.black;
-    public static final Color C_SEARCH_EXILED = Color.black;
-    public static final Color C_SHUFFLE = Color.blue;
-    public static final Color C_REVEAL = Color.blue;
-    public static final Color C_DISCONNECT = Color.pink;
+    public static final Color C_SEARCH_EXILED    = Color.black;
+    public static final Color C_SHUFFLE          = Color.blue;
+    public static final Color C_REVEAL           = Color.blue.darker().darker();
+    public static final Color C_DISCONNECT       = Color.pink;
+    public static final Color C_MESSAGE          = Color.black;
+    public static final Color C_RANDOM           = Color.pink.darker();
+    public static final Color C_RESTART          = Color.blue;
 
     private GridBagConstraints f;
     private GridBagConstraints s;

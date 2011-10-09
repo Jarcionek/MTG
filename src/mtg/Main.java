@@ -28,7 +28,7 @@ import server.Server;
  */
 public class Main extends JFrame {
     public static final String TITLE = "MTG";
-    public static final String VERSION = "beta 1.1";
+    public static final String VERSION = "beta 1.2";
 
     public static final File DIRECTORY
             = new File(System.getProperty("user.dir"), "MTG");
@@ -48,6 +48,7 @@ public class Main extends JFrame {
     private JButton createGame;
     private JButton joinGame;
     private JButton settingsButton;
+    private JButton helpButton;
     private JLabel background;
     
     public static void main(String[] args)
@@ -141,13 +142,10 @@ public class Main extends JFrame {
         
         coming = new JTextArea(
                 "Coming up:\n" +
-                "- tokens\n" +
                 "- more cards and decks\n" +
-                "- changing cards' sizes\n" +
-                "- tossing a coin, rolling a die\n" +
-                "- choosing a card at random\n" +
                 "- putting counters on permanents\n" +
                 "- music\n" +
+                "- better graphics\n" +
                 "- improved deck creator"
                 );
         coming.setFocusable(false);
@@ -182,7 +180,7 @@ public class Main extends JFrame {
                 if (Server.getStatus() != Server.DEAD) {
                     int c = JOptionPane.showConfirmDialog(Main.this,
                             "Server is already running.\n"
-                            + "Do you want to close it?", "MTG",
+                            + "Do you want to close it?", Main.TITLE,
                             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                     if (c == JOptionPane.YES_OPTION) {
                         Server.closeServer();
@@ -208,6 +206,15 @@ public class Main extends JFrame {
         settingsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Settings.openSettingsPanel(Main.this);
+            }
+        });
+        
+        helpButton = new JButton("Help");
+        helpButton.setOpaque(false);
+        helpButton.setFocusable(false);
+        helpButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Help.show(Main.this);
             }
         });
         
@@ -274,6 +281,14 @@ public class Main extends JFrame {
                 settingsButton.getPreferredSize().height);
         contentPane.add(settingsButton);
         
+        helpButton.setBounds(
+                settingsButton.getBounds().x + (settingsButton.getBounds().width
+                - helpButton.getPreferredSize().width) / 2,
+                settingsButton.getBounds().y - settingsButton.getBounds().height - 5,
+                helpButton.getPreferredSize().width,
+                helpButton.getPreferredSize().height);
+        contentPane.add(helpButton);
+        
         background.setBounds(0, 0, 750, 450);
         contentPane.add(background);
         
@@ -285,9 +300,10 @@ public class Main extends JFrame {
             case Server.PLAYERS_CONNECTED:
                 if (JOptionPane.showConfirmDialog(Main.this,
                         "The server is running and the game is in progress.\n"
-                        + "Do you want to close exit anyway?", "MTG",
+                        + "Do you want to exit anyway?", Main.TITLE,
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
                         != JOptionPane.YES_OPTION) {
+                    Server.closeServer();
                     return;
                 }
                 break;
@@ -295,9 +311,10 @@ public class Main extends JFrame {
                 if (JOptionPane.showConfirmDialog(Main.this,
                         "The server is running, but\n"
                         + "the game has not yet started.\n"
-                        + "Are you sure that you want to exit?", "MTG",
+                        + "Are you sure that you want to exit?", Main.TITLE,
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
                         != JOptionPane.YES_OPTION) {
+                    Server.closeServer();
                     return;
                 }
                 break;
@@ -306,39 +323,37 @@ public class Main extends JFrame {
     }
 }
 
-/** NOT FINISHED
- * Settings 4: card size multiplier (add static in Card and multiply by it
- *          whenever card.W or H is used and for table size and cards positions)
- */
-
 /** //TODO LIST
- * start again in game GUI - all to library, shuffle, draw
  * 
- * DECKS!
- * reveal card from hand
- * put card on the bottom
- * help
- * return random number from server (coin, die, specified borders)
- * choose a card at random from your hand
+ * proof read help
+ * 
+ * bottom library
  * add +1/+1 and -1/-1 counters to cards
+ * restart with specified number of cards
+ * splash screen
+ * 
  * add notes to cards?
- * chat?
- * Settings 2: music volume
- * PlayerX taps CardY - change into PlayerX taps his CardY etc
- *          move requestor field into Action class
- * finish deckCreator:
- *          - better basic lands management
- *          - statistics on the right
+ * 
+ * ----- ----- ----- ----- ----- RECREATE GAME GUI ----- ----- ----- ----- -----
+ * divide InSearcherListener into X listeners
+ *          - reveal card from hand
+ *          - put card on the bottom
+ * music?
+ * PlayerX taps CardY - change into PlayerX taps his CardY etc (also in MoveCard)
+ * TABLE should have a fixed size while card's position should be recalculated
+ *          while placing a card or sending an Action to server
+ * ----- ----- ----- ----- ----- DECK CREATOR ----- ----- ----- ----- ----- ----
+ * deck creator - cards can be easily added or removed from the deck by
+ *          accident, especially while viewing larger cards
+ * better basic lands management
+ * statistics on the right
+ * show all files instead of tree
  */
 
 /** //FIXME LIST
- * logger does not scroll correctly when changing health or poison
+ * card is shaking while being dragged in large zoom
+ * table is shaking when dragged to the border of it
+ * 
+ * logger sometimes does not scroll correctly when changing health or poison
  * deck creator - small cards viewer still crashes occasionally while scrolling
- * deck creator - cards can be easily added or removed from the deck by
- *          accident, especially while viewing larger cards
- */
-
-/** //FIXME LIST (problems at university computer)
- * linux could not load a deck: IllegalArgumentException: Unicode
- * UI problems on some computers (use java one)
  */

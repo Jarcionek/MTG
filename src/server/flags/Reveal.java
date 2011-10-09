@@ -12,8 +12,8 @@ public class Reveal extends Action {
     public Zone source;
     public String cardID;
 
-    public Reveal(Zone source, int requestor, String cardID) {
-        super(requestor);
+    public Reveal(Zone source, String cardID) {
+        super(-1);
         this.source = source;
         this.cardID = cardID;
     }

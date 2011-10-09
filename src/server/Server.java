@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mtg.Debug;
 import mtg.Deck;
+import mtg.InvalidDeckException;
 import mtg.Main;
 import mtg.Utilities;
 import mtg.Zone;
@@ -53,7 +54,9 @@ public class Server extends Thread {
 
     private static Server serverMainThread;
 
-    private Server() {}
+    private Server() {
+        super("Server Main Thread");
+    }
 
     /**
      * Waits for connection of <code>players</code> number of players. Downloads
@@ -101,6 +104,13 @@ public class Server extends Thread {
 
                 // exchange basic info
                 newdeck = (CheckDeck) ois[i].readObject();
+                try {
+                    Deck.check(newdeck.deck);
+                } catch (InvalidDeckException ex) {
+                    oos[i].writeObject(ex);
+                    oos[i].flush();
+                    throw ex;
+                }
                 newdeck.owner = checkName(Utilities.checkName(newdeck.owner));
                 names[i] = newdeck.owner;
                 decks[i] = newdeck.deck;
@@ -134,17 +144,17 @@ public class Server extends Thread {
                 if (getStatus() != RUNNING) {
                     return;
                 }
-                Logger.getLogger(Server.this.getName()).log(Level.SEVERE, null, ex);
+//                Logger.getLogger(Server.this.getName()).log(Level.SEVERE, null, ex);
                 String ip = socket[i] == null? null : socket[i].getLocalAddress() == null?
                     "not received" : "" + socket[i].getLocalAddress();
                 String msg = "Server: Error while dealing with player " + i + ": "
                         + "IP = " + ip + ", name = " + names[i]
                         + ", exception = " + ex;
                 Debug.p(msg, Debug.W);
-                i--;
                 try {
                     fileSocket[i].close();
                 } catch (Exception ex2) {}
+                i--;
                 continue;
             }
 
@@ -262,7 +272,7 @@ public class Server extends Thread {
     }
 
     /**
-     * Sends an MoveCard action to all players but only to a requestor player
+     * Sends a MoveCard action to all players but only to a requestor player
      * is sent a card's ID. For example, if there are four players and player 2
      * draws a card, players 0, 1 and 3 receives MoveCard object but with
      * no card ID, while player 2 receives a full object with a proper ID.
@@ -281,9 +291,28 @@ public class Server extends Thread {
             }
         }
     }
+    
+    /**
+     * Sends a Restart action to all players but only to a requestor player
+     * is sent cards' IDs.
+     * @param r object to be sent
+     */
+    static void sendToAllInvisible(Restart r) {
+        String[] ids = r.IDs;
+        r.IDs = null;
+        for (int i = 0; i < ready.length; i++) {
+            if (i == r.requestor) {
+                r.IDs = ids;
+                Server.send(i, r);
+                r.IDs = null;
+            } else {
+                Server.send(i, r);
+            }
+        }
+    }
 
     /**
-     * Sends an search Action to all the players, but only requestor player
+     * Sends a search Action to all the players, but only requestor player
      * receives list of cards. For other players it is only an information
      * that a player is searching a zone.
      * @param s Search action
@@ -349,7 +378,7 @@ public class Server extends Thread {
      * and closes a server with no client connected to it.
      */
     public static void closeServer() {
-        sendToAll(new Disconnect(-1, true));
+        sendToAll(new Disconnect(true));
         for (int i = 0; i < ready.length; i++) {
             disconnectOnly(i);
         }
@@ -383,5 +412,9 @@ public class Server extends Thread {
             }
         }
         return name;
+    }
+    
+    static int getDeckSize(int player) {
+        return decks[player].getDeckSize();
     }
 }

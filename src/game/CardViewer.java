@@ -88,6 +88,10 @@ public class CardViewer extends JPanel {
     public void removeCard(Card card) {
         cards.remove(card);
     }
+    
+    public void removeAllCards() {
+        cards.clear();
+    }
 
     /**
      * Repaints the container with the chosen card fully visible.
@@ -183,6 +187,9 @@ public class CardViewer extends JPanel {
     }
 
     public static void removeCardFromCurrentlyOpenCardViewer(String cardID) {
+        if (!mostRecentCardViewer.isShowing()) {
+            return;
+        }
         Card previous;
         for (Card e : mostRecentCardViewer.cards) {
             previous = e;

@@ -8,6 +8,10 @@ package server.flags;
 public class Disconnect extends Action {
     public boolean intentional;
 
+    public Disconnect(boolean intentional) {
+        this(-1, intentional);
+    }
+    
     public Disconnect(int player, boolean intentional) {
         super(player);
         this.intentional = intentional;

@@ -38,7 +38,7 @@ public class ViewableCard extends JLabel implements Comparable<ViewableCard> {
         } catch (IOException e) {
             Debug.p("ViewableCard error: " + e, Debug.E);
         }
-        this.setIcon(new ImageIcon(Card.resize(img)));
+        this.setIcon(new ImageIcon(Utilities.resize(img, Card.W, Card.H)));
         this.setHorizontalAlignment(SwingConstants.CENTER);
         this.addMouseListener(new MouseAdapter() {
             @Override

@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
+import mtg.Main;
 import mtg.Zone;
 import server.flags.Player;
 import server.flags.Search;
@@ -88,10 +89,9 @@ public class PlayerInfo extends JPanel {
                 String[] examples = new String[] {"-1", "5", "+1"};
                 String x = (String) JOptionPane.showInputDialog(
                         null,
-                        "Enter new amount of poison counters",
-                        "Change " + nameLabel.getText() + "'s poison counters",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
+                        "Enter new amount of poison counters for "
+                        + nameLabel.getText(), Main.TITLE,
+                        JOptionPane.PLAIN_MESSAGE, null,
                         null, examples[new Random().nextInt(3)]);
 
                 if (x == null) {
@@ -111,8 +111,7 @@ public class PlayerInfo extends JPanel {
                     return;
                 }
 
-                Game.client.send(new Player(-1, playerID,
-                        value, Player.POISON));
+                Game.client.send(new Player(playerID, value, Player.POISON));
             }
         });
         poisonButton.setFocusable(false);
@@ -123,10 +122,8 @@ public class PlayerInfo extends JPanel {
                 String[] examples = new String[] {"-5", "20", "+5"};
                 String x = (String) JOptionPane.showInputDialog(
                         null,
-                        "Enter new health value",
-                        "Change " + nameLabel.getText() + "'s health",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
+                        "Enter new health value for " + nameLabel.getText(),
+                        Main.TITLE, JOptionPane.PLAIN_MESSAGE, null,
                         null, examples[new Random().nextInt(3)]);
 
                 if (x == null) {
@@ -146,8 +143,7 @@ public class PlayerInfo extends JPanel {
                     return;
                 }
 
-                Game.client.send(new Player(-1, playerID,
-                        value, Player.HEALTH));
+                Game.client.send(new Player(playerID, value, Player.HEALTH));
             }
         });
         healthButton.setFocusable(false);

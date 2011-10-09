@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
+import mtg.Main;
 import mtg.Zone;
 import server.flags.MoveCard;
 import server.flags.Reveal;
@@ -54,11 +55,8 @@ public class CurrentPlayerLibrary extends JPanel {
                 Object x = JOptionPane.showInputDialog(
                         null,
                         "How many cards from the top\n" +
-                        "of your library you would like to see?",
-                        "Search your library",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
-                        null, "all");
+                        "of your library you would like to see?", Main.TITLE,
+                        JOptionPane.PLAIN_MESSAGE, null, null, "all");
 
                 if (x == null) {
                     return;
@@ -83,7 +81,7 @@ public class CurrentPlayerLibrary extends JPanel {
         revealTopButton = new JButton("Reveal top");
         revealTopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Game.client.send(new Reveal(Zone.TOP_LIBRARY, -1, null));
+                Game.client.send(new Reveal(Zone.TOP_LIBRARY, null));
             }
         });
         revealTopButton.setFocusable(false);

@@ -15,7 +15,7 @@ public class JoinGameFrame {
         if (deck == null) {
             JOptionPane.showMessageDialog(parent,
                     "Could not load chosen deck",
-                    "MTG Error", JOptionPane.ERROR_MESSAGE);
+                    Main.TITLE, JOptionPane.ERROR_MESSAGE);
         } else {
             String ip = "";
             String msg = "Host:";
@@ -24,7 +24,7 @@ public class JoinGameFrame {
 
             while (true) {
                 ip = (String) JOptionPane.showInputDialog(parent,
-                        msg, "MTG", JOptionPane.PLAIN_MESSAGE, null,
+                        msg, Main.TITLE, JOptionPane.PLAIN_MESSAGE, null,
                         null, Settings.getLastIP());
                 if (ip == null) {
                     return; //user cancel
@@ -55,7 +55,7 @@ public class JoinGameFrame {
                 msg = "Port:";
                 while (true) {
                     portStr = (String) JOptionPane.showInputDialog(
-                            parent, msg, "MTG",
+                            parent, msg, Main.TITLE,
                             JOptionPane.PLAIN_MESSAGE, null, null,
                             "56789");
                     if (portStr == null) {
@@ -76,21 +76,29 @@ public class JoinGameFrame {
                 Settings.save();
                 new game.Client(parent, Settings.getName(), ip, port, deck);
                 parent.setVisible(false);
-            } catch (IOException ex) {
-                switch (ex.getLocalizedMessage()) {
-                    case "Connection refused: connect":
-                        JOptionPane.showMessageDialog(parent,
-                                "Connection refused", "MTG",
-                                JOptionPane.WARNING_MESSAGE);
-                        break;
-                    case "Connection timed out: connect":
-                        JOptionPane.showMessageDialog(parent,
-                                "Connection timed out", "MTG",
-                                JOptionPane.WARNING_MESSAGE);
-                        break;
-                    default:
-                        Debug.p(ex, Debug.CE);
-                        break;
+            } catch (Exception ex) {
+                Debug.p("Exception while joining the server: " + ex);
+                if (ex.getClass().equals(InvalidDeckException.class)) {
+                    JOptionPane.showMessageDialog(parent,
+                            "Your deck has been rejected by the server: "
+                            + ex.getLocalizedMessage(), Main.TITLE,
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    switch (ex.getLocalizedMessage()) {
+                        case "Connection refused: connect":
+                            JOptionPane.showMessageDialog(parent,
+                                    "Connection refused", Main.TITLE,
+                                    JOptionPane.WARNING_MESSAGE);
+                            break;
+                        case "Connection timed out: connect":
+                            JOptionPane.showMessageDialog(parent,
+                                    "Connection timed out", Main.TITLE,
+                                    JOptionPane.WARNING_MESSAGE);
+                            break;
+                        default:
+                            Debug.p(ex, Debug.CE);
+                            break;
+                    }
                 }
             }
         }

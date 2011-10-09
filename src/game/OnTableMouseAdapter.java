@@ -5,10 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import mtg.Card;
 import mtg.Zone;
 import server.flags.DragCard;
 import server.flags.MoveCard;
@@ -19,15 +18,15 @@ import server.flags.TapCard;
  */
 public class OnTableMouseAdapter extends MouseAdapter {
 
-    private Card tempCard;
+    private TCard tempCard;
     private int tempX;
     private int tempY;
     private Point cardPosition;
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        Card source = (Card) e.getSource();
-        JPanel table = (JPanel) source.getParent();
+        TCard source = (TCard) e.getSource();
+        JComponent table = (JComponent) source.getParent();
         table.remove(source);
         table.add(source, 0);
         source.repaint();
@@ -35,7 +34,7 @@ public class OnTableMouseAdapter extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        final Card source = (Card) e.getSource();
+        final TCard source = (TCard) e.getSource();
         if (e.getButton() == MouseEvent.BUTTON1) {
             tempCard = source;
             tempX = e.getX();
@@ -44,10 +43,10 @@ public class OnTableMouseAdapter extends MouseAdapter {
             if (e.getClickCount() == 2) {
                 if (source.isTapped()) {
                     source.untap();
-                    Game.client.send(new TapCard(-1, source.getID(), false));
+                    Game.client.send(new TapCard(source.getID(), false));
                 } else {
                     source.tap();
-                    Game.client.send(new TapCard(-1, source.getID(), true));
+                    Game.client.send(new TapCard(source.getID(), true));
                 }
             }
         } else {
@@ -95,23 +94,21 @@ public class OnTableMouseAdapter extends MouseAdapter {
                 popupMenu.add(exile);
 
                 popupMenu.show(source, e.getX(), e.getY());
-            } else {
-                source.viewLarger();
             }
         }
     }
+    
     @Override
     public void mouseReleased(MouseEvent e) {
         if (tempCard == null) {
             return;
         }
-        Card source = ((Card) e.getSource());
+        TCard source = ((TCard) e.getSource());
         Point currentPos = source.getCardPosition();
-        if (Math.abs(currentPos.x - cardPosition.x) > Table.mistakeMargin
-                || Math.abs(currentPos.y - cardPosition.y) > Table.mistakeMargin) {
-            Game.client.send(new DragCard(-1, source.getID(), currentPos.x, currentPos.y));
-        } else {
-            source.setCardPosition(cardPosition.x, cardPosition.y);
+        if (cardPosition.x != currentPos.x || cardPosition.y != currentPos.y) {
+            Game.client.send(new DragCard(source.getID(),
+                    currentPos.x,
+                    currentPos.y));
         }
     }
 
@@ -120,19 +117,18 @@ public class OnTableMouseAdapter extends MouseAdapter {
         if (tempCard == null) {
             return;
         }
-        JPanel table = (JPanel) ((Card) e.getSource()).getParent();
         int newx = tempCard.getXpos() - tempX + e.getX();
         int newy = tempCard.getYpos() - tempY + e.getY();
-        int margin = Card.H / 2;
+        int margin = TCard.H() / 2;
         if (newx < margin) {
             newx = margin;
-        } else if (newx > table.getWidth() - margin) {
-            newx = table.getWidth() - margin;
+        } else if (newx > Table.SIZE.width - margin) {
+            newx = Table.SIZE.width - margin;
         }
         if (newy < margin) {
             newy = margin;
-        } else if (newy > table.getHeight() - margin) {
-            newy = table.getHeight() - margin;
+        } else if (newy > Table.SIZE.height - margin) {
+            newy = Table.SIZE.height - margin;
         }
         tempCard.setCardPosition(newx, newy);
     }

@@ -15,16 +15,18 @@ class Collection {
     }
 
     void addCard(Card card) {
-        cards.add(card);
-    }
-
-    Card removeCard(Card card) {
-        int index = cards.indexOf(card);
-        return cards.remove(index);
+        if (card != null) {
+            cards.add(card);
+        }
     }
 
     Card removeCard(String ID) {
-        return removeCard(new Card(null, ID));
+        cards.remove(new Card(null, ID));
+        if (ID.charAt(1) == 'X') {
+            return null;
+        } else {
+            return new Card(null, ID);
+        }
     }
 
     Card get(int i) {
@@ -104,7 +106,9 @@ class Collection {
      */
     void transferCardsTo(Collection c, int player) {
         for (int i = 0; i < cards.size(); i++) {
-            if (cards.get(i).ID.charAt(0) == player + 'A') {
+            if (cards.get(i).ID.charAt(1) == 'X') { //token
+                cards.remove(i--);
+            } else if (cards.get(i).ID.charAt(0) == player + 'A') {
                 c.addCard(cards.remove(i--));
             }
         }

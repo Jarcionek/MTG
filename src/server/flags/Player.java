@@ -13,8 +13,8 @@ public class Player extends Action {
     public int newValue;
     public int poisonOrHealth;
 
-    public Player(int requestor, int target, int newValue, int poisonOrHealth) {
-        super(requestor);
+    public Player(int target, int newValue, int poisonOrHealth) {
+        super(-1);
         this.target = target;
         this.newValue = newValue;
         this.poisonOrHealth = poisonOrHealth;

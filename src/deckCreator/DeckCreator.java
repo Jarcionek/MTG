@@ -115,7 +115,7 @@ public class DeckCreator extends JFrame {
                     Deck t = Deck.load(f);
                     if (t == null) {
                         JOptionPane.showMessageDialog(DeckCreator.this,
-                                "Deck could not be loaded", "Error",
+                                "Deck could not be loaded", Main.TITLE,
                                 JOptionPane.ERROR_MESSAGE);
                     } else {
                         deck = t;
@@ -140,7 +140,7 @@ public class DeckCreator extends JFrame {
                                 + Utilities.getName(f));
                     } else {
                         JOptionPane.showMessageDialog(DeckCreator.this,
-                                "Deck could not be saved", "Error",
+                                "Deck could not be saved", Main.TITLE,
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }

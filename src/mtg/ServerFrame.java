@@ -46,7 +46,7 @@ public class ServerFrame extends JFrame {
         int choice = 0;
         
         while (true) {
-            choice = JOptionPane.showOptionDialog(parent, conent, "MTG",
+            choice = JOptionPane.showOptionDialog(parent, conent, Main.TITLE,
                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
                     new String[] {"Create", "Cancel"}, 0);
             if (choice != 0) {
@@ -74,17 +74,28 @@ public class ServerFrame extends JFrame {
                             if (deck == null) {
                                 JOptionPane.showMessageDialog(parent,
                                         "Could not load chosen deck",
-                                        "MTG Error", JOptionPane.ERROR_MESSAGE);
+                                        Main.TITLE, JOptionPane.ERROR_MESSAGE);
                             } else {
-                                new game.Client(parent, Settings.getName(), "localhost",
-                                        Integer.parseInt(portField.getText()), deck);
-                                parent.setVisible(false);
+                                try {
+                                    new game.Client(parent, Settings.getName(), "localhost",
+                                            Integer.parseInt(portField.getText()), deck);
+                                    parent.setVisible(false);
+                                } catch (InvalidDeckException ex) {
+                                    Debug.p("Deck rejected by the server: " + ex);
+                                    JOptionPane.showMessageDialog(parent,
+                                            "Your deck has been rejected by the server: "
+                                            + ex.getLocalizedMessage(), Main.TITLE,
+                                            JOptionPane.WARNING_MESSAGE);
+                                    break;
+                                } catch (Exception ex) {
+                                    Debug.p("Could not join a host: " + ex, Debug.CE);
+                                }
                             }
                         }
                         break;
-                    } catch (IOException ex) {
-                        Logger.getLogger(ServerFrame.class.getName()).log(Level.SEVERE, null, ex);
-                        messagesField.setText("Could not create a server:\n" + ex);
+                    } catch (IOException ex1) {
+//                        Logger.getLogger(ServerFrame.class.getName()).log(Level.SEVERE, null, ex1);
+                        messagesField.setText("Could not create a server:\n" + ex1);
                         allOK = false;
                     }
                 }

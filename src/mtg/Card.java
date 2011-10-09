@@ -47,18 +47,18 @@ public final class Card extends JLabel {
      * File with card's image.
      */
     private File image;
-    private boolean tapped;
     private int xpos;
     private int ypos;
     private String ID;
 
     private Card() {}
 
-    public Card(File image, String ID) {
+    public Card(String path, String ID) {
         super();
 
-        this.image = image;
-        this.tapped = true;
+        if (path != null) {
+            this.image = new File(path);
+        }
         this.ID = ID;
 
         this.addMouseWheelListener(new MouseWheelListener() {
@@ -72,19 +72,13 @@ public final class Card extends JLabel {
             }
         });
 
-        this.untap();
-    }
-
-    public Card(File image) {
-        this(image, null);
+        if (path != null) {
+            this.setIcon(new ImageIcon(Utilities.resize(this.load(), W, H)));
+        }
     }
 
     public Card(String path) {
-        this(new File(path));
-    }
-
-    public Card(String path, String ID) {
-        this(new File(path), ID);
+        this(path, null);
     }
 
     /**
@@ -129,17 +123,10 @@ public final class Card extends JLabel {
         Rectangle r = this.getBounds();
         xpos = x;
         ypos = y;
-        if (tapped) {
-            r.x = x - H / 2;
-            r.y = y - W / 2;
-            r.width = H;
-            r.height = W;
-        } else {
-            r.x = x - W / 2;
-            r.y = y - H / 2;
-            r.width = W;
-            r.height = H;
-        }
+        r.x = x - W / 2;
+        r.y = y - H / 2;
+        r.width = W;
+        r.height = H;
         this.setBounds(r);
     }
 
@@ -169,40 +156,10 @@ public final class Card extends JLabel {
         return ypos;
     }
 
-    /**
-     * Returns true if the card is tapped, false otherwise.
-     * @return true if the card is tapped, false otherwise
-     */
-    public boolean isTapped() {
-        return tapped;
-    }
-
-    /**
-     * Taps the card. Does nothing if the card is already tapped.
-     */
-    public void tap() {
-        if (!tapped) {
-            this.tapped = true;
-            this.setIcon(new ImageIcon(rotate(resize(this.load()))));
-            this.setCardPosition(this.xpos, this.ypos);
-        }
-    }
-
-    /**
-     * Untaps the card. Does nothing if the card is already untapped.
-     */
-    public void untap() {
-        if (tapped) {
-            this.tapped = false;
-            this.setIcon(new ImageIcon(resize(this.load())));
-            this.setCardPosition(this.xpos, this.ypos);
-        }
-    }
-
     public String getID() {
         return ID;
     }
-
+    
     /**
      * Displays new, undecorated JFrame with original (not resized) image in
      * the centre of a screen. Frame is disposed when mouse button is released
@@ -247,7 +204,6 @@ public final class Card extends JLabel {
         
         return frame;
     }
-
 
     ///// OVERRIDES /////
 
@@ -306,40 +262,6 @@ public final class Card extends JLabel {
                 || name.equalsIgnoreCase("swamp")
                 || name.equalsIgnoreCase("mountain")
                 || name.equalsIgnoreCase("forest");
-    }
-
-    /**
-     * Resizes BufferedImage to height equal <code>Card.H</code> and
-     * width equal <code>Card.W</code>
-     * @param org original BufferedImage
-     * @return scaled BufferedImage
-     */
-    public static BufferedImage resize(BufferedImage org) {
-        BufferedImage scaledImage = new BufferedImage(
-                W, H, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = scaledImage.createGraphics();
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        graphics2D.drawImage(org, 0, 0, W, H, null);
-        graphics2D.dispose();
-        return scaledImage;
-    }
-
-    /**
-     * Rotates the BufferedImage with height equal <code>Card.H</code>
-     * and width equal <code>Card.W</code> by 90 degrees
-     * @param org original BufferedImage of sizes Card.H x Card.W
-     * @return rotated BufferedImage with width equal <code>Card.H</code>
-     * and height equal <code>Card.W</code>
-     */
-    private static BufferedImage rotate(BufferedImage org) {
-        BufferedImage rotated = new BufferedImage(
-            H, W, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = rotated.createGraphics();
-        graphics2D.rotate(Math.toRadians(90), H / 2, H / 2);
-        graphics2D.drawImage(resize(org), 0, 0, W, H, 0, 0, W, H, null);
-        graphics2D.dispose();
-        return rotated;
     }
 
 }

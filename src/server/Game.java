@@ -1,8 +1,10 @@
 package server;
 
+import java.util.Random;
 import java.util.TreeMap;
 import mtg.Debug;
 import mtg.Deck;
+import server.flags.CreateToken;
 
 /**
  * @author Jaroslaw Pawlak
@@ -23,6 +25,7 @@ class Game {
     private Collection table;
     private int[] health;
     private int[] poison;
+    private int[] tokens;
 
     private TreeMap<String, String> cardsList;
 
@@ -39,6 +42,7 @@ class Game {
             health[i] = 20;
         }
         poison = new int[decks.length];
+        tokens = new int[decks.length];
 
         cardsList = new TreeMap<>();
 
@@ -315,6 +319,10 @@ class Game {
         } else {
             return false;
         }
+    }
+
+    synchronized String handRandomCard(int player) {
+        return hand[player].get(new Random().nextInt(hand[player].getSize())).ID;
     }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -612,6 +620,33 @@ class Game {
         table.transferCardsTo(exiled[player], player);
         health[player] = 0;
         poison[player] = 0;
+    }
+
+    synchronized String[] restart(int player) {
+        hand[player].transferCardsTo(library[player], player);
+        graveyard[player].transferCardsTo(library[player], player);
+        exiled[player].transferCardsTo(library[player], player);
+        table.transferCardsTo(library[player], player);
+        health[player] = 20;
+        poison[player] = 0;
+        
+        library[player].shuffle();
+        
+        int size = library[player].getSize() < 7? library[player].getSize() : 7;
+        String[] result = new String[size];
+        for (int i = 0; i < 7; i++) {
+            Card c = library[player].removeLast();
+            hand[player].addCard(c);
+            result[i] = c.ID;
+        }
+        
+        return result;
+    }
+    
+    synchronized String createToken(CreateToken ct) {
+        String r = (char) ('A' + ct.requestor) + "X" + tokens[ct.requestor]++;
+        table.addCard(new Card("token \"ct.name\"", r));
+        return r;
     }
 
 }

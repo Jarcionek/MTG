@@ -11,8 +11,8 @@ public class DragCard extends Action {
     public int newxpos;
     public int newypos;
 
-    public DragCard(int requestor, String ID, int newxpos, int newypos) {
-        super(requestor);
+    public DragCard(String ID, int newxpos, int newypos) {
+        super(-1);
         this.ID = ID;
         this.newxpos = newxpos;
         this.newypos = newypos;

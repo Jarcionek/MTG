@@ -134,7 +134,7 @@ public class Deck implements Serializable {
         if (amounts.get(t) == 0) {
             return 2;
         }
-        if (!isBasicLand(name) && amounts.get(t) > 4) {
+        if (!Card.isBasicLand(name) && amounts.get(t) > 4) {
             return 3;
         }
         return 4;
@@ -175,14 +175,6 @@ public class Deck implements Serializable {
             paths.set(i, t);
         }
         return t;
-    }
-
-    private boolean isBasicLand(String name) {
-        return name.equalsIgnoreCase("plains")
-                || name.equalsIgnoreCase("island")
-                || name.equalsIgnoreCase("swamp")
-                || name.equalsIgnoreCase("mountain")
-                || name.equalsIgnoreCase("forest");
     }
 
     /**
@@ -227,6 +219,21 @@ public class Deck implements Serializable {
     }
 
     /**
+     * In case of accessing <code>paths</code> after serialization.
+     * This method creates <code>paths</code> ArrayList (if missing)
+     * and adds nulls if <code>paths'</code> size is smaller than
+     * <code>names'</code> size.
+     */
+    private void checkPaths() {
+        if (paths == null) {
+            paths = new ArrayList<>(getArraySize());
+        }
+        for (int i = paths.size(); i < getArraySize(); i++) {
+            paths.add(i, null);
+        }
+    }
+
+    /**
      * Loads a deck from text file given
      * @param file file to load a deck from
      * @return deck or null if loading failed
@@ -253,19 +260,26 @@ public class Deck implements Serializable {
         }
         return null;
     }
-
-    /**
-     * In case of accessing <code>paths</code> after serialization.
-     * This method creates <code>paths</code> ArrayList (if missing)
-     * and adds nulls if <code>paths'</code> size is smaller than
-     * <code>names'</code> size.
-     */
-    private void checkPaths() {
-        if (paths == null) {
-            paths = new ArrayList<>(getArraySize());
+    
+    public static void check(Deck deck) throws InvalidDeckException {
+        if (deck.amounts.size() != deck.names.size()) {
+            throw new InvalidDeckException("Number of amounts and names differ");
         }
-        for (int i = paths.size(); i < getArraySize(); i++) {
-            paths.add(i, null);
+        
+        int total = 0;
+        for (int i = 0; i < deck.amounts.size(); i++) {
+            if (deck.amounts.get(i) > 4 && !Card.isBasicLand(deck.names.get(i))) {
+                throw new InvalidDeckException("More than 4 instances of \""
+                        + deck.names.get(i) + "\"");
+            } else if (deck.amounts.get(i) < 0) {
+                throw new InvalidDeckException("Negative number of instances "
+                        + "of \"" + deck.names.get(i) + "\"");
+            }
+            total += deck.amounts.get(i);
+        }
+        
+        if (total < 60) {
+            throw new InvalidDeckException("Less than 60 cards in deck");
         }
     }
 }

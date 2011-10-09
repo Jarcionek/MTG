@@ -1,5 +1,8 @@
 package mtg;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -197,5 +200,42 @@ public class Utilities {
             name = name.substring(0, 15);
         }
         return name;
+    }
+
+    /**
+     * Resizes BufferedImage to height equal <code>h</code> and
+     * width equal <code>w</code>
+     * @param org original BufferedImage
+     * @param w requested width
+     * @param h requested height
+     * @return scaled BufferedImage
+     */
+    public static BufferedImage resize(BufferedImage org, int w, int h) {
+        BufferedImage scaledImage = new BufferedImage(
+                w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = scaledImage.createGraphics();
+        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics2D.drawImage(org, 0, 0, w, h, null);
+        graphics2D.dispose();
+        return scaledImage;
+    }
+
+    /**
+     * Resizes and rotates the BufferedImage by 90 degrees.
+     * @param org original BufferedImage
+     * @param w requested width
+     * @param h requested height
+     * @return rotated BufferedImage with width equal <code>h</code>
+     * and height equal <code>w</code>
+     */
+    public static BufferedImage rotate(BufferedImage org, int w, int h) {
+        BufferedImage rotated = new BufferedImage(
+            h, w, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = rotated.createGraphics();
+        graphics2D.rotate(Math.toRadians(90), h / 2, h / 2);
+        graphics2D.drawImage(resize(org, w, h), 0, 0, w, h, 0, 0, w, h, null);
+        graphics2D.dispose();
+        return rotated;
     }
 }

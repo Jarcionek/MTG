@@ -3,8 +3,6 @@ package game;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -14,30 +12,33 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.util.TreeMap;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import mtg.Card;
 import mtg.Main;
 import mtg.Utilities;
 import mtg.Zone;
+import server.flags.CreateToken;
+import server.flags.Message;
+import server.flags.RandomValue;
+import server.flags.RandomCard;
+import server.flags.Restart;
+import server.flags.UntapAll;
 
 /**
  * @author Jaroslaw Pawlak
  */
-public class Game extends JFrame {
+class Game extends JFrame {
     static Client client;
 
     private Table table;
@@ -45,14 +46,21 @@ public class Game extends JFrame {
     private PlayerInfo[] playersInfo;
     private CurrentPlayerLibrary playerLibrary;
     private Logger logger;
+    private JTextField chat;
     
     private JButton exit;
+    private JButton restart;
+    private JButton coin;
+    private JButton die;
+    private JButton token;
+    private JButton rand;
+    private JButton untapAll;
 
     private static TreeMap<String, String> list;
 
     private Game() {}
 
-    public Game(int players, final Client client) {
+    Game(int players, final Client client) {
         super(Main.TITLE);
         Game.client = client;
 
@@ -79,15 +87,7 @@ public class Game extends JFrame {
     }
 
     private void createGUIComponents(int players) {
-        if (players == 2) {
-            table = new Table(Table.TWO_PLAYERS);
-        } else if (players <= 4) {
-            table = new Table(Table.FOUR_PLAYERS);
-        } else if (players <= 6) {
-            table = new Table(Table.SIX_PLAYERS);
-        } else {
-            table = new Table(Table.EIGHT_PLAYERS);
-        }
+        table = new Table();
 
         hand = new CardViewer(new InSearcherMouseAdapter(Zone.HAND));
 
@@ -105,8 +105,91 @@ public class Game extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                client.closeClient();
-                Game.this.dispose();
+                if (JOptionPane.showConfirmDialog(Game.this,
+                        "Are you sure that you want\nto leave the game?",
+                        Main.TITLE, JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE)
+                        == JOptionPane.YES_OPTION) {
+                    client.closeClient();
+                    Game.this.dispose();
+                }
+            }
+        });
+        
+        restart = new JButton("Restart");
+        restart.setFocusable(false);
+        restart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (JOptionPane.showConfirmDialog(Game.this,
+                        "Are you sure that you want to shuffle all your cards\n"
+                        + "into your library and draw seven cards?\n"
+                        + "This will also destroy all your tokens and reset "
+                        + "your health.",
+                        Main.TITLE, JOptionPane.YES_NO_OPTION,
+                        JOptionPane.PLAIN_MESSAGE)
+                        == JOptionPane.YES_OPTION) {
+                    client.send(new Restart());
+                }
+            }
+        });
+        
+        coin = new JButton("Toss a coin");
+        coin.setFocusable(false);
+        coin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.send(new RandomValue(RandomValue.COIN));
+            }
+        });
+        
+        die = new JButton("Roll a die");
+        die.setFocusable(false);
+        die.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.send(new RandomValue(RandomValue.DIE));
+            }
+        });
+        
+        chat = new JTextField();
+        chat.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (chat.getText() != null && !chat.getText().equals("")) {
+                    client.send(new Message(chat.getText()));
+                    chat.setText("");
+                }
+            }
+        });
+        
+        token = new JButton("Create token");
+        token.setFocusable(false);
+        token.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CreateToken ct = TokenCreator.show(Game.this);
+                if (ct != null) {
+                    client.send(ct);
+                }
+            }
+        });
+        
+        rand = new JButton("<html>Choose random card<br>from your hand</html>");
+        rand.setFocusable(false);
+        rand.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.send(new RandomCard());
+            }
+        });
+        
+        untapAll = new JButton("Untap all");
+        untapAll.setFocusable(false);
+        untapAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.send(new UntapAll());
             }
         });
     }
@@ -127,8 +210,12 @@ public class Game extends JFrame {
                 playersInfoScrollPane.getPreferredSize().width + 20,
                 playersInfoScrollPane.getPreferredSize().height));
 
+        JPanel loggerAndChat = new JPanel(new BorderLayout(0, 0));
+        loggerAndChat.add(logger, BorderLayout.CENTER);
+        loggerAndChat.add(chat, BorderLayout.SOUTH);
+        
         JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                playersInfoScrollPane, logger);
+                playersInfoScrollPane, loggerAndChat);
 
         JPanel handPanel = new JPanel(new GridLayout(1, 1));
         handPanel.add(hand);
@@ -149,11 +236,18 @@ public class Game extends JFrame {
                 BorderFactory.createEmptyBorder(b, b, b, b)));
         c.insets = new Insets(outside, outside, between, outside);
         leftInnerPanel.add(title, c);
+        c.insets = new Insets(0, outside, between, outside);
+        leftInnerPanel.add(untapAll, c);
+        leftInnerPanel.add(token, c);
+        leftInnerPanel.add(rand, c);
+        leftInnerPanel.add(coin, c);
+        leftInnerPanel.add(die, c);
+        leftInnerPanel.add(restart, c);
         c.insets = new Insets(0, outside, outside, outside);
         leftInnerPanel.add(exit, c);
         
         JPanel leftOuterPanel = new JPanel(new BorderLayout());
-        leftOuterPanel.add(leftInnerPanel, BorderLayout.NORTH);
+        leftOuterPanel.add(leftInnerPanel, BorderLayout.CENTER);
         
         
         JPanel bottom = new JPanel(new BorderLayout());
@@ -180,9 +274,9 @@ public class Game extends JFrame {
         return table;
     }
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// INIT /////////////////////////////////////
 
-    public void addPlayer(String name) {
+    void addPlayer(String name) {
         for (int i = 0; i < playersInfo.length; i++) {
             if (playersInfo[i].nameLabel.getText().equals("...waiting...")) {
                 playersInfo[i].nameLabel.setText(name);
@@ -191,7 +285,7 @@ public class Game extends JFrame {
         }
     }
 
-    public void setPlayerLibrarySize(String playerName, int size) {
+    void setPlayerLibrarySize(String playerName, int size) {
         for (int i = 0; i < playersInfo.length; i++) {
             if (playersInfo[i].nameLabel.getText().equals(playerName)) {
                 playersInfo[i].handSizeValue.setText("0");
@@ -202,45 +296,58 @@ public class Game extends JFrame {
         }
     }
 
-    public void setCardsList(TreeMap<String, String> list) {
+    void setCardsList(TreeMap<String, String> list) {
         Game.list = list;
     }
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// GUI MUTATORS /////////////////////////////////
+    
+    void createToken(CreateToken ct) {
+        table.addCard(new Token(ct));
+    }
 
-    public void cardAddToHand(String ID) {
+    void cardAddToHand(String ID) {
         Card c = new Card(Utilities.findPath(list.get(ID)), ID);
         hand.addCard(c);
         hand.showCards(c);
     }
 
-    public void cardRemoveFromHand(String ID) {
-        hand.removeCard(new Card(Utilities.findPath(list.get(ID)), ID));
+    void cardRemoveFromHand(String ID) {
+        hand.removeCard(new Card(null, ID));
+        hand.showCards(null);
+    }
+    
+    void cardDiscardEntireHand() {
+        hand.removeAllCards();
         hand.showCards(null);
     }
 
-    public void cardAddToTable(String ID) {
-        table.addCard(new Card(Utilities.findPath(list.get(ID)), ID));
+    void cardAddToTable(String ID) {
+        table.addCard(new TCard(Utilities.findPath(list.get(ID)), ID));
     }
 
-    public void cardRemoveFromTable(String ID) {
+    void cardRemoveFromTable(String ID) {
         table.removeCard(ID);
     }
 
-    public void cardDragOnTable(String ID, int newx, int newy) {
+    void cardDragOnTable(String ID, int newx, int newy) {
         table.dragCard(ID, newx, newy);
     }
 
-    public void cardTap(String ID, boolean tapped) {
+    void cardTap(String ID, boolean tapped) {
         table.tapCard(ID, tapped);
     }
+    
+    void cardUntapAll(int player) {
+        table.untapAll(player);
+    }
 
-    public void changeLibrarySize(int player, int by) {
+    void changeLibrarySize(int player, int by) {
         JLabel t = playersInfo[player].librarySizeValue;
         t.setText("" + (Integer.parseInt(t.getText()) + by));
     }
 
-    public void changeHandSize(int player, int by) {
+    void changeHandSize(int player, int by) {
         JLabel t = playersInfo[player].handSizeValue;
         t.setText("" + (Integer.parseInt(t.getText()) + by));
     }
@@ -251,7 +358,7 @@ public class Game extends JFrame {
      * @param newValue new health
      * @return old health
      */
-    public int playerSetHealth(int player, int newValue) {
+    int playerSetHealth(int player, int newValue) {
         int t = Integer.parseInt(playersInfo[player].healthPointsValue.getText());
         playersInfo[player].healthPointsValue.setText("" + newValue);
         return t;
@@ -263,7 +370,7 @@ public class Game extends JFrame {
      * @param newValue new amount of poison counters
      * @return old amount of poison counters
      */
-    public int playerSetPoison(int player, int newValue) {
+    int playerSetPoison(int player, int newValue) {
         int t = Integer.parseInt(playersInfo[player].poisonCountersValue.getText());
         playersInfo[player].poisonCountersValue.setText("" + newValue);
         return t;
@@ -278,22 +385,35 @@ public class Game extends JFrame {
         playersInfo[player].poisonCountersValue.setText("0");
         table.removeCards(player);
     }
-
-////////////////////////////////////////////////////////////////////////////////
-
-    public void log(String first, String second, Color color) {
-        logger.log(first, second, color);
+    
+    void restart(int player, int deckSize) {
+        playersInfo[player].healthPointsValue.setText("20");
+        playersInfo[player].librarySizeValue.setText("" + (deckSize - 7));
+        playersInfo[player].poisonCountersValue.setText("0");
+        playersInfo[player].handSizeValue.setText("7");
+        table.removeCards(player);
     }
 
-    public void log(String cardID, boolean onTable, String text, Color color) {
+/////////////////////////// LOGGING AND INFORMATION ////////////////////////////
+
+    void log(String first, String second, Color color) {
+        logger.log(first == null? "" : first, second, color);
+    }
+
+    void log(String cardID, boolean onTable, String text, Color color) {
         logger.log(cardID, onTable, text, color);
     }
 
-    public static String getCardName(String cardID) {
-        return list.get(cardID);
+    String getPlayerName(int i) {
+        return playersInfo[i].nameLabel.getText();
     }
 
-    public String getPlayerName(int i) {
-        return playersInfo[i].nameLabel.getText();
+    static String getCardName(String cardID) {
+        String r = list.get(cardID);
+        if (r == null) {
+            return "token";
+        } else {
+            return r;
+        }
     }
 }

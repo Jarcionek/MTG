@@ -3,7 +3,6 @@ package mtg;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -45,8 +44,71 @@ public class Resources {
         "Sword of War and Peace.jpg",
         "Trusty Machete.jpg",
     };
-    private static String[] realmOfIllusionCards = {};
-    private static String[] strengthOfStoneCards = {};
+    private static String[] realmOfIllusionCards = {
+        "Æther Adept.jpg",
+        "Æther Figment.jpg",
+        "Air Elemental.jpg",
+        "Blind Phantasm.jpg",
+        "Cancel.jpg",
+        "Concentrate.jpg",
+        "Counterspell.jpg",
+        "Disorient.jpg",
+        "Divination.jpg",
+        "Drake Umbra.jpg",
+        "Evacuation.jpg",
+        "Fleeting Distraction.jpg",
+        "Island.jpg",
+        "Jace's Ingenuity.jpg",
+        "Kraken's Eye.jpg",
+        "Krovikan Mist.jpg",
+        "Lord of the Unreal.jpg",
+        "Mahamoti Djinn.jpg",
+        "Mind Control.jpg",
+        "Mind Spring.jpg",
+        "Phantasmal Bear.jpg",
+        "Phantasmal Dragon.jpg",
+        "Phantom Beast.jpg",
+        "Phantom Warrior.jpg",
+        "Prosperity.jpg",
+        "Quicksilver Geyser.jpg",
+        "Repulse.jpg",
+        "Sower of Temptation.jpg",
+        "Summoner's Bane.jpg",
+        "Time Warp.jpg",
+        "Wall of Air.jpg",
+    };
+    private static String[] strengthOfStoneCards = {
+        "Act of Treason.jpg",
+        "Assault Strobe.jpg",
+        "Bloodfire Colossus.jpg",
+        "Cerebral Eruption.jpg",
+        "Claws of Valakut.jpg",
+        "Conquering Manticore.jpg",
+        "Darksteel Axe.jpg",
+        "Earth Elemental.jpg",
+        "Earth Servant.jpg",
+        "Fault Line.jpg",
+        "Flameborn Hellion.jpg",
+        "Flowstone Overseer.jpg",
+        "Goblin Mountaineer.jpg",
+        "Golden Urn.jpg",
+        "Grim Lavamancer.jpg",
+        "Hero of Oxid Ridge.jpg",
+        "Koth's Courier.jpg",
+        "Lavaborn Muse.jpg",
+        "Magma Phoenix.jpg",
+        "Molten Ravager.jpg",
+        "Mountain.jpg",
+        "Oxidda Scrapmelter.jpg",
+        "Rockslide Elemental.jpg",
+        "Spikeshot Elder.jpg",
+        "Spire Barrage.jpg",
+        "Spitting Earth.jpg",
+        "Tephraderm.jpg",
+        "Volcanic Strength.jpg",
+        "Vulshok Berserker.jpg",
+        "Vulshok Heartstoker.jpg",
+    };
     private static String[] guardiansOfTheWoodCards = {
         "Elven Riders.jpg",
         "Elvish Eulogist.jpg",
@@ -111,7 +173,37 @@ public class Resources {
         "Ulamog, the Infinite Gyre.jpg",
         "Yavimaya's Embrace.jpg",
     };
-    private static String[] dragonsRoarCards = {};
+    private static String[] dragonsRoarCards = {
+        "Assassinate.jpg",
+        "Burst Lightning.jpg",
+        "Crucible of Fire.jpg",
+        "Disfigure.jpg",
+        "Dragon Fodder.jpg",
+        "Dragon's Claw.jpg",
+        "Dragonmaster Outcast.jpg",
+        "Dragonspeaker Shaman.jpg",
+        "Festering Goblin.jpg",
+        "Flameblast Dragon.jpg",
+        "Furnace Whelp.jpg",
+        "Furyborn Hellkite.jpg",
+        "Giant Scorpion.jpg",
+        "Goblin Offensive.jpg",
+        "Goblin Piker.jpg",
+        "Goblin Wardrive.jpg",
+        "Gravedigger.jpg",
+        "Hellkite Charger.jpg",
+        "Manic Vandal.jpg",
+        "Mountain.jpg",
+        "Pyroclasm.jpg",
+        "Raging Goblin.jpg",
+        "Rally the Forces.jpg",
+        "Rorix Bladewing.jpg",
+        "Ruby Medallion.jpg",
+        "Slavering Nulls.jpg",
+        "Swamp.jpg",
+        "Volcanic Dragon.jpg",
+        "Voracious Dragon.jpg",
+    };
     private static String[] blooHungerCards = {
         "Barony Vampire.jpg",
         "Blade of the Bloodchief.jpg",
@@ -182,8 +274,69 @@ public class Resources {
         "Venser's Journal.jpg",
         "Wurmcoil Engine.jpg",
     };
-    private static String[] unquenchableCards = {};
-    private static String[] apexPredatorsCards = {};
+    private static String[] unquenchableCards = {
+        "Banefire.jpg",
+        "Blaze.jpg",
+        "Chandra's Outrage.jpg",
+        "Chandra's Phoenix.jpg",
+        "Cinder Wall.jpg",
+        "Dragon's Claw.jpg",
+        "Ember Shot.jpg",
+        "Fiery Hellhound.jpg",
+        "Fire Elemental.jpg",
+        "Fire Servant.jpg",
+        "Flame Slash.jpg",
+        "Flame Wave.jpg",
+        "Flameblast Dragon.jpg",
+        "Flamekin Brawler.jpg",
+        "Flametongue Kavu.jpg",
+        "Goblin Arsonist.jpg",
+        "Goblin War Paint.jpg",
+        "Incinerate.jpg",
+        "Inferno Titan.jpg",
+        "Kiln Fiend.jpg",
+        "Lava Axe.jpg",
+        "Mountain.jpg",
+        "Prodigal Pyromancer.jpg",
+        "Punishing Fire.jpg",
+        "Pyroclasm.jpg",
+        "Relentless Assault.jpg",
+        "Sizzle.jpg",
+        "Volcanic Hammer.jpg",
+        "Wheel of Fortune.jpg",
+    };
+    private static String[] apexPredatorsCards = {
+        "Beast Hunt.jpg",
+        "Borderland Ranger.jpg",
+        "Centaur Courser.jpg",
+        "Craw Wurm.jpg",
+        "Cudgel Troll.jpg",
+        "Dungrove Elder.jpg",
+        "Elephant Guide.jpg",
+        "Engulfing Slagwurm.jpg",
+        "Forest.jpg",
+        "Gaea's Revenge.jpg",
+        "Garruk's Companion.jpg",
+        "Garruk's Packleader.jpg",
+        "Giant Growth.jpg",
+        "Giant Spider.jpg",
+        "Grazing Gladehart.jpg",
+        "Hunted Wumpus.jpg",
+        "Hunters' Feast.jpg",
+        "Lead the Stampede.jpg",
+        "Leatherback Baloth.jpg",
+        "Multani, Maro-Sorcerer.jpg",
+        "Nature's Lore.jpg",
+        "Overrun.jpg",
+        "Rites of Flourishing.jpg",
+        "Runeclaw Bear.jpg",
+        "Serrated Arrows.jpg",
+        "Stomper Cub.jpg",
+        "Terra Stomper.jpg",
+        "Thrun, the last Troll.jpg",
+        "Wall of Vines.jpg",
+        "Wolfbriar Elemental.jpg",
+    };
     
     static void saveExampleCards() {
         File examples = new File(Main.CARDS, "Example");
@@ -241,12 +394,17 @@ public class Resources {
 
     static void saveExampleDecks() {
         String[] decks = {
+            "Apex Predators.txt",
             "Ancient Depths.txt",
             "Blood Hunger.txt",
+            "Dragon's Roar.txt",
             "Guardians of the Wood.txt",
             "Machinations.txt",
+            "Realm of Illusion.txt",
+            "Strength of Stone.txt",
+            "Unquenchable Fire.txt",
             "Wielding Steel.txt",
-        }; //TODO more decks!
+        };
 
         for (String e : decks) {
             save("/resources/decks/" + e, new File(Main.DECKS, e));
@@ -266,7 +424,7 @@ public class Resources {
             }
             bos.close();
             is.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Debug.p("Resource " + resource + " could not be saved: "
                     + ex, Debug.E);
         }

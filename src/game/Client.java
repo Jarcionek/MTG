@@ -1,7 +1,5 @@
 package game;
 
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 import java.awt.Color;
 import server.flags.*;
 import java.io.File;
@@ -9,10 +7,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import mtg.Debug;
 import mtg.Deck;
+import mtg.InvalidDeckException;
 import mtg.Main;
 import mtg.Utilities;
 import mtg.Zone;
@@ -49,7 +49,9 @@ public class Client extends Thread {
      * not send player's name and deck or could not receive file transfer port
      */
     public Client(JFrame parent, String playerName, String ip, int port, Deck deck)
-            throws IOException {
+            throws IOException, ClassNotFoundException, InvalidDeckException {
+        super("Client");
+    
         this.s = new Socket(ip, port);
         this.serverIP = ip;
         this.parentFrame = parent;
@@ -61,10 +63,18 @@ public class Client extends Thread {
         oos.flush();
 
         ois = new ObjectInputStream(s.getInputStream());
+        
         try {
-            this.playerName = (String) ois.readObject();
-        } catch (ClassNotFoundException ex) {
-            Debug.p("Client: Error while receiving name from server", Debug.E);
+            Object obj = ois.readObject();
+            if (obj.getClass().equals(InvalidDeckException.class)) {
+                throw (InvalidDeckException) obj;
+            }
+            this.playerName = (String) obj;
+        } catch (ClassNotFoundException | InvalidDeckException ex) {
+            try {
+                this.s.close();
+            } catch (Exception ex1) {}
+            throw ex;
         }
         fileTransferPort = ois.readInt();
         int players = ois.readInt();
@@ -83,8 +93,14 @@ public class Client extends Thread {
                 object = (Action) ois.readObject();
                 Debug.p("Client: Client received: " + object);
 
+                // MESSAGE
+                if (object.getClass().equals(Message.class)) {
+                    Message m = (Message) object;
+                    g.log(g.getPlayerName(m.requestor) + ":", m.msg,
+                            Logger.C_MESSAGE);
+                    
                 // DRAG
-                if (object.getClass().equals(DragCard.class)) {
+                } else if (object.getClass().equals(DragCard.class)) {
                     DragCard dc = (DragCard) object;
                     g.log(dc.ID, true, g.getPlayerName(dc.requestor)
                             + " drags " + Game.getCardName(dc.ID), game.Logger.C_DRAG);
@@ -125,6 +141,12 @@ public class Client extends Thread {
                                 + g.playerSetPoison(p.target, p.newValue)
                                 + " to " + p.newValue, game.Logger.C_CHANGE_HP);
                     }
+
+                // UNTAP ALL
+                } else if (object.getClass().equals(UntapAll.class)) {
+                    g.log("", g.getPlayerName(object.requestor)
+                            + " untaps all cards he owns", Logger.C_TAP);
+                    g.cardUntapAll(object.requestor);
 
                 // SEARCH
                 } else if (object.getClass().equals(Search.class)) {
@@ -189,7 +211,53 @@ public class Client extends Thread {
                                 + " reveals top card of his library: "
                                 + Game.getCardName(r.cardID), game.Logger.C_REVEAL);
                     }
-
+                    
+                // CREATE TOKEN
+                } else if (object.getClass().equals(CreateToken.class)) {
+                    CreateToken ct = (CreateToken) object;
+                    g.log(null, g.getPlayerName(ct.requestor) + " creates "
+                            + "a token " + ct.name, Logger.C_MOVE_PLAY);
+                    g.createToken(ct);
+                    
+                // RAND
+                } else if (object.getClass().equals(RandomValue.class)) {
+                    RandomValue rv = (RandomValue) object;
+                    String text = g.getPlayerName(rv.requestor);
+                    if (rv.max == RandomValue.COIN) {
+                        text += " tosses a coin and gets: ";
+                        if (rv.value == 0) {
+                            text += "head";
+                        } else if (rv.value == 1) {
+                            text += "tail";
+                        }
+                    } else if (rv.max == RandomValue.DIE) {
+                        text += " rolls a die and gets: ";
+                        text += (rv.value + 1);
+                    } else {
+                        text += " rolls a " + rv.max + "-sided die and gets: ";
+                        text += (rv.value + 1);
+                    }
+                    g.log(null, true, text, Logger.C_RANDOM);
+                    
+                // RESTART
+                } else if (object.getClass().equals(Restart.class)) {
+                    Restart r = (Restart) object;
+                    g.log(null, g.getPlayerName(r.requestor) + " starts a game "
+                            + "again", Logger.C_RESTART);
+                    g.restart(r.requestor, r.deckSize);
+                    if (r.IDs != null) {
+                        g.cardDiscardEntireHand();
+                        for (int i = 0; i < r.IDs.length; i++) {
+                            g.cardAddToHand(r.IDs[i]);
+                        }
+                    }
+                // RANDOM CARD
+                } else if (object.getClass().equals(RandomCard.class)) {
+                    RandomCard rc = (RandomCard) object;
+                    g.log(rc.cardID, false, g.getPlayerName(rc.requestor)
+                            + " choses a card at random from his hand: "
+                            + Game.getCardName(rc.cardID), Logger.C_REVEAL);
+                    
                 // REQUEST CARD - server requests client to send card's image
                 } else if (object.getClass().equals(RequestCard.class)) {
                     RequestCard t = (RequestCard) object;
@@ -231,16 +299,16 @@ public class Client extends Thread {
                     Disconnect d = (Disconnect) object;
                     if (d.requestor == -1) {
                         JOptionPane.showMessageDialog(parentFrame,
-                                "Server has been closed", "MTG",
+                                "Server has been closed", Main.TITLE,
                                 JOptionPane.ERROR_MESSAGE);
                         s.close();
                         g.dispose();
                         parentFrame.setVisible(true);
                         return;
                     }
-                    String text = d.intentional? "has left the game" :
-                            "has lost connection";
-                    g.log(null, false, g.getPlayerName(d.requestor) + " " + text,
+                    String text = d.intentional? " has left the game" :
+                            " has lost connection";
+                    g.log(null, false, g.getPlayerName(d.requestor) + text,
                             game.Logger.C_DISCONNECT);
                     g.kill(d.requestor);
 
@@ -253,12 +321,16 @@ public class Client extends Thread {
                         ex.getLocalizedMessage() : "") {
                     case "Connection reset":
                         Debug.p("Client: Server closed");
-                        closeClient();
+                        JOptionPane.showMessageDialog(parentFrame,
+                                "Server has been closed unexpectedly", Main.TITLE,
+                                JOptionPane.ERROR_MESSAGE);
+                        g.dispose();
+                        parentFrame.setVisible(true);
                     case "socket closed":
                         //it happens when client has been closed
                         return;
                     default:
-                        //Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                        java.util.logging.Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                         Debug.p("Client: Error while dealing with " + object + ": " + ex,
                                 Debug.E);
                         break;
@@ -332,6 +404,12 @@ public class Client extends Thread {
                 }
                 break;
             case TABLE:
+                if (mc.cardID.charAt(1) == 'X') { //token
+                    g.log(null, g.getPlayerName(mc.requestor) + " destroyes "
+                            + owner + " token", Logger.C_MOVE_DESTROY);
+                    g.cardRemoveFromTable(mc.cardID);
+                    break;
+                }
                 switch (mc.destination) {
                     case HAND:
                         g.changeHandSize(mc.requestor, 1);
@@ -339,7 +417,7 @@ public class Client extends Thread {
                                     + " returns " + Game.getCardName(mc.cardID)
                                     + " from table to " + owner + " hand",
                                 game.Logger.C_MOVE_TO_HAND);
-                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                        if (playerName.equals(g.getPlayerName(mc.cardID.charAt(0) - 'A'))) {
                             g.cardAddToHand(mc.cardID);
                         }
                         break;
@@ -376,7 +454,7 @@ public class Client extends Thread {
                                 + " takes " + Game.getCardName(mc.cardID)
                                 + " from " + owner + " graveyard to his hand",
                                 game.Logger.C_MOVE_PLAY);
-                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                        if (playerName.equals(g.getPlayerName(mc.cardID.charAt(0) - 'A'))) {
                             g.cardAddToHand(mc.cardID);
                         }
                         break;
@@ -404,9 +482,7 @@ public class Client extends Thread {
                                 game.Logger.C_MOVE_TO_LIBRARY);
                         break;
                 }
-                if (playerName.equals(g.getPlayerName(mc.requestor))) {
-                    CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
-                }
+                CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                 break;
             case EXILED:
                 switch (mc.destination) {
@@ -416,7 +492,7 @@ public class Client extends Thread {
                                 + " takes " + Game.getCardName(mc.cardID)
                                 + " from " + owner + " exiled zone to his hand",
                                 game.Logger.C_MOVE_TO_HAND);
-                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                        if (playerName.equals(g.getPlayerName(mc.cardID.charAt(0) - 'A'))) {
                             g.cardAddToHand(mc.cardID);
                         }
                         break;
@@ -445,9 +521,7 @@ public class Client extends Thread {
                                 game.Logger.C_MOVE_TO_LIBRARY);
                         break;
                 }
-                if (playerName.equals(g.getPlayerName(mc.requestor))) {
-                    CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
-                }
+                CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                 break;
             case LIBRARY:
                 switch (mc.destination) {
@@ -469,7 +543,7 @@ public class Client extends Thread {
                                     + " from your library to hand",
                                     game.Logger.C_MOVE_TO_HAND);
                         }
-                        if (playerName.equals(g.getPlayerName(mc.requestor))) {
+                        if (playerName.equals(g.getPlayerName(mc.cardID.charAt(0) - 'A'))) {
                             g.cardAddToHand(mc.cardID);
                         }
                         break;
@@ -513,7 +587,7 @@ public class Client extends Thread {
                         }
                         break;
                 }
-                if (playerName.equals(g.getPlayerName(mc.requestor))
+                if (playerName.equals(g.getPlayerName(mc.cardID.charAt(0) - 'A'))
                         && mc.destination != Zone.TOP_LIBRARY) {
                     CardViewer.removeCardFromCurrentlyOpenCardViewer(mc.cardID);
                 }
@@ -572,7 +646,7 @@ public class Client extends Thread {
     void closeClient() {
         this.interrupt();
         try {
-            send(new Disconnect(-1, true));
+            send(new Disconnect(true));
             s.close();
         } catch (IOException ex1) {}
         parentFrame.setVisible(true);
