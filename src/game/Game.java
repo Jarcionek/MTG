@@ -61,7 +61,7 @@ class Game extends JFrame {
     private Game() {}
 
     Game(int players, final Client client) {
-        super(Main.TITLE);
+        super(Main.TITLE_LONG);
         Game.client = client;
 
         createGUIComponents(players);
@@ -107,7 +107,7 @@ class Game extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (JOptionPane.showConfirmDialog(Game.this,
                         "Are you sure that you want\nto leave the game?",
-                        Main.TITLE, JOptionPane.YES_NO_OPTION,
+                        Main.TITLE_SHORT, JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE)
                         == JOptionPane.YES_OPTION) {
                     client.closeClient();
@@ -126,7 +126,7 @@ class Game extends JFrame {
                         + "into your library and draw seven cards?\n"
                         + "This will also destroy all your tokens and reset "
                         + "your health.",
-                        Main.TITLE, JOptionPane.YES_NO_OPTION,
+                        Main.TITLE_MED, JOptionPane.YES_NO_OPTION,
                         JOptionPane.PLAIN_MESSAGE)
                         == JOptionPane.YES_OPTION) {
                     client.send(new Restart());

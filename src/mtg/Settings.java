@@ -176,7 +176,7 @@ public class Settings {
         });
         message.add(deckButton, s);
         
-        if(JOptionPane.showOptionDialog(parentFrame, message, Main.TITLE,
+        if(JOptionPane.showOptionDialog(parentFrame, message, Main.TITLE_MED,
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
                 new String[] {"Apply", "Cancel"}, 0) == 0) {
             settings.put(NAME, nametf.getText());

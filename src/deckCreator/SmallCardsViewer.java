@@ -24,7 +24,7 @@ import mtg.Card;
  * @author Jaroslaw Pawlak
  */
 public class SmallCardsViewer extends JScrollPane {
-    private SwingWorker t;
+    private SwingWorker swingWorker;
 
     private JPanel panel;
     private List<ViewableCard> cards;
@@ -37,7 +37,7 @@ public class SmallCardsViewer extends JScrollPane {
 
         this.parent = parent;
 
-        t = new SwingWorker() {
+        swingWorker = new SwingWorker() {
 
             @Override
             protected Object doInBackground() throws Exception {
@@ -77,7 +77,7 @@ public class SmallCardsViewer extends JScrollPane {
 
         this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         this.setViewportView(panel);
-        t.execute();
+        swingWorker.execute();
     }
 
     public void addCard(ViewableCard card) {
@@ -96,6 +96,8 @@ public class SmallCardsViewer extends JScrollPane {
                     break;
                 }
             }
+        } else {
+            return; //do not add basic land
         }
         if (!done) {
             cards.add(card);
@@ -108,18 +110,8 @@ public class SmallCardsViewer extends JScrollPane {
                 ViewableCard source = (ViewableCard) e.getSource();
                 if (e.getButton() == MouseEvent.BUTTON1
                         && parent.deck.removeCard(source.getCardName(), 1)) {
-                    cards.remove(source);
-                    panel.remove(source);
-                    panel.setPreferredSize(
-                            new Dimension(Card.W * cards.size(), Card.H));
-                    panel.validate();
-                    panel.repaint();
-                    SmallCardsViewer.this.validate();
-                    SmallCardsViewer.this.repaint();
-                    JLabel t = SmallCardsViewer.this.parent.deckName;
-                    if (!t.getText().endsWith("*")) {
-                        t.setText(t.getText() + "*");
-                    }
+                    removeCard(source);
+                    parent.stats.modifyCard(source.getCardName(), -1);
                 }
             }
         });
@@ -135,8 +127,8 @@ public class SmallCardsViewer extends JScrollPane {
      * disposure of a frame containing this SmallCardsViewer.
      */
     public void close() {
-        if (t != null) {
-            t.cancel(true);
+        if (swingWorker != null) {
+            swingWorker.cancel(true);
         }
     }
 
@@ -148,6 +140,32 @@ public class SmallCardsViewer extends JScrollPane {
             for (int amount = 0; amount < parent.deck.getArrayAmounts(name); amount++) {
                 addCard(new ViewableCard(parent.deck.getArrayFiles(name)));
             }
+        }
+    }
+    
+    boolean removeCard(String name) {
+        if (parent.deck.removeCard(name, 1)) {
+            for (ViewableCard card : cards) {
+                if (card.getCardName().equals(name)) {
+                    removeCard(card);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    private void removeCard(ViewableCard card) {
+        cards.remove(card);
+        panel.remove(card);
+        panel.setPreferredSize(new Dimension(Card.W * cards.size(), Card.H));
+        panel.validate();
+        panel.repaint();
+        SmallCardsViewer.this.validate();
+        SmallCardsViewer.this.repaint();
+        JLabel t = SmallCardsViewer.this.parent.deckName;
+        if (!t.getText().endsWith("*")) {
+            t.setText(t.getText() + "*");
         }
     }
 

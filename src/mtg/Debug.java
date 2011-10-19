@@ -60,7 +60,7 @@ public class Debug {
             }
         } else if (type == CE) {
             JOptionPane.showMessageDialog(null, print("CRITICAL ERROR: " + message),
-                    Main.TITLE, JOptionPane.ERROR_MESSAGE);
+                    Main.TITLE_SHORT, JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         } else {
             if (other) {

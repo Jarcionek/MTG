@@ -4,12 +4,15 @@ import deckCreator.DeckCreator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,8 +30,11 @@ import server.Server;
  * @author Jaroslaw Pawlak
  */
 public class Main extends JFrame {
-    public static final String TITLE = "MTG";
-    public static final String VERSION = "beta 1.2";
+    public static final String TITLE_LONG = "Virtual Magic The Gathering Table";
+    public static final String TITLE_MED = "Virtual MTG Table";
+    public static final String TITLE_SHORT = "VMTGT";
+    public static final String VERSION = "beta 1.3";
+    public static final String DATE = "19.10.2011";
 
     public static final File DIRECTORY
             = new File(System.getProperty("user.dir"), "MTG");
@@ -65,7 +71,7 @@ public class Main extends JFrame {
                     "MTG will be using \n" + DIRECTORY.getPath()
                     + "\nto save files. "
                     + "Do you want to continue?",
-                    TITLE,
+                    TITLE_MED,
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.PLAIN_MESSAGE);
             if (choice != 0) {
@@ -84,7 +90,7 @@ public class Main extends JFrame {
     }
 
     private Main() {
-        super(TITLE);
+        super(TITLE_LONG);
         
         createComponents();
         this.setContentPane(createGUI());
@@ -142,12 +148,18 @@ public class Main extends JFrame {
         
         coming = new JTextArea(
                 "Coming up:\n" +
-                "- more cards and decks\n" +
                 "- putting counters on permanents\n" +
-                "- music\n" +
                 "- better graphics\n" +
-                "- improved deck creator"
+                "- improved token creator\n" +
+                "- archenemy cards\n" +
+                "- searching opponents' libraries\n" +
+                "- putting a card on the\n\tbottom of a library\n" +
+                "- flipping a card and\n\tplaying it face down\n" +
+                "- dragging and (un)tapping\n\tmultiple cards\n" +
+                "- music (?)\n" +
+                ""
                 );
+        coming.setTabSize(4);
         coming.setFocusable(false);
         coming.setEditable(false);
         coming.setOpaque(false);
@@ -159,7 +171,7 @@ public class Main extends JFrame {
         deckCreator.setFocusable(false);
         deckCreator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new DeckCreator(TITLE + ": Deck Creator", Main.this);
+                new DeckCreator(TITLE_LONG + ": Deck Creator", Main.this);
             }
         });
         
@@ -180,7 +192,7 @@ public class Main extends JFrame {
                 if (Server.getStatus() != Server.DEAD) {
                     int c = JOptionPane.showConfirmDialog(Main.this,
                             "Server is already running.\n"
-                            + "Do you want to close it?", Main.TITLE,
+                            + "Do you want to close it?", Main.TITLE_SHORT,
                             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                     if (c == JOptionPane.YES_OPTION) {
                         Server.closeServer();
@@ -219,7 +231,22 @@ public class Main extends JFrame {
         });
         
         background = new JLabel(new ImageIcon(
-                Main.class.getResource("/resources/Background.jpg")));
+                Main.class.getResource("/resources/Background.jpg"))) {
+            @Override
+            public void paint(Graphics g) {
+                super.paint(g);
+                
+                BufferedImage bi = new BufferedImage(300, 400, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2 = bi.createGraphics();
+                g2.setFont(new Font("Arial", Font.BOLD, 35));
+                g2.setColor(new Color(1.0f, 0.3f, 0.3f, 0.95f));
+                g2.rotate(Math.PI * 15/8, 0, bi.getHeight());
+                g2.drawString("Virtual Table", 150, 300);
+                g2.dispose();
+                
+                g.drawImage(bi, 70, 150, null);
+            }
+        };
     }
     
     private JPanel createGUI() {
@@ -300,7 +327,7 @@ public class Main extends JFrame {
             case Server.PLAYERS_CONNECTED:
                 if (JOptionPane.showConfirmDialog(Main.this,
                         "The server is running and the game is in progress.\n"
-                        + "Do you want to exit anyway?", Main.TITLE,
+                        + "Do you want to exit anyway?", Main.TITLE_SHORT,
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
                         != JOptionPane.YES_OPTION) {
                     Server.closeServer();
@@ -311,7 +338,7 @@ public class Main extends JFrame {
                 if (JOptionPane.showConfirmDialog(Main.this,
                         "The server is running, but\n"
                         + "the game has not yet started.\n"
-                        + "Are you sure that you want to exit?", Main.TITLE,
+                        + "Are you sure that you want to exit?", Main.TITLE_SHORT,
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
                         != JOptionPane.YES_OPTION) {
                     Server.closeServer();
@@ -324,13 +351,30 @@ public class Main extends JFrame {
 }
 
 /** //TODO LIST
- * 
- * proof read help
- * 
- * bottom library
- * add +1/+1 and -1/-1 counters to cards
+ * search opponent's library
+ * put card in the bottom of library
+ * add +1/+1, -1/-1 and some other counters to cards
  * restart with specified number of cards
  * splash screen
+ * add some nice tokens: http://magiccards.info/extras.html
+ * play card face down
+ * flip card
+ * on table card should be enlarged with mouse wheel as they are in hand
+ * token creator, copy card on table
+ * * / * in token creator
+ * logs: show drags or not
+ * select cards on table - by clicking and by selecting area
+ *          shortcuts to tap/untap selected
+ *          drag all selected cards
+ *          left single click = select (and drag all selected)
+ *          left double click = tap/untap all selected
+ *          ctrl + left click = add clicked to selection
+ * Main - if MTG directory exists, check all cards in resources and save missing
+ *          redundant, cards will not be added later
+ * 
+ * download missing cards if not found?
+ * 
+ * archenemy cards?
  * 
  * add notes to cards?
  * 
@@ -343,16 +387,29 @@ public class Main extends JFrame {
  * TABLE should have a fixed size while card's position should be recalculated
  *          while placing a card or sending an Action to server
  * ----- ----- ----- ----- ----- DECK CREATOR ----- ----- ----- ----- ----- ----
- * deck creator - cards can be easily added or removed from the deck by
- *          accident, especially while viewing larger cards
- * better basic lands management
- * statistics on the right
  * show all files instead of tree
+ * use timer to scroll scv
+ */
+
+/** //CHECKME LIST
+ * in serverCreate frame, first ip check failed, button "create" was pressed
+ *          first time and obtained an IP, then it was clicked second time
+ *          and did not create a game but displayed a frame third time
+ * when player restarts the game, server receives an array filled with
+ *          seven nulls, instead of null array
+ * token creation image problem - zoom out, create a token, zoom in and then
+ *          it looked as if image was enlarged instead of using "original" one,
+ *          large pixels and low readability etc.
  */
 
 /** //FIXME LIST
+ * it is possible to open few deck creator when clicking the button fast
  * card is shaking while being dragged in large zoom
  * table is shaking when dragged to the border of it
+ * connection problems, client was disconnected with message "server closed
+ *          unexpectedly" while SLT entered infinite loop with:
+ *          java.net.SocketException: Software caused connection abort: recv failed
+ * SLT and client loops should be broken in case of SocketException
  * 
  * logger sometimes does not scroll correctly when changing health or poison
  * deck creator - small cards viewer still crashes occasionally while scrolling

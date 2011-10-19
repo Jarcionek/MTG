@@ -90,7 +90,7 @@ public class PlayerInfo extends JPanel {
                 String x = (String) JOptionPane.showInputDialog(
                         null,
                         "Enter new amount of poison counters for "
-                        + nameLabel.getText(), Main.TITLE,
+                        + nameLabel.getText(), Main.TITLE_SHORT,
                         JOptionPane.PLAIN_MESSAGE, null,
                         null, examples[new Random().nextInt(3)]);
 
@@ -123,7 +123,7 @@ public class PlayerInfo extends JPanel {
                 String x = (String) JOptionPane.showInputDialog(
                         null,
                         "Enter new health value for " + nameLabel.getText(),
-                        Main.TITLE, JOptionPane.PLAIN_MESSAGE, null,
+                        Main.TITLE_SHORT, JOptionPane.PLAIN_MESSAGE, null,
                         null, examples[new Random().nextInt(3)]);
 
                 if (x == null) {

@@ -55,7 +55,7 @@ public class CurrentPlayerLibrary extends JPanel {
                 Object x = JOptionPane.showInputDialog(
                         null,
                         "How many cards from the top\n" +
-                        "of your library you would like to see?", Main.TITLE,
+                        "of your library you would like to see?", Main.TITLE_SHORT,
                         JOptionPane.PLAIN_MESSAGE, null, null, "all");
 
                 if (x == null) {

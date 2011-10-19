@@ -129,7 +129,7 @@ public class ServerListeningThread extends Thread {
                     ct.cardID = Server.game.createToken(ct);
                     Server.sendToAll(ct);
                     
-                // RAND
+                // RANDOM VALUE
                 } else if (object.getClass().equals(RandomValue.class)) {
                     RandomValue rv = (RandomValue) object;
                     rv.value = new Random().nextInt(rv.max);

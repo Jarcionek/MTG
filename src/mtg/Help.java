@@ -147,7 +147,7 @@ public class Help extends JTextArea {
         
         JTextArea other = new Help(
                 "Version: " + Main.VERSION + "\n"
-                + "Date: " + "09.10.2011" + "\n"
+                + "Date: " + Main.DATE + "\n"
                 + "Author: Jaroslaw Pawlak\n"
                 + "\n"
                 + "© All names and cards' images "
@@ -159,7 +159,7 @@ public class Help extends JTextArea {
                 );
         contentPane.addTab("About", other);
         
-        JOptionPane.showMessageDialog(parent, contentPane, Main.TITLE,
+        JOptionPane.showMessageDialog(parent, contentPane, Main.TITLE_LONG,
                 JOptionPane.PLAIN_MESSAGE);
     }
 }

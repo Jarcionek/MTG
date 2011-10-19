@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseListener;
@@ -41,6 +43,14 @@ public class CardViewer extends JPanel {
         this.listener = listener;
         this.cards = new ArrayList<>(60);
         this.setPreferredSize(new Dimension(Card.W * 2, Card.H));
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if (CardViewer.this.getComponentCount() != 0) {
+                    showCards((Card) CardViewer.this.getComponent(0));
+                }
+            }
+        });
     }
 
     /**

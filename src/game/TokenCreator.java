@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -71,6 +72,7 @@ public class TokenCreator {
                 }
             });
             descArea.setBorder(nameField.getBorder());
+            descArea.setFont(new Font("Arial", Font.PLAIN, 15));
             descArea.setRows(5);
             descArea.setLineWrap(true);
                 
@@ -121,7 +123,7 @@ public class TokenCreator {
         contentPane.add(stats, c);
         
         int choice = JOptionPane.showOptionDialog(parent, contentPane,
-                Main.TITLE, JOptionPane.DEFAULT_OPTION,
+                Main.TITLE_MED, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null,
                 new String[] {"Create", "Cancel"}, 0);
         if (choice == 0) {

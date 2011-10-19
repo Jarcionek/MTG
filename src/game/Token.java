@@ -218,7 +218,7 @@ public class Token extends TCard {
         g2.setFont(new Font("Arial", Font.PLAIN, r1.height - 6));
         g2.drawString(ct.type, r3.x + 5, r3.y + r3.height - 3);
         
-        g2.setFont(new Font("Arial", Font.PLAIN, 9));
+        g2.setFont(new Font("Arial", Font.PLAIN, 8));
         String[] desc = ct.desc.split("\n");
         for (int i = 0; i < desc.length && i < 5; i++) {
             g2.drawString(desc[i], r4.x + 5, r4.y + 13 * (i+1));

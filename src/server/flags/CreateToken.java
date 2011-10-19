@@ -40,10 +40,9 @@ public class CreateToken extends Action {
         return super.toString() + ", red = " + red + ", blue = " + blue
                 + ", white = " + white + ", black = " + black + ", green = "
                 + green + ", name = " + name + ", type = " + type + ", desc = "
-                + desc + ", creature = " + creature + ", atk = " + atk
-                + ", def = " + def + ", cardID = " + cardID + ")";
+                + desc.replaceAll("\n", "/") + ", creature = " + creature
+                + ", atk = " + atk + ", def = " + def + ", cardID = "
+                + cardID + ")";
     }
-    
-    
     
 }

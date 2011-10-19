@@ -1,6 +1,7 @@
 package deckCreator;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +34,7 @@ public class DeckCreator extends JFrame {
 
     SmallCardsViewer scv;
     LargeCardsViewer lcv;
+    Stats stats;
     private JTree cardsTree;
     private JLabel cardsFound;
     private JButton back;
@@ -115,13 +117,14 @@ public class DeckCreator extends JFrame {
                     Deck t = Deck.load(f);
                     if (t == null) {
                         JOptionPane.showMessageDialog(DeckCreator.this,
-                                "Deck could not be loaded", Main.TITLE,
+                                "Deck could not be loaded", Main.TITLE_SHORT,
                                 JOptionPane.ERROR_MESSAGE);
                     } else {
                         deck = t;
                         deckName.setText("Deck: "
                                 + Utilities.getName(f));
                         scv.refresh();
+                        stats.refresh();
                     }
                 }
             }
@@ -140,12 +143,14 @@ public class DeckCreator extends JFrame {
                                 + Utilities.getName(f));
                     } else {
                         JOptionPane.showMessageDialog(DeckCreator.this,
-                                "Deck could not be saved", Main.TITLE,
+                                "Deck could not be saved", Main.TITLE_SHORT,
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
         });
+        
+        stats = new Stats(this);
     }
 
     private void createGUILayout() {
@@ -165,8 +170,8 @@ public class DeckCreator extends JFrame {
         loadSavePanel.add(save);
 
         JPanel rightPanel = new JPanel(new BorderLayout(5, 5));
-        rightPanel.add(new JLabel("cards, lands"), BorderLayout.NORTH);
-        rightPanel.add(new JLabel("card - amount"), BorderLayout.CENTER);
+        rightPanel.setMinimumSize(new Dimension(100, 0));
+        rightPanel.add(new JScrollPane(stats), BorderLayout.CENTER);
         rightPanel.add(loadSavePanel, BorderLayout.SOUTH);
 
         JSplitPane centerAndRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,

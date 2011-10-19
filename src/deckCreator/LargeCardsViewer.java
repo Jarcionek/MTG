@@ -76,14 +76,17 @@ public class LargeCardsViewer extends JPanel {
             }
         });
         cardsPanel = new JPanel(new GridLayout(1, 1));
-        JPanel innerPane = new JPanel(new BorderLayout());
-        innerPane.add(left, BorderLayout.WEST);
-        innerPane.add(right, BorderLayout.EAST);
-        innerPane.add(cardsPanel, BorderLayout.CENTER);
+        
+        JPanel leftPanel = new JPanel(new GridLayout(2, 1));
+        leftPanel.add(left);
+        leftPanel.add(moreLeft);
+        JPanel rightPanel = new JPanel(new GridLayout(2, 1));
+        rightPanel.add(right);
+        rightPanel.add(moreRight);
 
-        this.add(moreLeft, BorderLayout.WEST);
-        this.add(moreRight, BorderLayout.EAST);
-        this.add(innerPane, BorderLayout.CENTER);
+        this.add(leftPanel, BorderLayout.WEST);
+        this.add(rightPanel, BorderLayout.EAST);
+        this.add(cardsPanel, BorderLayout.CENTER);
 
         this.setPreferredSize(new Dimension(this.getPreferredSize().width, Card.H));
         cardsPanel.setMinimumSize(new Dimension(Card.W, Card.H));
@@ -123,6 +126,7 @@ public class LargeCardsViewer extends JPanel {
                                 if (!t.getText().endsWith("*")) {
                                     t.setText(t.getText() + "*");
                                 }
+                                parent.stats.modifyCard(vc.getCardName(), 1);
                             }
                         } catch (CloneNotSupportedException ex) {
                             Debug.p("Should never happen: " + ex, Debug.E);
@@ -157,6 +161,18 @@ public class LargeCardsViewer extends JPanel {
 
         cardsPanel.validate();
         cardsPanel.repaint();
+    }
+    
+    boolean addCard(String name) {
+        if (parent.deck.addCard(name, 1)) {
+            parent.scv.addCard(new ViewableCard(new File(Utilities.findPath(name))));
+            JLabel t = LargeCardsViewer.this.parent.deckName;
+            if (!t.getText().endsWith("*")) {
+                t.setText(t.getText() + "*");
+            }
+            return true;
+        }
+        return false;
     }
 
     /**

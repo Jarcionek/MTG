@@ -43,6 +43,9 @@ public class Resources {
         "Sunspear Shikari.jpg",
         "Sword of War and Peace.jpg",
         "Trusty Machete.jpg",
+        "Guardian Seraph.jpg",
+        "Loxodon Gatekeeper.jpg",
+        "Sunblast Angel.jpg",
     };
     private static String[] realmOfIllusionCards = {
         "Æther Adept.jpg",
@@ -76,6 +79,9 @@ public class Resources {
         "Summoner's Bane.jpg",
         "Time Warp.jpg",
         "Wall of Air.jpg",
+        "Cultural Exchange.jpg",
+        "Bribery.jpg",
+        "Curfew.jpg",
     };
     private static String[] strengthOfStoneCards = {
         "Act of Treason.jpg",
@@ -108,6 +114,9 @@ public class Resources {
         "Volcanic Strength.jpg",
         "Vulshok Berserker.jpg",
         "Vulshok Heartstoker.jpg",
+        "Slagstorm.jpg",
+        "Cyclops Gladiator.jpg",
+        "Stuffy Doll.jpg",
     };
     private static String[] guardiansOfTheWoodCards = {
         "Elven Riders.jpg",
@@ -138,6 +147,9 @@ public class Resources {
         "Viridian Emissary.jpg",
         "Viridian Shaman.jpg",
         "Wildheart Invoker.jpg",
+        "Fog.jpg",
+        "Elvish Champion.jpg",
+        "Hydra Omnivore.jpg",
     };
     private static String[] ancientDepthsCards = {
         "Compulsive Research.jpg",
@@ -172,6 +184,9 @@ public class Resources {
         "Treasure Hunt.jpg",
         "Ulamog, the Infinite Gyre.jpg",
         "Yavimaya's Embrace.jpg",
+        "Mold Shambler.jpg",
+        "Windstorm.jpg",
+        "Mass Polymorph.jpg",
     };
     private static String[] dragonsRoarCards = {
         "Assassinate.jpg",
@@ -203,8 +218,11 @@ public class Resources {
         "Swamp.jpg",
         "Volcanic Dragon.jpg",
         "Voracious Dragon.jpg",
+        "Breath of Malfegor.jpg",
+        "Malfegor.jpg",
+        "Earthquake.jpg",
     };
-    private static String[] blooHungerCards = {
+    private static String[] bloodHungerCards = {
         "Barony Vampire.jpg",
         "Blade of the Bloodchief.jpg",
         "Bloodghast.jpg",
@@ -235,6 +253,9 @@ public class Resources {
         "Vampire Outcasts.jpg",
         "Vampire's Bite.jpg",
         "Vicious Hunger.jpg",
+        "Butcher of Malakir.jpg",
+        "Barter in Blood.jpg",
+        "Bloodhusk Ritualist.jpg",
     };
     private static String[] machinationsCards = {
         "Alpha Myr.jpg",
@@ -273,6 +294,9 @@ public class Resources {
         "Undermine.jpg",
         "Venser's Journal.jpg",
         "Wurmcoil Engine.jpg",
+        "Damnation.jpg",
+        "Sphinx Sovereign.jpg",
+        "Cumber Stone.jpg",
     };
     private static String[] unquenchableCards = {
         "Banefire.jpg",
@@ -304,6 +328,9 @@ public class Resources {
         "Sizzle.jpg",
         "Volcanic Hammer.jpg",
         "Wheel of Fortune.jpg",
+        "Flame Rift.jpg",
+        "Volcanic Fallout.jpg",
+        "Insurrection.jpg",
     };
     private static String[] apexPredatorsCards = {
         "Beast Hunt.jpg",
@@ -336,6 +363,116 @@ public class Resources {
         "Thrun, the last Troll.jpg",
         "Wall of Vines.jpg",
         "Wolfbriar Elemental.jpg",
+        "Heartwood Storyteller.jpg",
+        "Fresh Meat.jpg",
+        "Copperhoof Vorrac.jpg",
+    };
+    private static String[] graveWhispersCards = {
+        "Swamp.jpg",
+        "Demon's Horn.jpg",
+        "Disentomb.jpg",
+        "Quest for the Gravelord.jpg",
+        "The Rack.jpg",
+        "Unholy Strength.jpg",
+        "Consume Spirit.jpg",
+        "Doom Blade.jpg",
+        "Liliana's Caress.jpg",
+        "Marsh Casualties.jpg",
+        "Reassembling Skeleton.jpg",
+        "Gloomhunter.jpg",
+        "Hypnotic Specter.jpg",
+        "Liliana's Specter.jpg",
+        "Mind Rot.jpg",
+        "Quag Sickness.jpg",
+        "Blood Tithe.jpg",
+        "Guul Draz Specter.jpg",
+        "Moan of the Unhallowed.jpg",
+        "Mortivore.jpg",
+        "Scavenger Drake.jpg",
+        "Syphon Mind.jpg",
+        "Beacon of Unrest.jpg",
+        "Bloodgift Demon.jpg",
+        "Monomania.jpg",
+        "Ob Nixilis, the Fallen.jpg",
+        "Syphon Flesh.jpg",
+        "Corrupt.jpg",
+        "Grave Titan.jpg",
+        "Massacre Wurm.jpg",
+    };
+    private static String[] cloudburstCards = {
+        "Island.jpg",
+        "Mountain.jpg",
+        "Elixir of Immortality.jpg",
+        "Lightning Bolt.jpg",
+        "Lightning Serpent.jpg",
+        "Shock.jpg",
+        "Spark Elemental.jpg",
+        "Into the Roil.jpg",
+        "Reverberate.jpg",
+        "Sparkmage Apprentice.jpg",
+        "Storm Crow.jpg",
+        "Thunder Strike.jpg",
+        "Turn the Tide.jpg",
+        "Æther Tradewinds.jpg",
+        "Arc Runner.jpg",
+        "Ball Lightning.jpg",
+        "Electropotence.jpg",
+        "Gelectrode.jpg",
+        "Wee Dragonauts.jpg",
+        "Wind Drake.jpg",
+        "Lightning Elemental.jpg",
+        "Skirsdag Cultist.jpg",
+        "Skizzik.jpg",
+        "Air Servant.jpg",
+        "Murder of Crows.jpg",
+        "Prophetic Bolt.jpg",
+        "Spellbound Dragon.jpg",
+        "Stormcloud Djinn.jpg",
+        "Time Reversal.jpg",
+        "Mahamoti Djinn.jpg",
+        "Niv-Mizzet, the Firemind.jpg",
+        "Thundermare.jpg",
+        "Thunder Dragon.jpg",
+    };
+    private static String[] auramancerCards = {
+        "Plains.jpg",
+        "Forest.jpg",
+        "Hyena Umbra.jpg",
+        "Lifelink.jpg",
+        "Rancor.jpg",
+        "Suntail Hawk.jpg",
+        "Wreath of Geists.jpg",
+        "Canopy Cover.jpg",
+        "Divine Favor.jpg",
+        "Femeref Enchantress.jpg",
+        "Fists of Ironwood.jpg",
+        "Heroes' Reunion.jpg",
+        "Kor Spiritdancer.jpg",
+        "Nature's Spiral.jpg",
+        "Pacifism.jpg",
+        "Silhana Ledgewalker.jpg",
+        "Silvercoat Lion.jpg",
+        "Spectral Rider.jpg",
+        "Stormfront Pegasus.jpg",
+        "Armadillo Cloak.jpg",
+        "Auramancer.jpg",
+        "Aura Gnarlid.jpg",
+        "Boar Umbra.jpg",
+        "Griffin Guide.jpg",
+        "Lure.jpg",
+        "Mesa Enchantress.jpg",
+        "Oakenform.jpg",
+        "Sacred Wolf.jpg",
+        "Snake Umbra.jpg",
+        "Angelic Destiny.jpg",
+        "Retether.jpg",
+        "Bramble Elemental.jpg",
+        "Gigantiform.jpg",
+        "Mammoth Umbra.jpg",
+        "Siege Mastodon.jpg",
+        "Three Dreams.jpg",
+        "Totem-Guide Hartebeest.jpg",
+        "Mythic Proportions.jpg",
     };
     
     static void saveExampleCards() {
@@ -372,7 +509,7 @@ public class Resources {
         }
         
         File bloodHunger = new File(examples, "Blood Hunger");
-        for (String e : blooHungerCards) {
+        for (String e : bloodHungerCards) {
             save("/resources/cards/" + e, new File(bloodHunger, e));
         }
         
@@ -390,6 +527,21 @@ public class Resources {
         for (String e : apexPredatorsCards) {
             save("/resources/cards/" + e, new File(apexPredators, e));
         }
+        
+        File graveWhispers = new File(examples, "Grave Whispers");
+        for (String e : graveWhispersCards) {
+            save("/resources/cards/" + e, new File(graveWhispers, e));
+        }
+        
+        File cloudburst = new File(examples, "Cloudburst");
+        for (String e : cloudburstCards) {
+            save("/resources/cards/" + e, new File(cloudburst, e));
+        }
+        
+        File auramancer = new File(examples, "Auramancer");
+        for (String e : auramancerCards) {
+            save("/resources/cards/" + e, new File(auramancer, e));
+        }
     }
 
     static void saveExampleDecks() {
@@ -404,6 +556,9 @@ public class Resources {
             "Strength of Stone.txt",
             "Unquenchable Fire.txt",
             "Wielding Steel.txt",
+            "Auramancer.txt",
+            "Cloudburst.txt",
+            "Grave Whispers.txt",
         };
 
         for (String e : decks) {

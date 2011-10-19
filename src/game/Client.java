@@ -219,7 +219,7 @@ public class Client extends Thread {
                             + "a token " + ct.name, Logger.C_MOVE_PLAY);
                     g.createToken(ct);
                     
-                // RAND
+                // RANDOM VALUE
                 } else if (object.getClass().equals(RandomValue.class)) {
                     RandomValue rv = (RandomValue) object;
                     String text = g.getPlayerName(rv.requestor);
@@ -251,6 +251,7 @@ public class Client extends Thread {
                             g.cardAddToHand(r.IDs[i]);
                         }
                     }
+                    
                 // RANDOM CARD
                 } else if (object.getClass().equals(RandomCard.class)) {
                     RandomCard rc = (RandomCard) object;
@@ -299,7 +300,7 @@ public class Client extends Thread {
                     Disconnect d = (Disconnect) object;
                     if (d.requestor == -1) {
                         JOptionPane.showMessageDialog(parentFrame,
-                                "Server has been closed", Main.TITLE,
+                                "Server has been closed", Main.TITLE_SHORT,
                                 JOptionPane.ERROR_MESSAGE);
                         s.close();
                         g.dispose();
@@ -322,7 +323,7 @@ public class Client extends Thread {
                     case "Connection reset":
                         Debug.p("Client: Server closed");
                         JOptionPane.showMessageDialog(parentFrame,
-                                "Server has been closed unexpectedly", Main.TITLE,
+                                "Server has been closed unexpectedly", Main.TITLE_SHORT,
                                 JOptionPane.ERROR_MESSAGE);
                         g.dispose();
                         parentFrame.setVisible(true);

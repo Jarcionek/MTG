@@ -15,7 +15,7 @@ public class JoinGameFrame {
         if (deck == null) {
             JOptionPane.showMessageDialog(parent,
                     "Could not load chosen deck",
-                    Main.TITLE, JOptionPane.ERROR_MESSAGE);
+                    Main.TITLE_SHORT, JOptionPane.ERROR_MESSAGE);
         } else {
             String ip = "";
             String msg = "Host:";
@@ -24,7 +24,7 @@ public class JoinGameFrame {
 
             while (true) {
                 ip = (String) JOptionPane.showInputDialog(parent,
-                        msg, Main.TITLE, JOptionPane.PLAIN_MESSAGE, null,
+                        msg, Main.TITLE_SHORT, JOptionPane.PLAIN_MESSAGE, null,
                         null, Settings.getLastIP());
                 if (ip == null) {
                     return; //user cancel
@@ -55,7 +55,7 @@ public class JoinGameFrame {
                 msg = "Port:";
                 while (true) {
                     portStr = (String) JOptionPane.showInputDialog(
-                            parent, msg, Main.TITLE,
+                            parent, msg, Main.TITLE_SHORT,
                             JOptionPane.PLAIN_MESSAGE, null, null,
                             "56789");
                     if (portStr == null) {
@@ -81,18 +81,18 @@ public class JoinGameFrame {
                 if (ex.getClass().equals(InvalidDeckException.class)) {
                     JOptionPane.showMessageDialog(parent,
                             "Your deck has been rejected by the server: "
-                            + ex.getLocalizedMessage(), Main.TITLE,
+                            + ex.getLocalizedMessage(), Main.TITLE_SHORT,
                             JOptionPane.WARNING_MESSAGE);
                 } else {
                     switch (ex.getLocalizedMessage()) {
                         case "Connection refused: connect":
                             JOptionPane.showMessageDialog(parent,
-                                    "Connection refused", Main.TITLE,
+                                    "Connection refused", Main.TITLE_SHORT,
                                     JOptionPane.WARNING_MESSAGE);
                             break;
                         case "Connection timed out: connect":
                             JOptionPane.showMessageDialog(parent,
-                                    "Connection timed out", Main.TITLE,
+                                    "Connection timed out", Main.TITLE_SHORT,
                                     JOptionPane.WARNING_MESSAGE);
                             break;
                         default:
