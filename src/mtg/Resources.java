@@ -48,8 +48,8 @@ public class Resources {
         "Sunblast Angel.jpg",
     };
     private static String[] realmOfIllusionCards = {
-        "Æther Adept.jpg",
-        "Æther Figment.jpg",
+        "Aether Adept.jpg",
+        "Aether Figment.jpg",
         "Air Elemental.jpg",
         "Blind Phantasm.jpg",
         "Cancel.jpg",
@@ -153,7 +153,7 @@ public class Resources {
     };
     private static String[] ancientDepthsCards = {
         "Compulsive Research.jpg",
-        "Æther Mutation.jpg",
+        "Aether Mutation.jpg",
         "Assault Zeppelid.jpg",
         "Coiling Oracle.jpg",
         "Cultivate.jpg",
@@ -413,7 +413,7 @@ public class Resources {
         "Storm Crow.jpg",
         "Thunder Strike.jpg",
         "Turn the Tide.jpg",
-        "Æther Tradewinds.jpg",
+        "Aether Tradewinds.jpg",
         "Arc Runner.jpg",
         "Ball Lightning.jpg",
         "Electropotence.jpg",
