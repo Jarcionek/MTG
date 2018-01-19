@@ -327,7 +327,7 @@ public class Client extends Thread {
                                 JOptionPane.ERROR_MESSAGE);
                         g.dispose();
                         parentFrame.setVisible(true);
-                    case "socket closed":
+                    case "Socket closed":
                         //it happens when client has been closed
                         return;
                     default:
