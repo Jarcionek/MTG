@@ -13,6 +13,7 @@ import java.util.Scanner;
  * @author Jaroslaw Pawlak
  */
 public class Deck implements Serializable {
+    //TODO Jarek: drop the paths, replace 2 arrays with new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
     private String deckName;
     private ArrayList<String> names;
     private ArrayList<Integer> amounts;
@@ -204,6 +205,7 @@ public class Deck implements Serializable {
         }
         try (Writer bf = new OutputStreamWriter(
                 new FileOutputStream(file), "Unicode")) {
+            //TODO Jarek: remove that null at the end, change the save format to something like "count name" so it's compatible with deckbox
             for (int i = 0; i < names.size(); i++) {
                 bf.write(names.get(i) + ";"
                         + amounts.get(i) + ";"
@@ -239,6 +241,7 @@ public class Deck implements Serializable {
      * @return deck or null if loading failed
      */
     public static Deck load(File file) {
+        //TODO Jarek: load format can be more flexible, e.g. ^\d{1,2}[\s,;-]+"?.*"?$
         try (Scanner in = new Scanner(file, "Unicode")) {
             Deck result = new Deck();
             String line;
